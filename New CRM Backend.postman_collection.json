@@ -1,11 +1,10 @@
 {
 	"info": {
-		"_postman_id": "7f817c8f-394c-429c-994f-f3eb988208ab",
+		"_postman_id": "eee841e5-0580-4c9a-8c1f-0c2ed3592019",
 		"name": "New CRM Backend",
 		"description": "Complete API collection for CRM Backend System",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "39667115",
-		"_collection_link": "https://crm-backend-new.postman.co/workspace/CRM-BACKEND-NEW-Workspace~5bafd9b7-8696-4a95-9fd8-e9e6ad6ad944/collection/39667115-7f817c8f-394c-429c-994f-f3eb988208ab?action=share&source=collection_link&creator=39667115"
+		"_exporter_id": "40533505"
 	},
 	"item": [
 		{
@@ -717,14 +716,6 @@
 								}
 							},
 							"response": []
-						},
-						{
-							"name": "get users filtered",
-							"request": {
-								"method": "GET",
-								"header": []
-							},
-							"response": []
 						}
 					]
 				},
@@ -817,35 +808,6 @@
 									"path": [
 										"subscriptions",
 										"request"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "remove plan client",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InN1cGVyYWRtaW4iLCJlbWFpbCI6InN1cGVyYWRtaW5AbmV4aXN2aXNpb24uY29tIiwicGhvbmUiOm51bGwsImlkIjoiZDMxd0c0U2hydEM4c0hsYWxHOGRleUQiLCJyb2xlIjoiMDZ6b1hjNTgwVHZMeUVOTjFQM0pDUjMiLCJyb2xlTmFtZSI6InN1cGVyLWFkbWluIiwiY3JlYXRlZF9ieSI6bnVsbCwiaWF0IjoxNzQwMzk4MTA1LCJleHAiOjE3NDA0ODQ1MDV9.I48Y7jts-bP4bCgSLfRwgZCRiCtvDcDY4f4HKHhEoUI",
-											"type": "string"
-										}
-									]
-								},
-								"method": "DELETE",
-								"header": [],
-								"url": {
-									"raw": "{{base}}/subscriptions/remove/f8opxxw4Bl2mD1yumcuPxNn",
-									"host": [
-										"{{base}}"
-									],
-									"path": [
-										"subscriptions",
-										"remove",
-										"f8opxxw4Bl2mD1yumcuPxNn"
 									]
 								}
 							},
@@ -1653,7 +1615,10 @@
 							"name": "get Esignature",
 							"request": {
 								"method": "GET",
-								"header": []
+								"header": [],
+								"url": {
+									"raw": ""
+								}
 							},
 							"response": []
 						},
@@ -2936,43 +2901,6 @@
 											"key": "id",
 											"value": ""
 										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "create-employeeeee",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InN1cGVyYWRtaW4iLCJlbWFpbCI6InN1cGVyYWRtaW5AbmV4aXN2aXNpb24uY29tIiwicGhvbmUiOm51bGwsImlkIjoibFgzMnd6OG90OWNLTVBpRkd2eG8xeUIiLCJyb2xlIjoiWHdyc2UybERHWkZ0TnR5czdJNW9zZlgiLCJyb2xlTmFtZSI6InN1cGVyLWFkbWluIiwiY3JlYXRlZF9ieSI6bnVsbCwiaWF0IjoxNzQwODA4NTQyLCJleHAiOjE3NDA4OTQ5NDJ9.Zm5e7YfBhcKcaZUWG--qaPanZRlv0XQb9Q6he1-exiE",
-											"type": "string"
-										}
-									]
-								},
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"name\":\"pk\",\r\n    \"email\":\"pk@yopmail.com\",\r\n    \"phone\":\"4353443534\"\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{base}}/employees/direct-job",
-									"host": [
-										"{{base}}"
-									],
-									"path": [
-										"employees",
-										"direct-job"
 									]
 								}
 							},
@@ -11122,207 +11050,6 @@
 							]
 						}
 					]
-				},
-				{
-					"name": "banking",
-					"item": [
-						{
-							"name": "account",
-							"item": [
-								{
-									"name": "add account",
-									"request": {
-										"auth": {
-											"type": "bearer",
-											"bearer": [
-												{
-													"key": "token",
-													"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImcxMDAxIiwiZW1haWwiOiJnMTAwMUB5b3BtYWlsLmNvbSIsInBob25lIjpudWxsLCJpZCI6IllBNkVaUmJZMTVqTHMzSWNtYzJWYVZKIiwicm9sZSI6ImQ4Q2o3UXJFSTlqTFVDNE5aWHpLRjVLIiwicm9sZU5hbWUiOiJjbGllbnQiLCJjcmVhdGVkX2J5Ijoic3VwZXJhZG1pbiIsImlhdCI6MTc0MDM4MDY2MSwiZXhwIjoxNzQwNDY3MDYxfQ.tzIhohbR4tSTdu-RgUEDrWT7sGCseFS3BM_Mu_gXvZk",
-													"type": "string"
-												}
-											]
-										},
-										"method": "POST",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\r\n    \"bankHolderName\": \"Jodsdfsdhn Doe\",\r\n    \"bankName\": \"HDFC Bank\",\r\n    \"accountNumber\": \"123432342567890\",\r\n    \"openingBalance\": 10000,\r\n    \"contactNumber\": \"+91 9876543210\",\r\n    \"bankAddress\": \"123 Main Street, Mumbai, Maharashtra 400001\"\r\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
-										"url": {
-											"raw": "{{base}}/accounts",
-											"host": [
-												"{{base}}"
-											],
-											"path": [
-												"accounts"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "get acconut",
-									"request": {
-										"method": "GET",
-										"header": []
-									},
-									"response": []
-								},
-								{
-									"name": "update Accont",
-									"request": {
-										"auth": {
-											"type": "bearer",
-											"bearer": [
-												{
-													"key": "token",
-													"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImcxMDAxIiwiZW1haWwiOiJnMTAwMUB5b3BtYWlsLmNvbSIsInBob25lIjpudWxsLCJpZCI6IllBNkVaUmJZMTVqTHMzSWNtYzJWYVZKIiwicm9sZSI6ImQ4Q2o3UXJFSTlqTFVDNE5aWHpLRjVLIiwicm9sZU5hbWUiOiJjbGllbnQiLCJjcmVhdGVkX2J5Ijoic3VwZXJhZG1pbiIsImlhdCI6MTc0MDM4MDY2MSwiZXhwIjoxNzQwNDY3MDYxfQ.tzIhohbR4tSTdu-RgUEDrWT7sGCseFS3BM_Mu_gXvZk",
-													"type": "string"
-												}
-											]
-										},
-										"method": "PUT",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\r\n    \"bankHolderName\": \"sdfsd Doe\",\r\n    \"bankName\": \"HDFsdfsC Bank\",\r\n    \"accountNumber\": \"123432342567890\",\r\n    \"openingBalance\": 10000,\r\n    \"contactNumber\": \"+91 9876543210\",\r\n    \"bankAddress\": \"123 Main Street, Mumbai, Maharashtra 400001\"\r\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
-										"url": {
-											"raw": "{{base}}/accounts/J6HeaAHrJvI63lX08zhuE9r",
-											"host": [
-												"{{base}}"
-											],
-											"path": [
-												"accounts",
-												"J6HeaAHrJvI63lX08zhuE9r"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "delete acconut",
-									"request": {
-										"method": "GET",
-										"header": []
-									},
-									"response": []
-								}
-							]
-						},
-						{
-							"name": "add account transfer",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImcxMDAxIiwiZW1haWwiOiJnMTAwMUB5b3BtYWlsLmNvbSIsInBob25lIjpudWxsLCJpZCI6IllBNkVaUmJZMTVqTHMzSWNtYzJWYVZKIiwicm9sZSI6ImQ4Q2o3UXJFSTlqTFVDNE5aWHpLRjVLIiwicm9sZU5hbWUiOiJjbGllbnQiLCJjcmVhdGVkX2J5Ijoic3VwZXJhZG1pbiIsImlhdCI6MTc0MDM4MDY2MSwiZXhwIjoxNzQwNDY3MDYxfQ.tzIhohbR4tSTdu-RgUEDrWT7sGCseFS3BM_Mu_gXvZk",
-											"type": "string"
-										}
-									]
-								},
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"fromAccount\": \"J6HeaAHrJvI63lX08zhuE9r\",\r\n    \"toAccount\": \"Ma47fjB6HPtNYEKiJphN7BI\",\r\n    \"amount\": 500,\r\n    \"date\": \"2024-03-20\",\r\n    \"description\": \"Salary transfer\"\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{base}}/accounts/transfer",
-									"host": [
-										"{{base}}"
-									],
-									"path": [
-										"accounts",
-										"transfer"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "get transfer acconut",
-							"request": {
-								"method": "GET",
-								"header": []
-							},
-							"response": []
-						},
-						{
-							"name": "update accont trnasfer",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImcxMDAxIiwiZW1haWwiOiJnMTAwMUB5b3BtYWlsLmNvbSIsInBob25lIjpudWxsLCJpZCI6IllBNkVaUmJZMTVqTHMzSWNtYzJWYVZKIiwicm9sZSI6ImQ4Q2o3UXJFSTlqTFVDNE5aWHpLRjVLIiwicm9sZU5hbWUiOiJjbGllbnQiLCJjcmVhdGVkX2J5Ijoic3VwZXJhZG1pbiIsImlhdCI6MTc0MDM4MDY2MSwiZXhwIjoxNzQwNDY3MDYxfQ.tzIhohbR4tSTdu-RgUEDrWT7sGCseFS3BM_Mu_gXvZk",
-											"type": "string"
-										}
-									]
-								},
-								"method": "PUT",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"fromAccount\": \"J6HeaAHrJvI63lX08zhuE9r\",\r\n    \"toAccount\": \"Ma47fjB6HPtNYEKiJphN7BI\",\r\n    \"amount\": 50,\r\n    \"date\": \"2024-03-20\",\r\n    \"description\": \"Salary transfer\"\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{base}}/accounts/transfer/bKPIkc4AjNZzDq7aemp2OwJ",
-									"host": [
-										"{{base}}"
-									],
-									"path": [
-										"accounts",
-										"transfer",
-										"bKPIkc4AjNZzDq7aemp2OwJ"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "delete transfer data",
-							"request": {
-								"method": "DELETE",
-								"header": [],
-								"url": {
-									"raw": "{{base}}/accounts/transfer/f26GwVxPKoQUpTto8XAq6AM",
-									"host": [
-										"{{base}}"
-									],
-									"path": [
-										"accounts",
-										"transfer",
-										"f26GwVxPKoQUpTto8XAq6AM"
-									]
-								}
-							},
-							"response": []
-						}
-					]
 				}
 			]
 		},
@@ -11470,38 +11197,10 @@
 						{
 							"name": "lead file",
 							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImdyZXdveDEwMDEiLCJlbWFpbCI6ImdyZXdveDEwMDFAeW9wbWFpbC5jb20iLCJpZCI6IkJjQ0E2elN3bWs1RHh4STJxZ3pBTlhQIiwicm9sZSI6Im9rT1Jab3VJTjBIYUY4cEI1ZjBSUUtTIiwicm9sZU5hbWUiOiJjbGllbnQiLCJjcmVhdGVkX2J5Ijoic3VwZXJhZG1pbiIsImlhdCI6MTczOTk0MjY2OSwiZXhwIjoxNzQwMDI5MDY5fQ.H0ieQKOuCpdUK9qPuCOb5U1lQiwyXjtDOQ4pwQWs9x8",
-											"type": "string"
-										}
-									]
-								},
 								"method": "POST",
 								"header": [],
-								"body": {
-									"mode": "formdata",
-									"formdata": [
-										{
-											"key": "lead_files",
-											"type": "file",
-											"src": "/C:/Users/DELL/Downloads/images.jpg"
-										}
-									]
-								},
 								"url": {
-									"raw": "{{base}}/leads/files/hkmNpTmocm3snE6TgWTfF4M",
-									"host": [
-										"{{base}}"
-									],
-									"path": [
-										"leads",
-										"files",
-										"hkmNpTmocm3snE6TgWTfF4M"
-									]
+									"raw": ""
 								}
 							},
 							"response": []
@@ -11511,25 +11210,8 @@
 							"request": {
 								"method": "POST",
 								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"lead_members\": {\r\n        \"lead_members\": [\"68470\", \"453345\"]\r\n    }\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
 								"url": {
-									"raw": "{{base}}/leads/membersadd/puYmhgCH3jxTAc0s1YphlBC",
-									"host": [
-										"{{base}}"
-									],
-									"path": [
-										"leads",
-										"membersadd",
-										"puYmhgCH3jxTAc0s1YphlBC"
-									]
+									"raw": ""
 								}
 							},
 							"response": []
@@ -11537,37 +11219,10 @@
 						{
 							"name": "lead quotation",
 							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImdyZXdveDEwMDEiLCJlbWFpbCI6ImdyZXdveDEwMDFAeW9wbWFpbC5jb20iLCJpZCI6IkJjQ0E2elN3bWs1RHh4STJxZ3pBTlhQIiwicm9sZSI6Im9rT1Jab3VJTjBIYUY4cEI1ZjBSUUtTIiwicm9sZU5hbWUiOiJjbGllbnQiLCJjcmVhdGVkX2J5Ijoic3VwZXJhZG1pbiIsImlhdCI6MTczOTk0MjY2OSwiZXhwIjoxNzQwMDI5MDY5fQ.H0ieQKOuCpdUK9qPuCOb5U1lQiwyXjtDOQ4pwQWs9x8",
-											"type": "string"
-										}
-									]
-								},
 								"method": "POST",
 								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n  \"valid_till\": \"2025-01-31\", // Invoice expiry date\r\n  \"currency\": \"USD\",\r\n  \"lead\": \"fdgfdgd\", // Lead ID\r\n//   \"client\": \"client456\", // Client ID\r\n  \"calculatedTax\": 10.99, // Calculated tax amount\r\n  \"items\": {\r\n    \"item1\": {\r\n      \"name\": \"dfgdf A\",\r\n      \"description\": \"Description of Product A\",\r\n      \"price\": 19.99,\r\n      \"quantity\": 2,\r\n      \"total\": 39.98 // Price * Quantity\r\n    },\r\n    \"item2\": {\r\n      \"name\": \"Service B\",\r\n      \"description\": \"Description of Service B\",\r\n      \"price\": 49.99,\r\n      \"quantity\": 1,\r\n      \"total\": 49.99\r\n    }\r\n  },\r\n  \"discount\": 5, // Applied discount amount\r\n  \"tax\": 10, // Total tax amount (may differ from calculatedTax)\r\n  \"total\": 85 // Sum of item totals, discount, and tax\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
 								"url": {
-									"raw": "{{base}}/quotations/lead/puYmhgCH3jxTAc0s1YphlBC",
-									"host": [
-										"{{base}}"
-									],
-									"path": [
-										"quotations",
-										"lead",
-										"puYmhgCH3jxTAc0s1YphlBC"
-									]
+									"raw": ""
 								}
 							},
 							"response": []
@@ -11575,37 +11230,10 @@
 						{
 							"name": "lead mem delete",
 							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImdyZXdveDEwMDEiLCJlbWFpbCI6ImdyZXdveDEwMDFAeW9wbWFpbC5jb20iLCJpZCI6IkJjQ0E2elN3bWs1RHh4STJxZ3pBTlhQIiwicm9sZSI6Im9rT1Jab3VJTjBIYUY4cEI1ZjBSUUtTIiwicm9sZU5hbWUiOiJjbGllbnQiLCJjcmVhdGVkX2J5Ijoic3VwZXJhZG1pbiIsImlhdCI6MTczOTk0MjY2OSwiZXhwIjoxNzQwMDI5MDY5fQ.H0ieQKOuCpdUK9qPuCOb5U1lQiwyXjtDOQ4pwQWs9x8\"",
-											"type": "string"
-										}
-									]
-								},
 								"method": "DELETE",
 								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"lead_members\": {\r\n        \"lead_members\": [\"U3Mth6mvhgG8GNQyNc5icCj\"]\r\n    }\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
 								"url": {
-									"raw": "{{base}}/leads/membersdel/puYmhgCH3jxTAc0s1YphlBC",
-									"host": [
-										"{{base}}"
-									],
-									"path": [
-										"leads",
-										"membersdel",
-										"puYmhgCH3jxTAc0s1YphlBC"
-									]
+									"raw": ""
 								}
 							},
 							"response": []
@@ -12471,6 +12099,48 @@
 												"kpEPwqONJ10IaOVl0v3jcKT"
 											]
 										}
+									},
+									"response": []
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "Banking",
+					"item": [
+						{
+							"name": "Account",
+							"item": [
+								{
+									"name": "add-Account",
+									"request": {
+										"method": "POST",
+										"header": []
+									},
+									"response": []
+								},
+								{
+									"name": "Get-Account",
+									"request": {
+										"method": "GET",
+										"header": []
+									},
+									"response": []
+								},
+								{
+									"name": "update Account",
+									"request": {
+										"method": "PUT",
+										"header": []
+									},
+									"response": []
+								},
+								{
+									"name": "Delete account",
+									"request": {
+										"method": "DELETE",
+										"header": []
 									},
 									"response": []
 								}
@@ -13902,7 +13572,10 @@
 							"name": "add lead note",
 							"request": {
 								"method": "GET",
-								"header": []
+								"header": [],
+								"url": {
+									"raw": ""
+								}
 							},
 							"response": []
 						}
@@ -14292,187 +13965,6 @@
 					"name": "Bill",
 					"item": [
 						{
-							"name": "bill-debitnote",
-							"item": [
-								{
-									"name": "create debit note",
-									"request": {
-										"auth": {
-											"type": "bearer",
-											"bearer": [
-												{
-													"key": "token",
-													"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImcxMDAxIiwiZW1haWwiOiJnMTAwMUB5b3BtYWlsLmNvbSIsInBob25lIjpudWxsLCJpZCI6IllBNkVaUmJZMTVqTHMzSWNtYzJWYVZKIiwicm9sZSI6ImQ4Q2o3UXJFSTlqTFVDNE5aWHpLRjVLIiwicm9sZU5hbWUiOiJjbGllbnQiLCJjcmVhdGVkX2J5Ijoic3VwZXJhZG1pbiIsImlhdCI6MTc0MDM4MDY2MSwiZXhwIjoxNzQwNDY3MDYxfQ.tzIhohbR4tSTdu-RgUEDrWT7sGCseFS3BM_Mu_gXvZk",
-													"type": "string"
-												}
-											]
-										},
-										"method": "POST",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\r\n    \"bill\": \"YXNwo3OR82iHAObCimS5zUZ\",\r\n    \"date\": \"2024-03-20\",\r\n    \"amount\": 2,\r\n    \"description\": \"Debit note for partial refund\"\r\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
-										"url": {
-											"raw": "{{base}}/bill-debits",
-											"host": [
-												"{{base}}"
-											],
-											"path": [
-												"bill-debits"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "get debit note",
-									"request": {
-										"auth": {
-											"type": "bearer",
-											"bearer": [
-												{
-													"key": "token",
-													"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImcxMDAxIiwiZW1haWwiOiJnMTAwMUB5b3BtYWlsLmNvbSIsInBob25lIjpudWxsLCJpZCI6IllBNkVaUmJZMTVqTHMzSWNtYzJWYVZKIiwicm9sZSI6ImQ4Q2o3UXJFSTlqTFVDNE5aWHpLRjVLIiwicm9sZU5hbWUiOiJjbGllbnQiLCJjcmVhdGVkX2J5Ijoic3VwZXJhZG1pbiIsImlhdCI6MTc0MDM4MDY2MSwiZXhwIjoxNzQwNDY3MDYxfQ.tzIhohbR4tSTdu-RgUEDrWT7sGCseFS3BM_Mu_gXvZk",
-													"type": "string"
-												}
-											]
-										},
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "{{base}}/bill-debits",
-											"host": [
-												"{{base}}"
-											],
-											"path": [
-												"bill-debits"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "update debit note",
-									"request": {
-										"method": "PUT",
-										"header": [],
-										"url": {
-											"raw": "{{base}}/bill-debits",
-											"host": [
-												"{{base}}"
-											],
-											"path": [
-												"bill-debits"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "delete debit note",
-									"request": {
-										"auth": {
-											"type": "bearer",
-											"bearer": [
-												{
-													"key": "token",
-													"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImcxMDAxIiwiZW1haWwiOiJnMTAwMUB5b3BtYWlsLmNvbSIsInBob25lIjpudWxsLCJpZCI6IllBNkVaUmJZMTVqTHMzSWNtYzJWYVZKIiwicm9sZSI6ImQ4Q2o3UXJFSTlqTFVDNE5aWHpLRjVLIiwicm9sZU5hbWUiOiJjbGllbnQiLCJjcmVhdGVkX2J5Ijoic3VwZXJhZG1pbiIsImlhdCI6MTc0MDM4MDY2MSwiZXhwIjoxNzQwNDY3MDYxfQ.tzIhohbR4tSTdu-RgUEDrWT7sGCseFS3BM_Mu_gXvZk",
-													"type": "string"
-												}
-											]
-										},
-										"method": "DELETE",
-										"header": [],
-										"url": {
-											"raw": "{{base}}/bill-debits/onMSOEANuxBv7YkomL3p9pf",
-											"host": [
-												"{{base}}"
-											],
-											"path": [
-												"bill-debits",
-												"onMSOEANuxBv7YkomL3p9pf"
-											]
-										}
-									},
-									"response": []
-								}
-							]
-						},
-						{
-							"name": "bill payment",
-							"item": [
-								{
-									"name": "get Payments",
-									"request": {
-										"auth": {
-											"type": "bearer",
-											"bearer": [
-												{
-													"key": "token",
-													"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImcxMDAxIiwiZW1haWwiOiJnMTAwMUB5b3BtYWlsLmNvbSIsInBob25lIjpudWxsLCJpZCI6IllBNkVaUmJZMTVqTHMzSWNtYzJWYVZKIiwicm9sZSI6ImQ4Q2o3UXJFSTlqTFVDNE5aWHpLRjVLIiwicm9sZU5hbWUiOiJjbGllbnQiLCJjcmVhdGVkX2J5Ijoic3VwZXJhZG1pbiIsImlhdCI6MTc0MDM4MDY2MSwiZXhwIjoxNzQwNDY3MDYxfQ.tzIhohbR4tSTdu-RgUEDrWT7sGCseFS3BM_Mu_gXvZk",
-													"type": "string"
-												}
-											]
-										},
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "{{base}}/bill-payments",
-											"host": [
-												"{{base}}"
-											],
-											"path": [
-												"bill-payments"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "create bill payment",
-									"request": {
-										"auth": {
-											"type": "bearer",
-											"bearer": [
-												{
-													"key": "token",
-													"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImcxMDAxIiwiZW1haWwiOiJnMTAwMUB5b3BtYWlsLmNvbSIsInBob25lIjpudWxsLCJpZCI6IllBNkVaUmJZMTVqTHMzSWNtYzJWYVZKIiwicm9sZSI6ImQ4Q2o3UXJFSTlqTFVDNE5aWHpLRjVLIiwicm9sZU5hbWUiOiJjbGllbnQiLCJjcmVhdGVkX2J5Ijoic3VwZXJhZG1pbiIsImlhdCI6MTc0MDM4MDY2MSwiZXhwIjoxNzQwNDY3MDYxfQ.tzIhohbR4tSTdu-RgUEDrWT7sGCseFS3BM_Mu_gXvZk",
-													"type": "string"
-												}
-											]
-										},
-										"method": "POST",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\r\n    \"bill\": \"YXNwo3OR82iHAObCimS5zUZ\",\r\n    \"date\": \"2024-03-20\",\r\n    \"amount\": 50,\r\n    \"account\": \"Ma47fjB6HPtNYEKiJphN7BI\",\r\n    \"reference\": \"PAY-REF-001\",\r\n    \"description\": \"Payment for March invoice\"\r\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
-										"url": {
-											"raw": "{{base}}/bill-payments",
-											"host": [
-												"{{base}}"
-											],
-											"path": [
-												"bill-payments"
-											]
-										}
-									},
-									"response": []
-								}
-							]
-						},
-						{
 							"name": "Create Bill",
 							"request": {
 								"auth": {
@@ -14762,63 +14254,6 @@
 										"tt1UdCiEwYi9zb13Xwdrdgb"
 									]
 								}
-							},
-							"response": []
-						}
-					]
-				},
-				{
-					"name": "vendor",
-					"item": [
-						{
-							"name": "create vendor",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImcxMDAxIiwiZW1haWwiOiJnMTAwMUB5b3BtYWlsLmNvbSIsInBob25lIjpudWxsLCJpZCI6IllBNkVaUmJZMTVqTHMzSWNtYzJWYVZKIiwicm9sZSI6ImQ4Q2o3UXJFSTlqTFVDNE5aWHpLRjVLIiwicm9sZU5hbWUiOiJjbGllbnQiLCJjcmVhdGVkX2J5Ijoic3VwZXJhZG1pbiIsImlhdCI6MTc0MDM4MDY2MSwiZXhwIjoxNzQwNDY3MDYxfQ.tzIhohbR4tSTdu-RgUEDrWT7sGCseFS3BM_Mu_gXvZk",
-											"type": "string"
-										}
-									]
-								},
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"name\": \"Tech Solutions Pvt Ltd\",\r\n    \"contact\": \"+91 9876543210\",\r\n    \"email\": \"info@techsolutions.com\",\r\n    \"taxNumber\": \"GSTIN123456789\",\r\n    \"address\": \"123 Business Park, Phase 1\",\r\n    \"city\": \"Mumbai\",\r\n    \"state\": \"Maharashtra\",\r\n    \"country\": \"India\",\r\n    \"zipcode\": \"400001\"\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{base}}/vendors",
-									"host": [
-										"{{base}}"
-									],
-									"path": [
-										"vendors"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "get vendors",
-							"request": {
-								"method": "GET",
-								"header": []
-							},
-							"response": []
-						},
-						{
-							"name": "update vendors",
-							"request": {
-								"method": "GET",
-								"header": []
 							},
 							"response": []
 						}
@@ -15790,10 +15225,32 @@
 			]
 		}
 	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
 	"variable": [
 		{
 			"key": "base",
-			"value": "http://localhost:5353/api/v1"
+			"value": "http://localhost:5354/api/v1"
 		}
 	]
 }
