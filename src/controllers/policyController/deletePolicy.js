@@ -17,14 +17,13 @@ export default {
             if (!policy) {
                 return responseHandler.error(res, "Policy not found");
             }
-            const file = policy.file;
-            if (file) {
-                const key = decodeURIComponent(file.split(".com/").pop());
+            if (policy.file) {
+                const key = decodeURIComponent(policy.file.split(".com/").pop());
                 const s3Params = {
                     Bucket: s3.config.bucketName,
                     Key: key,
                 };
-                await s3.deleteObject(s3Params).promise();
+                // await s3.deleteObject(s3Params).promise();
             }
             await policy.destroy();
             return responseHandler.success(res, "Policy deleted successfully", policy);
