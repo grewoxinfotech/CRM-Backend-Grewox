@@ -3,7 +3,6 @@ import Ticket from "../../models/ticketModel.js";
 import validator from "../../utils/validator.js";
 import responseHandler from "../../utils/responseHandler.js";
 import uploadToS3 from "../../utils/uploadToS3.js";
-import Notification from "../../models/notificationModel.js";
 
 export default {
     validator: validator({
@@ -35,32 +34,19 @@ export default {
                 fileUrl = await uploadToS3(req.file, req.user?.roleName, "support-tickets", req.user?.username);
             }
 
-            const ticket = await Ticket.create({ 
-                requestor, 
-                assignGroup, 
-                status, 
-                agent, 
-                project, 
-                type, 
-                ticketSubject, 
-                description, 
-                priority, 
-                channelName, 
-                tag, 
-                file: fileUrl, 
-                client_id: req.des?.client_id,
-                created_by: req.user?.username 
-            });
-
-            //notification
-            const notification = await Notification.create({
-                related_id: ticket.id,
-                users: [req.user?.id],
-                title: "New Ticket Created",
-                message: `New ticket created by ${req.user?.username}`,
-                description: ticketSubject,
-                from: req.user?.username,
-                notification_type: "reminder",
+            const ticket = await Ticket.create({
+                requestor,
+                assignGroup,
+                status,
+                agent,
+                project,
+                type,
+                ticketSubject,
+                description,
+                priority,
+                channelName,
+                tag,
+                file: fileUrl,
                 client_id: req.des?.client_id,
                 created_by: req.user?.username
             });

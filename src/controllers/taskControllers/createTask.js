@@ -5,7 +5,6 @@ import validator from "../../utils/validator.js";
 import Notification from "../../models/notificationModel.js";
 import isSameDay from "../../utils/isSameDay.js"
 import uploadToS3 from "../../utils/uploadToS3.js";
-import { s3 } from '../../config/config.js';
 
 export default {
     validator: validator({
@@ -28,9 +27,6 @@ export default {
         try {
             const { id } = req.params;
 
-            const task_file = req.files?.task_file?.[0];
-
-
 
             const {
                 taskName,
@@ -47,25 +43,10 @@ export default {
             if (existingTask) {
                 return responseHandler.error(res, "Task already exists");
             }
-
-            // const esignatureUrl = await uploadToS3(esignature, "esignatures", esignature_name, req.user?.username);
-            let task_file_url = task_file;
-            if (task_file) {
-                if (task_file.task_file) {
-                    const key = decodeURIComponent(task_file.split(".com/").pop());
-                    const s3Params = {
-                        Bucket: s3.config.bucketName,
-                        Key: key,
-                    };
-                    try {
-                        await s3.deleteObject(s3Params).promise();
-                    } catch (error) {
-                        console.error('Error deleting old signature:', error);
-                    }
-                }
-                task_file_url = await uploadToS3(task_file, "task_files", task_file.originalname, req.user?.username);
+            let fileUrl = null;
+            if (req.file) {
+                fileUrl = await uploadToS3(req.file, req.user?.roleName, "task_files", req.user?.username);
             }
-
 
             const task = await Task.create({
                 related_id: id,
@@ -78,7 +59,7 @@ export default {
                 priority,
                 status,
                 reminder_date,
-                task_file: task_file_url,
+                file: fileUrl,
                 client_id: req.des?.client_id,
                 created_by: req.user?.username,
             });
