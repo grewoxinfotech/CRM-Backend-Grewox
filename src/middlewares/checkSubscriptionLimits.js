@@ -10,8 +10,8 @@ import { Op } from 'sequelize';
 export const getActiveSubscription = async (req, res, next) => {
     try {
 
-        
-        
+
+
         const role = await Role.findByPk(req.user.role);
 
         // console.log("rolefgfg", role);
@@ -23,7 +23,7 @@ export const getActiveSubscription = async (req, res, next) => {
                 where: { client_id: req.user.id, status: ['active', 'trial', 'expired'] }
             });
         } else {
-            
+
             const user = await User.findByPk(req.user.id);
             if (!user?.client_plan_id) {
                 return responseHandler.error(res, 'No subscription plan found for user');
@@ -57,6 +57,7 @@ export const checkSubscriptionDates = async (req, res, next) => {
         const { login } = req.body;
         const currentDate = new Date();
 
+
         // First check if user is SuperAdmin
         const superAdmin = await SuperAdmin.findOne({
             where: {
@@ -85,7 +86,6 @@ export const checkSubscriptionDates = async (req, res, next) => {
                 ].filter(Boolean)
             }
         });
-
         if (!user) {
             return responseHandler.error(res, 'User not found');
         }
@@ -147,7 +147,7 @@ export const checkSubscriptionDates = async (req, res, next) => {
 
 export const checkSubscriptionLimits = async (req, res, next) => {
     try {
-        const role = await Role.findByPk(req.user.role_id);
+        const role = await Role.findByPk(req.user.role_id || req.user.role);
         if (!role) return responseHandler.error(res, 'Role not found');
 
         let clientSubscription, plan;

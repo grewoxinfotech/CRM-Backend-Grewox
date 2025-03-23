@@ -17,7 +17,6 @@ export default {
             budget: Joi.number().required(),
             estimatedmonths: Joi.string().allow('', null).optional(),
             estimatedhours: Joi.number().allow('', null).optional(),
-            files: Joi.array().allow(null).optional(),
             status: Joi.string().allow('', null).optional(),
             tag: Joi.string().allow('', null).optional(),
         })
