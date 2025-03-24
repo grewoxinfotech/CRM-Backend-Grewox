@@ -11,13 +11,14 @@ export default {
         }),
         body: Joi.object({
             category: Joi.string().required(),
-            links: Joi.object().required()
+            links: Joi.object().required(),
+            title:Joi.string().required(),
         })
     }),
     handler: async (req, res) => {
         try {
             const { id } = req.params
-            const { category, links } = req.body
+            const { category, links ,title} = req.body
             const existingTraining = await Training.findOne({ where: { category, id: { [Op.not]: id } } });
             if (existingTraining) {
                 return responseHandler.error(res, "Training already exists");
@@ -26,6 +27,7 @@ export default {
             await training.update({
                 category,
                 links,
+                title,
                 updated_by: req.user?.username
             })
             return responseHandler.success(res, "Training created successfully", training)

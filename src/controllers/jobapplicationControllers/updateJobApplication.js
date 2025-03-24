@@ -28,9 +28,11 @@ export default {
     handler: async (req, res) => {
         try {
             const { id } = req.params;
-            const cv = req.files?.cv?.[0];
+            const file = req.file;
+
 
             const { job, name, email, phone, location, total_experience, current_location, notice_period, status, applied_source, cover_letter } = req.body;
+
 
             const jobApplication = await JobApplication.findByPk(id);
 
@@ -43,18 +45,20 @@ export default {
             if (existingJobApplication) {
                 return responseHandler.error(res, "Job application already exists");
             }
-            let cvUrl = jobApplication.cv_path;
-            if (cv) {
-                if (jobApplication.cv_path) {
-                    const key = decodeURIComponent(jobApplication.cv_path.split(".com/").pop());
+
+             let cvUrl = jobApplication.file;
+            if (file) {
+                if (jobApplication.file) {
+                    const key = decodeURIComponent(jobApplication.file.split(".com/").pop());
                     const s3Params = {
                         Bucket: s3.config.bucketName,
                         Key: key,
                     };
                     await s3.deleteObject(s3Params).promise();
                 }
-                cvUrl = await uploadToS3(cv, "jobapplication", "cv", jobApplication.name, jobApplication.created_by);
+                cvUrl = await uploadToS3(file, req.user?.roleName, "jobapplication", req.user?.username, req.user?.created_by);
             }
+
 
             await jobApplication.update({ job, name, email, phone, location, total_experience, current_location, notice_period, status, applied_source, cover_letter, cv_path: cvUrl, updated_by: req.user?.username });
             return responseHandler.success(res, "Job application updated successfully", jobApplication);

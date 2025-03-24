@@ -20,6 +20,8 @@ export default {
     handler: async (req, res) => {
         try {
             const { job, candidate, interviewer, round, interviewType, startOn, startTime, commentForInterviewer, commentForCandidate } = req.body;
+
+            console.log("req.body", req.body);
             const existingInterviewSchedule = await InterviewSchedule.findOne({ where: { job, candidate, interviewer, round, interviewType, startOn, startTime } });
             if (existingInterviewSchedule) {
                 return responseHandler.error(res, "Interview schedule already exists");

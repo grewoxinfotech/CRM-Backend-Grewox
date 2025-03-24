@@ -1,4 +1,4 @@
-import { DataTypes } from "sequelize";
+    import { DataTypes } from "sequelize";
 import sequelize from "../config/db.js";
 import generateId from "../middlewares/generatorId.js";
 
@@ -9,6 +9,10 @@ const Training = sequelize.define('training', {
         primaryKey: true,
         unique: true,
         defaultValue: () => generateId()
+    },
+    title: {
+        type: DataTypes.STRING,
+        allowNull: false
     },
     category: {
         type: DataTypes.STRING,

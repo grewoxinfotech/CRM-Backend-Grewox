@@ -2,7 +2,12 @@ import nodemailer from 'nodemailer';
 import { EMAIL_CONFIG } from '../config/config.js';
 import Email from '../models/emailModel.js';
 
-const transporter = nodemailer.createTransport(EMAIL_CONFIG);
+const transporter = nodemailer.createTransport({
+    ...EMAIL_CONFIG,
+    tls: {
+        rejectUnauthorized: false // This will handle self-signed certificates
+    }
+});
 
 export const sendEmail = async (to, subject, html) => {
     try {

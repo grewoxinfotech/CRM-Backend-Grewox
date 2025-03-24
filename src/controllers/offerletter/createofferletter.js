@@ -17,19 +17,51 @@ export default {
     }),
     handler: async (req, res) => {
         try {
-            const file = req.file;
+            // Check if file exists in request
+            if (!req.file) {
+                return responseHandler.error(res, "Offer letter document is required");
+            }   
+
             const { job, job_applicant, offer_expiry, expected_joining_date, salary, description } = req.body;
-            const existingOfferLetter = await OfferLetter.findOne({ where: { job, job_applicant } });
+            
+            // Check for existing offer letter
+            const existingOfferLetter = await OfferLetter.findOne({ 
+                where: { job, job_applicant } 
+            });
+            
             if (existingOfferLetter) {
                 return responseHandler.error(res, "Offer letter already exists");
             }
-            const fileUrl = await uploadToS3(file, req.user?.roleName, "offer-letters", req.user?.username);
-            const offerletter = await OfferLetter.create({ job, job_applicant, offer_expiry, expected_joining_date, salary, description, file: fileUrl,
+
+            // Upload file to S3
+            const fileUrl = await uploadToS3(
+                req.file,
+                req.user?.roleName,
+                "offer-letters",
+                req.user?.username
+            );
+
+            // Create offer letter
+            const offerletter = await OfferLetter.create({
+                job,
+                job_applicant,
+                offer_expiry,
+                expected_joining_date,
+                salary,
+                description,
+                file: fileUrl,
                 client_id: req.des?.client_id,
-                created_by: req.user?.username });
-            return responseHandler.success(res, "Offer letter created successfully", offerletter);
+                created_by: req.user?.username
+            });
+
+            return responseHandler.success(
+                res,
+                "Offer letter created successfully",
+                offerletter
+            );
         } catch (error) {
-            return responseHandler.error(res, error);
+            console.error("Error creating offer letter:", error);
+            return responseHandler.error(res, error.message || "Failed to create offer letter");
         }
     }
 }

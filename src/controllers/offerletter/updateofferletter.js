@@ -26,6 +26,9 @@ export default {
             const { id } = req.params;
             const file = req.file;
             const { job, job_applicant, offer_expiry, expected_joining_date, salary, description } = req.body;
+
+            console.log("dfgdgdf",req.body);
+
             const offerletter = await OfferLetter.findByPk(id);
             if (!offerletter) {
                 return responseHandler.error(res, "Offer letter not found");
@@ -42,7 +45,7 @@ export default {
                         Bucket: s3.config.bucketName,
                         Key: key,
                     };
-                    await s3.deleteObject(s3Params).promise();
+                    // await s3.deleteObject(s3Params).promise();
                 }
                 fileUrl = await uploadToS3(file, req.user?.roleName, "offer-letters", req.user?.username);
             }

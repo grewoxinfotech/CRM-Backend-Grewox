@@ -6,19 +6,21 @@ import responseHandler from "../../utils/responseHandler.js";
 export default {
     validator: validator({
         body: Joi.object({
+            title:Joi.string().required(),
             category: Joi.string().required(),
             links: Joi.object().required()
         })
     }),
     handler: async (req, res) => {
         try {
-            const { category, links } = req.body
+            const { category, links,title } = req.body
             const existingTraining = await Training.findOne({ where: { category } });
             if (existingTraining) {
                 return responseHandler.error(res, "Training already exists");
             }
             const training = await Training.create({
                 category,
+                title,
                 links,
                 client_id: req.des?.client_id,
                 created_by: req.user?.username

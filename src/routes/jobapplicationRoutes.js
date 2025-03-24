@@ -8,11 +8,9 @@ const router = Router();
 
 router.use(authenticateUser,checkRole, passCompanyDetails);
 
-router.post("/", createJobApplication.handler, createJobApplication.validator);
+router.post("/",upload.single('file'), createJobApplication.handler, createJobApplication.validator);
 router.get("/", getAllJobApplication.handler, getAllJobApplication.validator);
-router.put("/:id",  upload.fields([
-    { name: 'cv', maxCount: 1 },
-]), updateJobApplication.handler, updateJobApplication.validator);
+router.put("/:id",  upload.single('file'), updateJobApplication.handler, updateJobApplication.validator);
 router.delete("/:id", deleteJobApplication.handler, deleteJobApplication.validator);
 
 export default router;

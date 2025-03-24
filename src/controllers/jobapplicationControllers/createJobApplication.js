@@ -2,6 +2,7 @@ import Joi from "joi";
 import validator from "../../utils/validator.js";
 import responseHandler from "../../utils/responseHandler.js";
 import JobApplication from "../../models/jobapplicationModel.js";
+import uploadToS3 from "../../utils/uploadToS3.js";
 
 export default {
     validator: validator({
@@ -17,21 +18,49 @@ export default {
             status: Joi.string().allow('', null),
             applied_source: Joi.string().allow('', null),
             cover_letter: Joi.string().allow('', null),
+            cv: Joi.string().allow(null),
         })
     }),
     handler: async (req, res) => {
         try {
             const { job, name, email, phone, location, total_experience, current_location, notice_period, status, applied_source, cover_letter } = req.body;
-            const existingJobApplication = await JobApplication.findOne({ where: { job, name, email, phone, location, total_experience, current_location, notice_period, status, applied_source, cover_letter } });
-            if (existingJobApplication) {
-                return responseHandler.error(res, "Job application already exists");
+            
+            // Check for existing application
+
+            // Handle CV file upload
+            let cvUrl = null;
+            if (req.file) {
+                try {
+                    cvUrl = await uploadToS3(req.file, req.user?.roleName, "job-applications", req.user?.username);
+                } catch (uploadError) {
+                    console.error('S3 Upload Error:', uploadError);
+                    return responseHandler.error(res, "Failed to upload CV file. Please try again later.");
+                }
             }
-            const jobApplication = await JobApplication.create({ job, name, email, phone, location, total_experience, current_location, notice_period, status, applied_source, cover_letter,
+
+            console.log("eretre",cvUrl);
+            // Create job application with CV
+            const jobApplication = await JobApplication.create({ 
+                job, 
+                name, 
+                email, 
+                phone, 
+                location, 
+                total_experience, 
+                current_location, 
+                notice_period, 
+                status, 
+                applied_source, 
+                cover_letter,
+                cv_path: cvUrl,
                 client_id: req.des?.client_id,
-                created_by: req.user?.username });
+                created_by: req.user?.username 
+            });
+
             return responseHandler.success(res, "Job application created successfully", jobApplication);
         } catch (error) {
-            return responseHandler.error(res, error?.message);
+            console.error('Job Application Creation Error:', error);
+            return responseHandler.error(res, error?.message || "Failed to create job application");
         }
     }
 }
