@@ -19,7 +19,9 @@ export default {
     handler: async (req, res) => {
         try {
             const { otp } = req.body;
+            console.log("otp", otp);
             const user = req.user;
+            console.log("req.user", user);
 
             const { subscription } = req;
 

@@ -53,7 +53,7 @@ export default {
             }
 
             const existingRole = await Role.findOne({
-                where: { 
+                where: {
                     role_name: 'sub-client',
                     client_id: req.des.client_id,
                     created_by: req.user.username
@@ -102,7 +102,7 @@ export default {
                 role_id: role.id,
                 password: hashedPassword,
                 verificationOTP: otp,
-                client_id: req.user?.client_id,
+                client_id: req.des?.client_id,
                 verificationOTPExpiry: Date.now() + OTP_CONFIG.EXPIRY.DEFAULT,
                 created_by: req.user?.username
             };
