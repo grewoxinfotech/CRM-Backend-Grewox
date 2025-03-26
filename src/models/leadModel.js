@@ -19,38 +19,41 @@ const Lead = sequelize.define('Lead', {
     },
     currency: {
         type: DataTypes.STRING,
-        allowNull: true,
-        defaultValue: null
+        allowNull: false,
     },
     leadValue: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+    },
+    company_name: {
         type: DataTypes.STRING,
         allowNull: true,
         defaultValue: null
     },
     firstName: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
+        defaultValue: null
     },
     lastName: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
+        defaultValue: null
     },
     phoneCode: {
         type: DataTypes.STRING,
         allowNull: true,
-        defaultValue: null
     },
     telephone: {
         type: DataTypes.STRING,
         allowNull: true,
-        defaultValue: null
     },
     email: {
         type: DataTypes.STRING,
         allowNull: true,
         defaultValue: null,
     },
-    assigned: {
+    address: {
         type: DataTypes.STRING,
         allowNull: true,
         defaultValue: null
@@ -80,15 +83,20 @@ const Lead = sequelize.define('Lead', {
         allowNull: false,
         defaultValue: 'new'
     },
-    tag: {
-        type: DataTypes.STRING,
+    interest_level: {
+        type: DataTypes.ENUM('high', 'medium', 'low'),
         allowNull: true,
         defaultValue: null
     },
-    company_name: {
-        type: DataTypes.STRING,
+    lead_score: {
+        type: DataTypes.INTEGER,
         allowNull: true,
-        defaultValue: null
+        defaultValue: null,
+        validate: {
+            min: 1,
+            max: 100
+        },
+        comment: 'Lead score as a percentage value (1-100%)'
     },
     client_id: {
         type: DataTypes.STRING,

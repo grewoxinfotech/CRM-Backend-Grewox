@@ -11,32 +11,27 @@ export default {
         body: Joi.object({
             leadTitle: Joi.string().required(),
             leadStage: Joi.string().required(),
-            currency: Joi.string().allow('', null),
-            leadValue: Joi.string().allow('', null),
-            source: Joi.string().allow('', null),
+            currency: Joi.string().required(),
+            leadValue: Joi.number().required(),
+            source: Joi.string().required(),
             company_name: Joi.string().allow('', null),
-            firstName: Joi.string().required(),
-            lastName: Joi.string().required(),
+            firstName: Joi.string().allow('', null),
+            lastName: Joi.string().allow('', null),
             phoneCode: Joi.string().allow('', null),
             telephone: Joi.string().allow('', null),
-            email: Joi.string().email(),
-            assigned: Joi.string().allow('', null),
+            email: Joi.string().email().allow('', null),
+            address: Joi.string().allow('', null),
+            interest_level: Joi.string().required().valid('high', 'medium', 'low'),
+            lead_members: Joi.object().allow(null),
             category: Joi.string().allow('', null),
-            status: Joi.string().required(),
-            tag: Joi.string().allow('', null),
-            website: Joi.string().allow('', null),
-            country: Joi.string().allow('', null),
-            city: Joi.string().allow('', null),
-            state: Joi.string().allow('', null),
-            zipCode: Joi.string().allow('', null),
-            address: Joi.string().allow('', null)
+            status: Joi.string().allow('', null)
         })
     }),
 
     handler: async (req, res) => {
         try {
             const { id } = req.params;
-            const { leadStage, leadTitle, firstName, lastName, phoneCode, telephone, email, assigned, category, status, tag, source, company_name, currency, leadValue, website, country, city, state, zipCode, address } = req.body;
+            const { leadStage, leadTitle, firstName, lastName, phoneCode, telephone, email, address, interest_level, lead_members, category, status, source, company_name, currency, leadValue } = req.body;
 
             const lead = await Lead.findByPk(id);
 
@@ -52,20 +47,15 @@ export default {
                 phoneCode,
                 telephone,
                 email,
-                assigned,
+                address,
+                interest_level,
+                lead_members,
                 category,
                 status,
-                tag,
                 source,
                 company_name,
                 currency,
                 leadValue,
-                website,
-                country,
-                city,
-                state,
-                zipCode,
-                address,
                 updated_by: req.user?.username
             });
 
