@@ -235,6 +235,11 @@ const User = sequelize.define('User', {
     },
 });
 
+// Add association with Role model
+User.belongsTo(Role, {
+    foreignKey: 'role_id',
+    as: 'Role'
+});
 
 User.beforeCreate(async (user) => {
     let isUnique = false;

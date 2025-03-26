@@ -1,6 +1,7 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../config/db.js';
 import generateId from '../middlewares/generatorId.js';
+import Role from './roleModel.js';
 
 const SuperAdmin = sequelize.define('SuperAdmin', {
     id: {
@@ -58,6 +59,12 @@ const SuperAdmin = sequelize.define('SuperAdmin', {
         allowNull: true,
         defaultValue: null
     }
+});
+
+// Add association with Role model
+SuperAdmin.belongsTo(Role, {
+    foreignKey: 'role_id',
+    as: 'Role'
 });
 
 SuperAdmin.beforeCreate(async (superAdmin) => {
