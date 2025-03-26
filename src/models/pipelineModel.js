@@ -27,7 +27,6 @@ const Pipeline = sequelize.define('pipeline', {
         type: DataTypes.STRING,
         allowNull: true,
         defaultValue: null
-
     }
 });
 

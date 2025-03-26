@@ -4,6 +4,7 @@ import validator from "../../utils/validator.js";
 import responseHandler from "../../utils/responseHandler.js";
 import Role from "../../models/roleModel.js";
 import User from "../../models/userModel.js";
+import { seedDefaultLabels } from "./createLabel.js";
 
 export default {
     validator: validator({
@@ -20,6 +21,7 @@ export default {
             const userRole = req.user.role;
             const { id } = req.params;
             let tags;
+            let client_id;
 
             // Find role in role model
             const role = await Role.findOne({
@@ -31,15 +33,8 @@ export default {
             }
 
             if (role.role_name === 'client') {
-                // If user is client, find tags matching their client_id
-                tags = await Tag.findAll({
-                    where: {
-                        related_id: id,
-                        client_id: req.user.id
-                    }
-                });
+                client_id = req.user.id;
             } else {
-                // For other roles, get client_id from user model
                 const user = await User.findOne({
                     where: { id: req.user.id }
                 });
@@ -47,13 +42,19 @@ export default {
                 if (!user) {
                     return responseHandler.error(res, "User not found");
                 }
+                client_id = user.client_id;
+            }
 
-                tags = await Tag.findAll({
-                    where: {
-                        related_id: id,
-                        client_id: user.client_id
-                    }
-                });
+            tags = await Tag.findAll({
+                where: {
+                    related_id: id,
+                    client_id: client_id
+                }
+            });
+
+            // If no tags exist, seed default tags
+            if (tags.length === 0) {
+                tags = await seedDefaultLabels(id, client_id);
             }
 
             return responseHandler.success(res, "Tags retrieved successfully", tags);
