@@ -9,11 +9,11 @@ export default {
             id: Joi.string().required()
         }),
         body: Joi.object({
-            leadTitle: Joi.string().required(),
-            leadStage: Joi.string().required(),
-            currency: Joi.string().required(),
-            leadValue: Joi.number().required(),
-            source: Joi.string().required(),
+            leadTitle: Joi.string().allow('', null),
+            leadStage: Joi.string().allow('', null),
+            currency: Joi.string().allow('', null),
+            leadValue: Joi.number().allow('', null),
+            source: Joi.string().allow('', null),
             company_name: Joi.string().allow('', null),
             firstName: Joi.string().allow('', null),
             lastName: Joi.string().allow('', null),
@@ -21,7 +21,7 @@ export default {
             telephone: Joi.string().allow('', null),
             email: Joi.string().email().allow('', null),
             address: Joi.string().allow('', null),
-            interest_level: Joi.string().required().valid('high', 'medium', 'low'),
+            interest_level: Joi.string().allow('', null),
             lead_members: Joi.object().allow(null),
             category: Joi.string().allow('', null),
             status: Joi.string().allow('', null)

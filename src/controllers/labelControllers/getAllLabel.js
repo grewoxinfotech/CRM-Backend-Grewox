@@ -52,6 +52,7 @@ export default {
                 }
             });
 
+
             // If no tags exist, seed default tags
             if (tags.length === 0) {
                 tags = await seedDefaultLabels(id, client_id);

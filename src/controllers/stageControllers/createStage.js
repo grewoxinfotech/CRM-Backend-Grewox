@@ -6,15 +6,17 @@ import Pipeline from "../../models/pipelineModel.js";
 
 const defaultStages = {
     sales: [
-        { stageName: "To Do", stageType: "lead", order: 1 },
-        { stageName: "In Progress", stageType: "lead", order: 2 },
-        { stageName: "Done", stageType: "lead", order: 3 }
+        { stageName: "New Lead", stageType: "lead" },
+        { stageName: "Qualified", stageType: "lead" },
+        { stageName: "Negotiation", stageType: "lead" },
+        { stageName: "Closed Won", stageType: "lead" }
     ],
     marketing: [
-        { stageName: "To Do", stageType: "deal", order: 1 },
-        { stageName: "In Progress", stageType: "deal", order: 2 },
-        { stageName: "Done", stageType: "deal", order: 3 }
-    ]
+        { stageName: "Lead Received", stageType: "deal" },
+        { stageName: "Initial Contact", stageType: "deal" },
+        { stageName: "Proposal Sent", stageType: "deal" },
+        { stageName: "Deal Closed", stageType: "deal" }
+    ],
 };
 
 export const seedDefaultStages = async (pipeline_id, client_id, username) => {
@@ -22,7 +24,6 @@ export const seedDefaultStages = async (pipeline_id, client_id, username) => {
         // Check if stages already exist for this pipeline
         const existingStages = await Stage.findAll({
             where: { pipeline: pipeline_id, client_id },
-            order: [['order', 'ASC']]
         });
 
         if (existingStages.length === 0) {
