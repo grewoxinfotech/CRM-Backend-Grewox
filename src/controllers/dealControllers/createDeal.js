@@ -6,19 +6,37 @@ import validator from "../../utils/validator.js";
 export default {
     validator: validator({
         body: Joi.object({
-            leadTitle: Joi.string().required(),
+            firstName: Joi.string().optional().allow(null),
+            email: Joi.string().optional().allow(null),
+            phone: Joi.string().optional().allow(null),
             dealName: Joi.string().required(),
             pipeline: Joi.string().optional().allow("",null),
+            status: Joi.string().optional().allow("",null),
             stage: Joi.string().optional().allow("",null),
-            price: Joi.number().optional().allow("",null),
+            label: Joi.string().optional().allow("",null),
+            value: Joi.number().optional().allow("",null),
             currency: Joi.string().optional().allow("",null),
             closedDate: Joi.date().optional().allow("",null),
-            project: Joi.string().optional().allow("",null),
+            company_name: Joi.string().optional().allow("",null),
+            source: Joi.string().optional().allow("",null),
         })
     }),
     handler: async (req, res) => {
         try {
-            const { leadTitle, dealName, pipeline, stage, price, currency, closedDate, project } = req.body;
+            const { 
+                firstName,
+                email,
+                phone,
+                dealName,
+                pipeline,
+                stage,
+                label,
+                value,
+                currency,
+                closedDate,
+                company_name,
+                source
+            } = req.body;
 
             const existingDeal = await Deal.findOne({ where: { dealName } });
             if (existingDeal) {
@@ -26,14 +44,18 @@ export default {
             }
 
             const deal = await Deal.create({
-                leadTitle,
+                firstName,
+                email,
+                phone,
                 dealName,
                 pipeline,
                 stage,
-                price,
+                label,
+                value,
                 currency,
                 closedDate,
-                project,
+                company_name,
+                source,
                 client_id: req.des?.client_id,
                 created_by: req.user?.username
             });

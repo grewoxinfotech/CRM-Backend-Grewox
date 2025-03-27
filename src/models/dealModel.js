@@ -14,6 +14,26 @@ const Deal = sequelize.define("Deal", {
         allowNull: true,
         defaultValue: null
     },
+    firstName: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: null
+    },
+    lastName: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: null
+    },
+    email: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: null
+    },
+    phone: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: null
+    },
     dealName: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -29,13 +49,23 @@ const Deal = sequelize.define("Deal", {
         allowNull: true,
         defaultValue: null
     },
-    currency: {
+    status: {
+        type: DataTypes.ENUM('won', 'lost', 'open'),    
+        allowNull: true,
+        defaultValue: 'open'
+    },
+    label: {
         type: DataTypes.STRING,
         allowNull: true,
         defaultValue: null
     },
-    price: {
+    value: {
         type: DataTypes.FLOAT,
+        allowNull: true,
+        defaultValue: null
+    },
+    currency: {
+        type: DataTypes.STRING,
         allowNull: true,
         defaultValue: null
     },
@@ -44,7 +74,36 @@ const Deal = sequelize.define("Deal", {
         allowNull: true,
         defaultValue: null
     },
-   
+    company_name: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: null
+    },
+    address: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: null
+    },
+    website: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: null
+    },
+    files: {
+        type: DataTypes.JSON,
+        allowNull: true,
+        defaultValue: null
+    },
+    assigned_to: {
+        type: DataTypes.JSON,
+        allowNull: true,
+        defaultValue: null
+    },
+    source: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: null
+    },
     project: {
         type: DataTypes.STRING,
         allowNull: true,
