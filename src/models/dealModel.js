@@ -50,9 +50,9 @@ const Deal = sequelize.define("Deal", {
         defaultValue: null
     },
     status: {
-        type: DataTypes.ENUM('won', 'lost', 'open'),    
+        type: DataTypes.ENUM('won', 'lost', 'pending'),    
         allowNull: true,
-        defaultValue: 'open'
+        defaultValue: 'pending'
     },
     label: {
         type: DataTypes.STRING,
