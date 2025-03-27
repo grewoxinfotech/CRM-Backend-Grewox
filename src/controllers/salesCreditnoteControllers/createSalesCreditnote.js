@@ -3,25 +3,7 @@ import SalesCreditnote from "../../models/salesCreditnoteModel.js";
 import SalesInvoice from "../../models/salesInvoiceModel.js";
 import validator from "../../utils/validator.js";
 import responseHandler from "../../utils/responseHandler.js";
-import multer from "multer";
-import path from "path";
-import fs from "fs";
-
-// Configure multer for file upload
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    const uploadDir = "uploads/creditnotes";
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-    cb(null, uploadDir);
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + "-" + file.originalname);
-  },
-});
-
-const upload = multer({ storage: storage });
+import uploadToS3 from "../../utils/uploadToS3.js";
 
 export default {
   validator: validator({
@@ -33,7 +15,6 @@ export default {
       description: Joi.string().optional().allow("", null),
     }),
   }),
-  upload: upload.single("attachment"),
   handler: async (req, res) => {
     try {
       const { id } = req.user;
@@ -53,10 +34,15 @@ export default {
         );
       }
 
-      // Handle file upload
-      let attachmentPath = null;
+      // Handle file upload to S3
+      let attachmentUrl = null;
       if (req.file) {
-        attachmentPath = req.file.path;
+        attachmentUrl = await uploadToS3(
+          req.file,
+          req.user?.roleName,
+          "creditnotes",
+          req.user?.username
+        );
       }
 
       // Create credit note
@@ -67,7 +53,7 @@ export default {
         currency,
         amount,
         description,
-        attachment: attachmentPath,
+        attachment: attachmentUrl,
         client_id: req.des?.client_id,
         created_by: req.user?.username,
       });

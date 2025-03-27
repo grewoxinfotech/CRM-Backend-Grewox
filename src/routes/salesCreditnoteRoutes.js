@@ -9,12 +9,13 @@ import {
 import { authenticateUser, checkRole } from "../middlewares/index.js";
 import passCompanyDetails from "../middlewares/passCompanyDetail.js";
 const router = Router();
+import upload from "../middlewares/upload.js";
 
 router.use(authenticateUser, checkRole, passCompanyDetails);
 
 router.post(
   "/",
-  createSalesCreditnote.upload,
+  upload.single("attachment"),
   createSalesCreditnote.validator,
   createSalesCreditnote.handler
 );
