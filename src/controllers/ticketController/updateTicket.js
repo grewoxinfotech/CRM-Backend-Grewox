@@ -47,7 +47,7 @@ export default {
                         Bucket: s3.config.bucketName,
                         Key: key,
                     };
-                    await s3.deleteObject(s3Params).promise();
+                    // await s3.deleteObject(s3Params).promise();
                 }
                 fileUrl = await uploadToS3(file, req.user?.roleName, "support-ticket", req.user?.username, req.user?.created_by);
             }

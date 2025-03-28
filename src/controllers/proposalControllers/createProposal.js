@@ -15,19 +15,20 @@ export default {
             items: Joi.object().required(),
             discount: Joi.number().optional(),
             tax: Joi.number().optional(),
-            total: Joi.number().required()
+            total: Joi.number().required(),
+            subtotal: Joi.number().required(),
         })
     }),
     handler: async (req, res) => {
         try {
-            const { lead_title, valid_till, currency, description, items, discount, tax, total } = req.body;
-            const existingProposal = await Proposal.findOne({ where: { lead_title, valid_till, currency, description, items, discount, tax, total } });
+            const { lead_title, valid_till, currency, description, items, discount, tax, total,subtotal } = req.body;
+            const existingProposal = await Proposal.findOne({ where: { lead_title, valid_till, currency, description, items, discount, tax, total,subtotal } });
             if (existingProposal) {
                 return responseHandler.error(res, "Proposal already exists");
             }
             const proposal = await Proposal.create({
                 lead_title, valid_till, currency, description,
-                items, discount, tax, total,
+                items, discount, tax, total,subtotal,
                 client_id: req.des?.client_id,
                 created_by: req.user?.username
             });

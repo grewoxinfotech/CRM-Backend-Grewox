@@ -28,11 +28,11 @@ const Customers = sequelize.define("customers", {
     },
     email: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
     },
     tax_number: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
     },
     alternate_number: {
         type: DataTypes.STRING,

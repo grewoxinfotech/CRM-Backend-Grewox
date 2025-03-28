@@ -8,8 +8,8 @@ export default {
         body: Joi.object({
             name: Joi.string().required(),
             contact: Joi.string().required(),
-            email: Joi.string().email().required(),
-            tax_number: Joi.string().allow('', null),
+            email: Joi.string().email().allow('', null).optional(),
+            tax_number: Joi.string().optional().allow('', null),
             alternate_number: Joi.string().allow('', null),
             billing_address: Joi.object().allow(null),
             shipping_address: Joi.object().allow(null)
@@ -19,7 +19,10 @@ export default {
         try {
             const { name, contact, email, tax_number, alternate_number, billing_address, shipping_address } = req.body;
 
-            const existingCustomer = await Customer.findOne({ where: { email } });
+            console.log(req.body,"fdffdfd");
+            
+
+            const existingCustomer = await Customer.findOne({ where: { contact } });
             if (existingCustomer) {
                 return responseHandler.error(res, "Customer already exists");
             }

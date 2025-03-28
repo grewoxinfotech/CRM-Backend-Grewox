@@ -7,19 +7,21 @@ export default {
     validator: validator({
         body: Joi.object({
             holiday_name: Joi.string().required(),
+            leave_type: Joi.string().required(),
             start_date: Joi.date().required(),
             end_date: Joi.date().required()
         })
     }),
     handler: async (req, res) => {
         try {
-            const { holiday_name, start_date, end_date } = req.body;
+            const { holiday_name, leave_type, start_date, end_date } = req.body;
             const existingHoliday = await Holiday.findOne({ where: { holiday_name } });
             if (existingHoliday) {
                 return responseHandler.error(res, 'Holiday already exists');
             }
             const holiday = await Holiday.create({
                 holiday_name,
+                leave_type,
                 start_date,
                 end_date,
                 client_id: req.des?.client_id,

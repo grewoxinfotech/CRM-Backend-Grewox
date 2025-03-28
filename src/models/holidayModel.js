@@ -14,6 +14,10 @@ const Holiday = sequelize.define('holiday', {
         type: DataTypes.STRING,
         allowNull: false,
     },
+    leave_type: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
     start_date: {
         type: DataTypes.DATE,
         allowNull: false,

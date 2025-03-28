@@ -49,6 +49,10 @@ const Proposal = sequelize.define("proposal", {
         type: DataTypes.FLOAT,
         allowNull: false
     },
+    subtotal:{
+        type: DataTypes.FLOAT,
+        allowNull: false
+    },
     client_id: {
         type: DataTypes.STRING,
         allowNull: false

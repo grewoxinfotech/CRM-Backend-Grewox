@@ -11,6 +11,7 @@ export default {
         }),
         body: Joi.object({
             holiday_name: Joi.string().optional(),
+            leave_type: Joi.string().optional(),
             start_date: Joi.date().optional(),
             end_date: Joi.date().optional(),
         })
@@ -18,7 +19,7 @@ export default {
     handler: async (req, res) => {
         try {
             const { id } = req.params;
-            const { holiday_name, start_date, end_date } = req.body;
+            const { holiday_name, leave_type, start_date, end_date } = req.body;
 
             const holiday = await Holiday.findByPk(id);
             if (!holiday) {
@@ -32,6 +33,7 @@ export default {
 
             await holiday.update({
                 holiday_name,
+                leave_type,
                 start_date,
                 end_date,
                 updated_by: req.user?.username
