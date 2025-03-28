@@ -12,13 +12,13 @@ export default {
             id: Joi.string().required(),
         }),
         body: Joi.object({
-            taskName: Joi.string().required(),
-            task_reporter: Joi.string().required(),
-            startDate: Joi.date().required(),
-            dueDate: Joi.date().required(),
+            taskName: Joi.string().optional().allow('', null),
+            task_reporter: Joi.string().optional().allow('', null),
+            startDate: Joi.date().optional().allow('', null),
+            dueDate: Joi.date().optional().allow('', null),
             assignTo: Joi.object().optional(),
-            priority: Joi.string().required(),
-            status: Joi.string().required(),
+            priority: Joi.string().optional().allow('', null),
+            status: Joi.string().optional().allow('', null),
             reminder_date: Joi.date().optional().allow('', null),
             description: Joi.string().optional().allow('', null)
         })

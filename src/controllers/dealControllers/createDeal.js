@@ -7,6 +7,9 @@ export default {
     validator: validator({
         body: Joi.object({
             firstName: Joi.string().optional().allow(null),
+            products: Joi.object({
+                products: Joi.array().items(Joi.string()).optional()
+            }).optional().allow("",null),
             email: Joi.string().optional().allow(null),
             phone: Joi.string().optional().allow(null),
             dealName: Joi.string().required(),
@@ -25,6 +28,7 @@ export default {
         try {
             const { 
                 firstName,
+                products,
                 email,
                 phone,
                 dealName,
@@ -50,6 +54,7 @@ export default {
                 dealName,
                 pipeline,
                 stage,
+                products,
                 label,
                 value,
                 currency,

@@ -89,6 +89,11 @@ const Deal = sequelize.define("Deal", {
         allowNull: true,
         defaultValue: null
     },
+    products: {
+        type: DataTypes.JSON,
+        allowNull: true,
+        defaultValue: null
+    },
     files: {
         type: DataTypes.JSON,
         allowNull: true,
@@ -96,7 +101,7 @@ const Deal = sequelize.define("Deal", {
     },
     assigned_to: {
         type: DataTypes.JSON,
-        allowNull: true,
+    allowNull: true,
         defaultValue: null
     },
     source: {

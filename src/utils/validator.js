@@ -1,6 +1,7 @@
 import responseHandler from "../utils/responseHandler.js";
 
 const validator = (schemas) => (req, res, next) => {
+
   const types = { body: req.body, params: req.params, query: req.query };
 
   for (const type in schemas) {

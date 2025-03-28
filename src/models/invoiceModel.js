@@ -15,6 +15,14 @@ const Invoice = sequelize.define('invoice', {
         type: DataTypes.STRING,
         unique: true,
     },
+    customer: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    subtotal: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    },
     related_id: {
         type: DataTypes.STRING,
         allowNull: false
@@ -33,11 +41,13 @@ const Invoice = sequelize.define('invoice', {
     },
     project: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: true,
+        defaultValue: null
     },
     client: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: true,
+        defaultValue: null
     },
     items: {
         type: DataTypes.JSON,

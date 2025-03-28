@@ -3,7 +3,6 @@ import Project from "../../models/projectModel.js";
 import validator from "../../utils/validator.js";
 import responseHandler from "../../utils/responseHandler.js";
 import uploadToS3 from "../../utils/uploadToS3.js";
-import { Op } from "sequelize";
 
 export default {
     validator: validator({
