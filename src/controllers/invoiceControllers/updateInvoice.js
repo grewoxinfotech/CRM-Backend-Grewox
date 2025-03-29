@@ -16,22 +16,23 @@ export default {
             customer: Joi.string().required(),
             subtotal: Joi.number().required(),
             currency: Joi.string().required(),
-            items: Joi.array().required(),
+            items: Joi.array().required(),  
             discount: Joi.number().optional(),
             tax: Joi.number().optional(),
-            total: Joi.number().required()
+            total: Joi.number().required(),
+            status: Joi.string().optional().allow("", null)
         })
     }),
     handler: async (req, res) => {
         try {
             const { id } = req.params;
-            const { issueDate, dueDate, currency, client, project, customer, items, discount, tax, total, subtotal } = req.body;
+            const { issueDate, dueDate, currency, client, project, customer, items, discount, tax, total, subtotal, status } = req.body;
 
             const invoice = await Invoice.findByPk(id);
             if (!invoice) {
                 return responseHandler.error(res, "Invoice not found");
             }
-            await invoice.update({ issueDate, dueDate, currency, client, project, customer, items, discount, tax, total, subtotal, updated_by: req.user?.username });
+            await invoice.update({ issueDate, dueDate, currency, client, project, customer, items, discount, tax, total, subtotal, status, updated_by: req.user?.username });
             return responseHandler.success(res, "Invoice updated successfully", invoice);
         } catch (error) {
             return responseHandler.error(res, error?.message);

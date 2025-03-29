@@ -11,8 +11,8 @@ export default {
             id: Joi.string().required(),
         }),
         body: Joi.object({
-            note_title: Joi.string().required(),
-            notetype: Joi.string().required(),
+            note_title: Joi.string().optional().allow('', null),
+            notetype: Joi.string().optional().allow('', null),
             employees: Joi.object().optional().allow('', null),
             description: Joi.string().optional().allow('', null),
         })
@@ -25,11 +25,12 @@ export default {
             if (!note) {
                 return responseHandler.error(res, "Note not found");
             }
-            const existingNote = await Note.findOne({ where: { note_title, notetype, employees, description, related_id: note.related_id, id: { [Op.not]: id } } });
+            const existingNote = await Note.findOne({ where: { note_title,  related_id: note.related_id, id: { [Op.not]: id } } });
             if (existingNote) {
                 return responseHandler.error(res, "Note already exists");
             }
             await note.update({ note_title, notetype, employees, description, updated_by: req.user?.username });
+            
             await Activity.create({
                 related_id: note.related_id,
                 activity_from: "note",

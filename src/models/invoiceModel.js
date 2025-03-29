@@ -31,6 +31,11 @@ const Invoice = sequelize.define('invoice', {
         type: DataTypes.DATE,
         allowNull: false
     },
+    status: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: null
+    },
     dueDate: {
         type: DataTypes.DATE,
         allowNull: false

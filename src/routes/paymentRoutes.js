@@ -7,7 +7,7 @@ const router = Router();
 
 router.use(authenticateUser, checkRole, passCompanyDetails);
 
-router.post('/:id', upload.single('receipt'), createPayment.validator, createPayment.handler);
+router.post('/:id', createPayment.validator, createPayment.handler);
 router.get('/:id', getAllPayment.validator, getAllPayment.handler);
 router.put('/:id', upload.single('receipt'), updatePayment.validator, updatePayment.handler);
 router.delete('/:id', deletePayment.validator, deletePayment.handler);

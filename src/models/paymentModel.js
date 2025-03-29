@@ -15,7 +15,8 @@ const Payment = sequelize.define('Payment', {
     },
     project_name: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
+        defaultValue: null,
     },
     invoice: {
         type: DataTypes.STRING,
@@ -45,7 +46,7 @@ const Payment = sequelize.define('Payment', {
         allowNull: false,
     },
     transactionId: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         allowNull: false,
     },
     paymentMethod: {
@@ -54,8 +55,8 @@ const Payment = sequelize.define('Payment', {
     },
     receipt: {
         type: DataTypes.STRING,
-
         allowNull: true,
+        defaultValue: null,
     },
     remark: {
         type: DataTypes.STRING,
