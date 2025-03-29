@@ -94,6 +94,7 @@ import billPaymentRoutes from "./billpayment.js";
 import emailRoutes from "./emailRoutes.js";
 import holidayRoutes from "./holidayRoutes.js";
 import reminderRoutes from "./reminderRoutes.js";
+import followupRoutes from "./followupRoutes.js";
 const router = express.Router();
 
 //>>>>>>>>>>>>>>  Super Admin  <<<<<<<<<<<<<<<//
@@ -211,6 +212,9 @@ router.use("/contracts", contractRoutes);
 /** 4. CRM system Setup*/
 router.use("/pipelines", pipelineRoutes);
 router.use("/stages", stageRoutes);
+
+/** 5. Lead & Deal Followup*/
+router.use("/followups", followupRoutes);
 
 //>>>>>>>>>>>>>>  Project Management System  <<<<<<<<<<<<<<<//
 
