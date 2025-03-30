@@ -102,10 +102,9 @@ export default {
                 emailTemplate
             );
 
-            return responseHandler.success(res, "Please verify your email to complete registration", { sessionToken })
-
+            return responseHandler.success(res, "OTP sent to email", { sessionToken })
         } catch (error) {
-            return responseHandler.error(res, error?.message)
+            return responseHandler.error(res, error?.message);
         }
     }
 };

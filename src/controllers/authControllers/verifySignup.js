@@ -8,6 +8,7 @@ import { getWelcomeEmailTemplate } from "../../utils/emailTemplates.js";
 import Role from "../../models/roleModel.js";
 import User from "../../models/userModel.js";
 import ClientSubscription from "../../models/clientSubscriptionModel.js";
+import { seedDefaultLabels } from "../labelControllers/createLabel.js";
 
 export default {
     validator: validator({
@@ -19,10 +20,7 @@ export default {
     handler: async (req, res) => {
         try {
             const { otp } = req.body;
-            console.log("otp", otp);
             const user = req.user;
-            console.log("req.user", user);
-
             const { subscription } = req;
 
             if (user.type !== 'signup_verification') {
@@ -41,9 +39,6 @@ export default {
             if (!role) {
                 return responseHandler.error(res, "Role not found");
             }
-
-
-
 
             // Create verified user
             const newUser = role.role_name === 'employee' ? await User.create({
@@ -75,7 +70,6 @@ export default {
                 links: user.links,
                 client_id: user.client_id,
                 created_by: user.created_by
-
             }) : await User.create({
                 username: user.username,
                 email: user.email,
@@ -87,6 +81,27 @@ export default {
                 isEmailVerified: true,
                 created_by: user.created_by
             });
+
+            // If this is a client, seed their labels
+            if (role.role_name === 'client') {
+                try {
+                    const labelTypes = ['source', 'status', 'tag', 'contract_type', 'category', 'followup'];
+
+                    // Seed labels in parallel
+                    await Promise.all(labelTypes.map(type =>
+                        seedDefaultLabels(
+                            newUser.id,    // related_id
+                            newUser.id,    // client_id
+                            'system',      // created_by
+                            type          // label type
+                        )
+                    ));
+                } catch (labelError) {
+                    console.error('Error seeding labels:', labelError);
+                    // Continue with verification even if label seeding fails
+                }
+            }
+
             //increment user/client count if subscription exists
             if (subscription) {
                 const clientSubscription = await ClientSubscription.findByPk(subscription.id);
@@ -98,7 +113,6 @@ export default {
                     }
                 }
             }
-
 
             // After creating the new user, generate a login token
             const token = jwt.sign(

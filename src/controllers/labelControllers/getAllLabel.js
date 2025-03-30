@@ -4,7 +4,6 @@ import validator from "../../utils/validator.js";
 import responseHandler from "../../utils/responseHandler.js";
 import Role from "../../models/roleModel.js";
 import User from "../../models/userModel.js";
-import { seedDefaultLabels } from "./createLabel.js";
 
 export default {
     validator: validator({
@@ -20,7 +19,6 @@ export default {
         try {
             const userRole = req.user.role;
             const { id } = req.params;
-            let tags;
             let client_id;
 
             // Find role in role model
@@ -45,18 +43,12 @@ export default {
                 client_id = user.client_id;
             }
 
-            tags = await Tag.findAll({
+            const tags = await Tag.findAll({
                 where: {
                     related_id: id,
                     client_id: client_id
                 }
             });
-
-
-            // If no tags exist, seed default tags
-            if (tags.length === 0) {
-                tags = await seedDefaultLabels(id, client_id);
-            }
 
             return responseHandler.success(res, "Tags retrieved successfully", tags);
         } catch (error) {

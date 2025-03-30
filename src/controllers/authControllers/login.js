@@ -19,7 +19,7 @@ export default {
     handler: async (req, res) => {
         try {
             const { login, password } = req.body;
-            
+
             // First try to find SuperAdmin
             let entity = await SuperAdmin.findOne({
                 where: { [Op.or]: [{ email: login }, { username: login }, { phone: login }] },
@@ -27,7 +27,7 @@ export default {
             });
 
             let role = null;
-            
+
             if (entity) {
                 // If SuperAdmin found, get their role
                 role = await Role.findOne({ where: { role_name: 'super-admin' } });
@@ -37,7 +37,7 @@ export default {
                     where: { [Op.or]: [{ email: login }, { username: login }, { phone: login }] },
                     attributes: { exclude: ['conversations'] }
                 });
-                
+
                 if (entity) {
                     // If User found, get their role
                     role = await Role.findOne({ where: { id: entity.role_id } });
@@ -65,9 +65,9 @@ export default {
                         roleName: role.role_name,
                         created_by: entity.created_by
                     }, JWT_SECRET, { expiresIn: '30d' });
-                    
-                    return responseHandler.success(res, "Login successful", { 
-                        token, 
+
+                    return responseHandler.success(res, "Login successful", {
+                        token,
                         user: {
                             ...entity.toJSON(),
                             roleName: role.role_name
@@ -86,9 +86,9 @@ export default {
                         roleName: role.role_name,
                         created_by: entity.created_by
                     }, JWT_SECRET, { expiresIn: '30d' });
-                    
-                    return responseHandler.success(res, "Login successful", { 
-                        token, 
+
+                    return responseHandler.success(res, "Login successful", {
+                        token,
                         user: {
                             ...entity.toJSON(),
                             roleName: role.role_name
@@ -111,7 +111,7 @@ export default {
     adminHandler: async (req, res) => {
         try {
             const { email, isClientPage } = req.body;
-            
+
             // First try to find SuperAdmin with Role
             let entity = await SuperAdmin.findOne({
                 where: { email },
@@ -171,8 +171,8 @@ export default {
                 delete userData.Role;
             }
 
-            return responseHandler.success(res, "Login successful", { 
-                token, 
+            return responseHandler.success(res, "Login successful", {
+                token,
                 user: userData
             });
         } catch (error) {
