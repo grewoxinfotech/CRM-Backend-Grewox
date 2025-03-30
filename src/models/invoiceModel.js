@@ -23,6 +23,11 @@ const Invoice = sequelize.define('invoice', {
         type: DataTypes.INTEGER,
         allowNull: false
     },
+    total_discount: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        defaultValue: null
+    },
     related_id: {
         type: DataTypes.STRING,
         allowNull: false

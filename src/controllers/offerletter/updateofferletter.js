@@ -27,7 +27,6 @@ export default {
             const file = req.file;
             const { job, job_applicant, offer_expiry, expected_joining_date, salary, description } = req.body;
 
-            console.log("dfgdgdf",req.body);
 
             const offerletter = await OfferLetter.findByPk(id);
             if (!offerletter) {

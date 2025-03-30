@@ -25,7 +25,6 @@ export default {
             });
 
             if (!userRole) {
-            // console.log("sdfsdfsdfsd",userRole);
 
                 return responseHandler.notFound(res, "User role not found");
             }

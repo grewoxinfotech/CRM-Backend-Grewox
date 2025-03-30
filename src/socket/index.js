@@ -400,7 +400,6 @@ function initializeSocket(server) {
                     });
                 });
 
-                console.log('Group created and stored:', group);
             } catch (error) {
                 console.error('Error in create_group:', error.message);
             }

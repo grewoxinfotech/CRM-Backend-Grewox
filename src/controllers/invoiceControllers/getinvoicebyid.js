@@ -19,7 +19,7 @@ export default {
         try {
             const { id } = req.params;
             const userRole = req.user.role;
-            let invoices;
+            let invoice;
 
             // Find role in role model
             const role = await Role.findOne({
@@ -31,12 +31,14 @@ export default {
             }
 
             if (role.role_name === 'client') {
-                // If user is client, find invoices matching their client_id
-                invoices = await Invoice.findAll({
+                // If user is client, find invoice matching their client_id and related_id
+                invoice = await Invoice.findAll({
                     where: {
+                        related_id: id,
                         client_id: req.user.id
                     }
                 });
+
             } else {
                 // For other roles, get client_id from user model
                 const user = await User.findOne({
@@ -47,14 +49,19 @@ export default {
                     return responseHandler.error(res, "User not found");
                 }
 
-                invoices = await Invoice.findAll({
+                invoice = await Invoice.findAll({
                     where: {
+                        related_id: id,
                         client_id: user.client_id
                     }
                 });
             }
 
-            return responseHandler.success(res, "Invoices fetched successfully", invoices);
+            if (!invoice) {
+                return responseHandler.error(res, "Invoice not found");
+            }
+
+            return responseHandler.success(res, "Invoice fetched successfully", invoice);
 
         } catch (error) {
             return responseHandler.error(res, error?.message);

@@ -16,14 +16,15 @@ export default {
             currency: Joi.string().optional().allow('', null),
             transactionId: Joi.string().optional().allow('', null),
             paymentMethod: Joi.string().optional().allow('', null),
-            remark: Joi.string().optional().allow('', null)
+            remark: Joi.string().optional().allow('', null),
+            status: Joi.string().optional().allow('', null)
         })
     }),
     handler: async (req, res) => {
         try {
            
             const { id } = req.params;
-            const { project_name, invoice, paidOn, amount, currency, transactionId, paymentMethod, remark } = req.body;
+            const { project_name, invoice, paidOn, amount, currency, transactionId, paymentMethod, remark, status } = req.body;
             const existingPayment = await Payment.findOne({ where: { invoice,related_id: id} });
             if (existingPayment) {
                 return responseHandler.error(res, "Payment already exists");
@@ -31,13 +32,14 @@ export default {
 
             const payment = await Payment.create({
                 related_id: id,
-                project_name,
+                project_name,   
                 invoice,
                 paidOn,
                 amount,
                 currency,
                 transactionId,
                 paymentMethod,
+                status,
                 remark,
                 client_id: req.des?.client_id,
                 created_by: req.user?.username,

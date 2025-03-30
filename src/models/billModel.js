@@ -97,7 +97,6 @@ Bill.beforeCreate(async (bill) => {
         raw: true
     });
 
-    // console.log("All existing bill numbers:", allBills);
 
     let highestNumber = 0;
     allBills.forEach(bill => {
@@ -109,13 +108,11 @@ Bill.beforeCreate(async (bill) => {
         }
     });
 
-    // console.log("Highest bill number found:", highestNumber);
 
     // Next number should be highest + 1
     const nextNumber = highestNumber + 1;
     bill.billNumber = `BILL#${nextNumber}`;
 
-    // console.log("New bill number assigned:", bill.billNumber);
 });
 
 export default Bill;

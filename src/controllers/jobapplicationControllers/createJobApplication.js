@@ -38,7 +38,6 @@ export default {
                 }
             }
 
-            console.log("eretre",cvUrl);
             // Create job application with CV
             const jobApplication = await JobApplication.create({ 
                 job, 

@@ -53,6 +53,7 @@ export default {
 
             // Handle file uploads if present
             if (uploadedFiles.length > 0) {
+                // Parse existing files if it's a string
                 const currentFiles = typeof deal.files === 'string' 
                     ? JSON.parse(deal.files)
                     : deal.files || [];

@@ -45,6 +45,11 @@ const Payment = sequelize.define('Payment', {
         type: DataTypes.STRING,
         allowNull: false,
     },
+    status: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: 'pending',
+    },
     transactionId: {
         type: DataTypes.STRING,
         allowNull: false,

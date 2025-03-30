@@ -17,16 +17,17 @@ export default {
             paidOn: Joi.date().optional().allow('', null),
             amount: Joi.number().optional().allow('', null),
             currency: Joi.string().optional().allow('', null),
-            transactionId: Joi.string().optional().allow('', null),
+            transactionId: Joi.number().optional().allow('', null),
             paymentMethod: Joi.string().optional().allow('', null),
-            remark: Joi.string().optional().allow('', null)
+            remark: Joi.string().optional().allow('', null),
+            status: Joi.string().optional().allow('', null)
         })
     }),
     handler: async (req, res) => {
         try {
             const { id } = req.params;
         
-            const { project, invoice, paidOn, amount, currency, transactionId, paymentMethod, remark } = req.body;
+            const { project, invoice, paidOn, amount, currency, transactionId, paymentMethod, remark, status } = req.body;
 
             const payment = await Payment.findByPk(id);
             if (!payment) {
@@ -44,6 +45,7 @@ export default {
                 amount,
                 currency,
                 transactionId,
+                status,
                 paymentMethod,
                 remark,
                 updated_by: req.user?.username

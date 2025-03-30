@@ -19,7 +19,6 @@ export default {
         try {
             const { name, contact, email, tax_number, alternate_number, billing_address, shipping_address } = req.body;
 
-            console.log(req.body,"fdffdfd");
             
 
             const existingCustomer = await Customer.findOne({ where: { contact } });
