@@ -145,13 +145,6 @@ export default {
 
 
 
-
-
-
-
-
-
-// import Joi from "joi";
 // import validator from "../../utils/validator.js";
 // import responseHandler from "../../utils/responseHandler.js";
 // import jwt from "jsonwebtoken";
