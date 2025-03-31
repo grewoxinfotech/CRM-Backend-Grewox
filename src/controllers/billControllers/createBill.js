@@ -12,18 +12,22 @@ export default {
             vendor: Joi.string().required(),
             billDate: Joi.date().required(),
             discription: Joi.string().required(),
-            status: Joi.string().required().default('pending'),
+            status: Joi.string().optional(),
             discount: Joi.number().optional(),
             tax: Joi.number().optional(),
+            currency: Joi.string().optional(),
             items: Joi.array().required(),
             total: Joi.number().required(),
             note: Joi.string().optional(),
+            subTotal: Joi.number().required(),
+            
+
         })
     }),
     handler: async (req, res) => {
         try {
             const { id } = req.params;
-            const { vendor, billDate, discription, status, discount, tax, items, total, note } = req.body;
+            const { vendor, billDate, discription, status, discount, tax, currency, items, total, note, subTotal } = req.body;
 
             // Determine bill_status based on total and updated total amounts
             const newBill = await Bill.create({ 
@@ -34,9 +38,11 @@ export default {
                 status,
                 discount,
                 tax, 
+                currency,
                 items,
                 total,
                 note,
+                subTotal,
                 bill_status: 'draft',
                 client_id: req.des?.client_id,
                 created_by: req.user?.username

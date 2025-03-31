@@ -34,6 +34,10 @@ const BillDebitnote = sequelize.define('BillDebitnote', {
     created_by: {
         type: DataTypes.STRING,
         allowNull: true,
+    },
+    currency: {
+        type: DataTypes.STRING,
+        allowNull: true,
     }
 }, );
 

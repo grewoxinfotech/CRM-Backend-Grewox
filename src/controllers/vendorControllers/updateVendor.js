@@ -11,13 +11,13 @@ export default {
         body: Joi.object({
             name: Joi.string().required(),
             contact: Joi.string().required(),
-            email: Joi.string().email().required(),
-            taxNumber: Joi.string().required(),
-            address: Joi.string().required(),
-            city: Joi.string().required(), 
-            state: Joi.string().required(),
-            country: Joi.string().required(),
-            zipcode: Joi.string().required()
+            email: Joi.string().email().optional().allow("", null), 
+            taxNumber: Joi.string().optional().allow("", null),
+            address: Joi.string().optional().allow("", null),
+            city: Joi.string().optional().allow("", null),
+            state: Joi.string().optional().allow("", null),
+            country: Joi.string().optional().allow("", null),
+            zipcode: Joi.string().optional().allow("", null)
         })
     }),
     handler: async (req, res) => {

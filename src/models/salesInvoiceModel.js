@@ -2,70 +2,86 @@ import { DataTypes } from "sequelize";
 import sequelize from "../config/db.js";
 import generateId from "../middlewares/generatorId.js";
 
-const SalesInvoice = sequelize.define("sales_Invoice", {
-  id: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    unique: true,
-    primaryKey: true,
-    defaultValue: () => generateId(),
-  },
-  salesInvoiceNumber: {
-    type: DataTypes.STRING,
-    unique: true,
-  },
-  related_id: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  customer: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  issueDate: {
-    type: DataTypes.DATE,
-    allowNull: false,
-  },
-  dueDate: {
-    type: DataTypes.DATE,
-    allowNull: false,
-  },
-  category: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
-  items: {
-    type: DataTypes.JSON,
-    allowNull: false,
-  },
-  discount: {
-    type: DataTypes.INTEGER,
-    allowNull: true,
-    defaultValue: null,
-  },
-  tax: {
-    type: DataTypes.INTEGER,
-    allowNull: true,
-    defaultValue: null,
-  },
-  total: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
-  client_id: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  created_by: {
-    type: DataTypes.STRING,
-    allowNull: true,
-    defaultValue: null,
-  },
-  updated_by: {
-    type: DataTypes.STRING,
-    allowNull: true,
-    defaultValue: null,
-  },
+
+const SalesInvoice = sequelize.define('sales_Invoice', {
+    id: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+        primaryKey: true,
+        defaultValue: () => generateId(),
+    },
+    salesInvoiceNumber: {
+        type: DataTypes.STRING,
+        unique: true,
+    },
+    subTotal: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    },
+    currency: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    related_id: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    customer: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    status: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: null
+    },
+    issueDate: {
+        type: DataTypes.DATE,
+        allowNull: false
+    },
+    dueDate: {
+        type: DataTypes.DATE,
+        allowNull: false
+    },
+    category: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: null  
+    },
+    items: {
+        type: DataTypes.JSON,
+        allowNull: false
+    },
+    discount: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        defaultValue: null
+    },
+    tax: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        defaultValue: null
+    },
+    total: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    },
+    client_id: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    created_by: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: null
+    },
+    updated_by: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: null
+
+    }
 });
 
 SalesInvoice.beforeCreate(async (salesInvoice) => {

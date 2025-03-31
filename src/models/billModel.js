@@ -25,7 +25,15 @@ const Bill = sequelize.define('Bill', {
         allowNull: false,
     },
     discription: {
-        type: DataTypes.JSON,
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    subTotal: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+    },
+    currency: {
+        type: DataTypes.STRING,
         allowNull: false,
     },
     items: {

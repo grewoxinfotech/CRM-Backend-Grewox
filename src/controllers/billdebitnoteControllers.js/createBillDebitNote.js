@@ -9,21 +9,21 @@ export default {
         body: Joi.object({
             bill: Joi.string().required(),
             date: Joi.date().required(), 
-            // currency: Joi.string().optional(),
+            currency: Joi.string().optional(),
             amount: Joi.number().required(),
             description: Joi.string().optional().allow('', null),
         })
     }),
     handler: async (req, res) => {
         try {
-            const { id } = req.user;
-            const { bill, date, amount, description } = req.body;
+          
+            const { bill, date, amount, description, currency } = req.body;
 
             // Find the bill in bill model
             const billData = await Bill.findOne({ 
                 where: { 
                     id: bill,
-                    // related_id: id 
+                    
                 } 
             });
             
@@ -41,7 +41,7 @@ export default {
                 // related_id: id, 
                 bill, 
                 date, 
-                // currency, 
+                currency, 
                 amount, 
                 description, 
                 client_id: req.des?.client_id,

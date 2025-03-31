@@ -9,26 +9,28 @@ export default {
             id: Joi.string().required()
         }),
         body: Joi.object({
-            vendor: Joi.string().required(),
-            billDate: Joi.date().required(),
-            discription: Joi.object().required(),
-            status: Joi.string().required().default('pending'),
+            vendor: Joi.string().optional(),
+            billDate: Joi.date().optional(),
+            discription: Joi.string().optional(),
+            status: Joi.string().optional(),
             discount: Joi.number().optional(),
             tax: Joi.number().optional(),
-            total: Joi.number().required(),
-            note: Joi.string().optional(),
+            total: Joi.number().optional(),
+            subTotal: Joi.number().optional(),
+            currency: Joi.string().optional(),
+            items: Joi.array().optional(),
         })
     }),
-    handler: async (req, res) => {
+    handler: async (req, res) => { 
         try {
             const { id } = req.params;
-            const { vendor, billDate, discription, status, discount, tax, total, note } = req.body;
+            const { vendor, billDate, discription, status, discount, tax, total, subTotal, currency, items } = req.body;
 
             const newBill = await Bill.findByPk(id);
             if (!newBill) {
                 return responseHandler.error(res, "Bill not found");
             }
-            await newBill.update({ vendor, billDate, discription, status, discount, tax, total, note, updated_by: req.user?.username });
+            await newBill.update({ vendor, billDate, discription, status, discount, tax, total, subTotal, currency, items, updated_by: req.user?.username });
             return responseHandler.success(res, "Bill updated successfully", newBill);
         } catch (error) {
             return responseHandler.error(res, error?.message);
