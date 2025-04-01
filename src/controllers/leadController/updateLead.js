@@ -11,6 +11,7 @@ export default {
         body: Joi.object({
             leadTitle: Joi.string().allow('', null),
             leadStage: Joi.string().allow('', null),
+            pipeline: Joi.string().allow('', null),
             currency: Joi.string().allow('', null),
             leadValue: Joi.number().allow('', null),
             source: Joi.string().allow('', null),
@@ -31,7 +32,7 @@ export default {
     handler: async (req, res) => {
         try {
             const { id } = req.params;
-            const { leadStage, leadTitle, firstName, lastName, phoneCode, telephone, email, address, interest_level, lead_members, category, status, source, company_name, currency, leadValue } = req.body;
+            const { leadStage, leadTitle, firstName, lastName, phoneCode, telephone, email, address, interest_level, lead_members, category, status, source, company_name, currency, leadValue, pipeline } = req.body;
 
             const lead = await Lead.findByPk(id);
 
@@ -56,6 +57,7 @@ export default {
                 company_name,
                 currency,
                 leadValue,
+                pipeline,
                 updated_by: req.user?.username
             });
 

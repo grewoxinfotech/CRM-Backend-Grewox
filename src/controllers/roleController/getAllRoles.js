@@ -62,6 +62,11 @@ export default {
             } else if (role.role_name === 'client') {
                 // If user is client, find projects matching their client_id
                 roles = await Role.findAll(
+                    {
+                        where: {
+                            client_id: req.user.id
+                        }
+                    }
                 );
             } else {
                 // For other roles, get client_id from user model

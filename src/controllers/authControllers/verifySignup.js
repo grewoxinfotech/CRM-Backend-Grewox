@@ -21,6 +21,7 @@ export default {
         try {
             const { otp } = req.body;
             const user = req.user;
+
             const { subscription } = req;
 
             if (user.type !== 'signup_verification') {

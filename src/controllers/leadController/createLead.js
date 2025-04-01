@@ -8,6 +8,7 @@ export default {
         body: Joi.object({
             leadTitle: Joi.string().required(),
             leadStage: Joi.string().required(),
+            pipeline: Joi.string().required(),
             currency: Joi.string().required(),
             leadValue: Joi.number().required(),
             source: Joi.string().required(),
@@ -27,13 +28,13 @@ export default {
 
     handler: async (req, res) => {
         try {
-            const { leadStage, leadTitle, firstName, lastName, phoneCode, telephone, email, address, interest_level, lead_members, category, status, source, company_name, currency, leadValue } = req.body;
+            const { leadStage, leadTitle, firstName, lastName, phoneCode, telephone, email, address, interest_level, lead_members, category, status, source, company_name, currency, leadValue, pipeline } = req.body;
             const existingLead = await Lead.findOne({ where: { email } });
             if (existingLead) {
                 return responseHandler.conflict(res, "Lead with this email already exists!");
             }
             const lead = await Lead.create({
-                leadStage, leadTitle, firstName, lastName, phoneCode, telephone, email, address, interest_level, lead_members, category, status, source, company_name, currency, leadValue,
+                leadStage, leadTitle, firstName, lastName, phoneCode, telephone, email, address, interest_level, lead_members, category, status, source, company_name, currency, leadValue, pipeline,
                 client_id: req.des?.client_id,
                 created_by: req.user?.username
             });

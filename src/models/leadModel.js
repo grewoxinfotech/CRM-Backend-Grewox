@@ -17,6 +17,10 @@ const Lead = sequelize.define('Lead', {
         type: DataTypes.STRING,
         allowNull: true,
     },
+    pipeline: {
+        type: DataTypes.STRING,
+        allowNull: true,
+    },
     currency: {
         type: DataTypes.STRING,
         allowNull: false,

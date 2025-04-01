@@ -17,7 +17,7 @@ export default {
             paidOn: Joi.date().optional().allow('', null),
             amount: Joi.number().optional().allow('', null),
             currency: Joi.string().optional().allow('', null),
-            transactionId: Joi.number().optional().allow('', null),
+            transactionId: Joi.string().optional().allow('', null),
             paymentMethod: Joi.string().optional().allow('', null),
             remark: Joi.string().optional().allow('', null),
             status: Joi.string().optional().allow('', null)

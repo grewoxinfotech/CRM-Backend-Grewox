@@ -6,19 +6,19 @@ import validator from "../../utils/validator.js";
 export default {
     validator: validator({
         body: Joi.object({
-            firstName: Joi.string().optional().allow(null),
+            firstName: Joi.string().required(),
             products: Joi.object({
                 products: Joi.array().items(Joi.string()).optional()
             }).optional().allow("",null),
-            email: Joi.string().optional().allow(null),
-            phone: Joi.string().optional().allow(null),
+            email: Joi.string().required(),
+            phone: Joi.string().required(),
             dealName: Joi.string().required(),
-            pipeline: Joi.string().optional().allow("",null),
-            status: Joi.string().optional().allow("",null),
-            stage: Joi.string().optional().allow("",null),
+            pipeline: Joi.string().required(),
+            status: Joi.string().required(),
+            stage: Joi.string().required(),
             label: Joi.string().optional().allow("",null),
-            value: Joi.number().optional().allow("",null),
-            currency: Joi.string().optional().allow("",null),
+            value: Joi.number().required(),
+            currency: Joi.string().required(),
             closedDate: Joi.date().optional().allow("",null),
             company_name: Joi.string().optional().allow("",null),
             source: Joi.string().optional().allow("",null),

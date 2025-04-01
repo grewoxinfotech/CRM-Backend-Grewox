@@ -14,11 +14,13 @@ export default {
         try {
             const { id } = req.params;
 
+            // Find the client
             const client = await User.findByPk(id);
             if (!client) {
                 return responseHandler.error(res, "Client not found");
             }
 
+            // Delete S3 files if they exist
             if (client.profilePic) {
                 const key = decodeURIComponent(client.profilePic.split(".com/").pop());
                 const s3Params = {
@@ -37,10 +39,12 @@ export default {
                 await s3.deleteObject(s3Params).promise();
             }
 
+            // The cascadeDelete middleware will handle all related deletions
             await client.destroy();
-            return responseHandler.success(res, "Client deleted successfully", client);
+
+            return responseHandler.success(res, "Client and all related records deleted successfully");
         } catch (error) {
-            return responseHandler.error(res, error?.message);
+            return responseHandler.error(res, error?.message || "Error deleting client and related records");
         }
     }
-}
+};
