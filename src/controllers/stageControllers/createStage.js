@@ -9,7 +9,7 @@ const defaultStages = {
         { stageName: "New Lead", stageType: "lead" },
         { stageName: "Qualified", stageType: "lead" },
         { stageName: "Negotiation", stageType: "lead" },
-        { stageName: "Closed Won", stageType: "lead" }
+        { stageName: "Closed Won", stageType: "lead" },
     ],
     marketing: [
         { stageName: "Lead Received", stageType: "deal" },
