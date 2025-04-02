@@ -10,12 +10,20 @@ const defaultStages = {
         { stageName: "Qualified", stageType: "lead" },
         { stageName: "Negotiation", stageType: "lead" },
         { stageName: "Closed Won", stageType: "lead" },
+        { stageName: "Initial Contact", stageType: "deal" },
+        { stageName: "Meeting Scheduled", stageType: "deal" },
+        { stageName: "Proposal Made", stageType: "deal" },
+        { stageName: "Contract Sent", stageType: "deal" }
     ],
     marketing: [
         { stageName: "Lead Received", stageType: "deal" },
         { stageName: "Initial Contact", stageType: "deal" },
         { stageName: "Proposal Sent", stageType: "deal" },
-        { stageName: "Deal Closed", stageType: "deal" }
+        { stageName: "Deal Closed", stageType: "deal" },
+        { stageName: "New Lead", stageType: "lead" },
+        { stageName: "Lead Qualified", stageType: "lead" },
+        { stageName: "Marketing Engaged", stageType: "lead" },
+        { stageName: "Campaign Active", stageType: "lead" }
     ],
 };
 

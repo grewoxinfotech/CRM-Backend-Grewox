@@ -77,8 +77,8 @@ export const defaultLabels = {
     { name: "WhatsApp", color: "#25D366" },
     { name: "Email", color: "#EA4335" },
     { name: "Telegram", color: "#0088cc" },
-    { name: "Video Call", color: "#7c3aed" }
-  ]
+    { name: "Video Call", color: "#7c3aed" },
+  ],
 };
 
 // Function to seed default labels by type

@@ -86,7 +86,7 @@ export default {
             // If this is a client, seed their labels
             if (role.role_name === 'client') {
                 try {
-                    const labelTypes = ['source', 'status', 'tag', 'contract_type', 'category', 'followup'];
+                    const labelTypes = ['source', 'status', 'tag', 'contract_type', 'category', 'followup', 'label'];
 
                     // Seed labels in parallel
                     await Promise.all(labelTypes.map(type =>

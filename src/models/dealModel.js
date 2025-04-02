@@ -9,8 +9,38 @@ const Deal = sequelize.define("Deal", {
         unique: true,
         defaultValue: () => generateId()
     },
-    leadTitle: {
+    dealTitle: {
         type: DataTypes.STRING,
+        allowNull: false,
+    },
+    currency: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    value: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    },
+    pipeline: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    stage: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    status: {
+        type: DataTypes.ENUM('won', 'lost', 'pending'),
+        allowNull: false,
+        defaultValue: 'pending'
+    },
+    label: {
+        type: DataTypes.ENUM('Hot', 'Warm', 'Cold'),
+        allowNull: false,
+        defaultValue: 'Cold'
+    },
+    closedDate: {
+        type: DataTypes.DATE,
         allowNull: true,
         defaultValue: null
     },
@@ -34,43 +64,8 @@ const Deal = sequelize.define("Deal", {
         allowNull: true,
         defaultValue: null
     },
-    dealName: {
+    source: {
         type: DataTypes.STRING,
-        allowNull: false,
-        unique: true
-    },
-    pipeline: {
-        type: DataTypes.STRING,
-        allowNull: true,
-        defaultValue: null
-    },
-    stage: {
-        type: DataTypes.STRING,
-        allowNull: true,
-        defaultValue: null
-    },
-    status: {
-        type: DataTypes.ENUM('won', 'lost', 'pending'),    
-        allowNull: true,
-        defaultValue: 'pending'
-    },
-    label: {
-        type: DataTypes.STRING,
-        allowNull: true,
-        defaultValue: null
-    },
-    value: {
-        type: DataTypes.FLOAT,
-        allowNull: true,
-        defaultValue: null
-    },
-    currency: {
-        type: DataTypes.STRING,
-        allowNull: true,
-        defaultValue: null
-    },
-    closedDate: {
-        type: DataTypes.DATE,
         allowNull: true,
         defaultValue: null
     },
@@ -80,11 +75,6 @@ const Deal = sequelize.define("Deal", {
         defaultValue: null
     },
     address: {
-        type: DataTypes.STRING,
-        allowNull: true,
-        defaultValue: null
-    },
-    website: {
         type: DataTypes.STRING,
         allowNull: true,
         defaultValue: null
@@ -101,16 +91,6 @@ const Deal = sequelize.define("Deal", {
     },
     assigned_to: {
         type: DataTypes.JSON,
-    allowNull: true,
-        defaultValue: null
-    },
-    source: {
-        type: DataTypes.STRING,
-        allowNull: true,
-        defaultValue: null
-    },
-    project: {
-        type: DataTypes.STRING,
         allowNull: true,
         defaultValue: null
     },

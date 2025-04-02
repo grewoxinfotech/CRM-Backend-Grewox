@@ -25,39 +25,22 @@ export default {
             interest_level: Joi.string().allow('', null),
             lead_members: Joi.object().allow(null),
             category: Joi.string().allow('', null),
-            status: Joi.string().allow('', null)
+            is_converted: Joi.boolean().allow(null),
         })
     }),
 
     handler: async (req, res) => {
         try {
             const { id } = req.params;
-            const { leadStage, leadTitle, firstName, lastName, phoneCode, telephone, email, address, interest_level, lead_members, category, status, source, company_name, currency, leadValue, pipeline } = req.body;
+            const updateData = req.body;
 
             const lead = await Lead.findByPk(id);
-
             if (!lead) {
                 return responseHandler.notFound(res, "Lead not found");
             }
 
             await lead.update({
-                leadStage,
-                leadTitle,
-                firstName,
-                lastName,
-                phoneCode,
-                telephone,
-                email,
-                address,
-                interest_level,
-                lead_members,
-                category,
-                status,
-                source,
-                company_name,
-                currency,
-                leadValue,
-                pipeline,
+                ...updateData,
                 updated_by: req.user?.username
             });
 

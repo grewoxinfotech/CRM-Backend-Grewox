@@ -82,11 +82,6 @@ const Lead = sequelize.define('Lead', {
         allowNull: true,
         defaultValue: null
     },
-    status: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        defaultValue: 'new'
-    },
     interest_level: {
         type: DataTypes.ENUM('high', 'medium', 'low'),
         allowNull: true,
@@ -101,6 +96,11 @@ const Lead = sequelize.define('Lead', {
             max: 100
         },
         comment: 'Lead score as a percentage value (1-100%)'
+    },
+    is_converted: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false
     },
     client_id: {
         type: DataTypes.STRING,
