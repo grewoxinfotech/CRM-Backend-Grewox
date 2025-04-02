@@ -12,7 +12,7 @@ export default {
             title: Joi.string().required(),
             description: Joi.string().required(),
             branch: Joi.object({
-                branches: Joi.array().items(Joi.string())
+                branch: Joi.array().items(Joi.string())
             }).optional().allow('', null),
         })
     }),
