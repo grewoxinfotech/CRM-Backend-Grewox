@@ -24,7 +24,7 @@ export default {
             accountholder: Joi.string().allow('', null),
             accountnumber: Joi.number().allow('', null),
             bankname: Joi.string().allow('', null),
-            ifsc: Joi.number().allow('', null),
+            ifsc: Joi.string().allow('', null),
             documents: Joi.object().optional().allow(null),
             links: Joi.object().optional().allow(null),
         })

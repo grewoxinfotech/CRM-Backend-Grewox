@@ -3,6 +3,11 @@ import validator from "../../utils/validator.js";
 import Inquiry from "../../models/inquiryModel.js";
 import responseHandler from "../../utils/responseHandler.js";
 
+
+
+
+
+
 export default {
     validator: validator({
         params: Joi.object({
