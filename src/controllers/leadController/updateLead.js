@@ -26,6 +26,7 @@ export default {
             lead_members: Joi.object().allow(null),
             category: Joi.string().allow('', null),
             is_converted: Joi.boolean().allow(null),
+            status: Joi.string().allow('', null),
         })
     }),
 

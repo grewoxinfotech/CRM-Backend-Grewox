@@ -10,34 +10,29 @@ export default {
             id: Joi.string().required()
         }),
         body: Joi.object({
-            leadTitle: Joi.string().optional().allow(null),
-            firstName: Joi.string().optional().allow(null), 
+            dealTitle: Joi.string().optional().allow(null),
+            firstName: Joi.string().optional().allow(null),
             lastName: Joi.string().optional().allow(null),
             email: Joi.string().optional().allow(null),
             phone: Joi.string().optional().allow(null),
-            dealName: Joi.string().optional().allow(null),
-            pipeline: Joi.string().optional().allow("",null),
-            stage: Joi.string().optional().allow("",null),
-            label: Joi.string().optional().allow("",null),
-            value: Joi.number().optional().allow("",null),
-            status: Joi.string().optional().allow("",null),
-            currency: Joi.string().optional().allow("",null),
-            closedDate: Joi.date().optional().allow("",null),
-            company_name: Joi.string().optional().allow("",null),
-            address: Joi.string().optional().allow("",null),
-            website: Joi.string().optional().allow("",null),
+            pipeline: Joi.string().optional().allow(null),
+            stage: Joi.string().optional().allow(null),
+            label: Joi.string().valid('Hot', 'Warm', 'Cold').optional().allow(null),
+            value: Joi.number().optional().allow(null),
+            status: Joi.string().valid('won', 'lost', 'pending').optional().allow(null),
+            currency: Joi.string().optional().allow(null),
+            closedDate: Joi.date().optional().allow(null),
+            company_name: Joi.string().optional().allow(null),
+            address: Joi.string().optional().allow(null),
             files: Joi.array().items(Joi.object({
                 filename: Joi.string().required(),
                 url: Joi.string().required()
             })).optional(),
-            assigned_to: Joi.object({
-                assigned_to: Joi.array().items(Joi.string()).optional()
-            }).optional().allow("",null),
-            products: Joi.object({
-                products: Joi.array().items(Joi.string()).optional()
-            }).optional().allow("",null),
-            source: Joi.string().optional().allow("",null),
-            project: Joi.string().optional().allow("",null)
+            assigned_to: Joi.object().optional().allow(null),
+            products: Joi.object().optional().allow(null),
+            source: Joi.string().optional().allow(null),
+            client_id: Joi.string().optional(),
+            is_won: Joi.boolean().optional().allow(null)
         })
     }),
     handler: async (req, res) => {
@@ -53,12 +48,10 @@ export default {
 
             // Handle file uploads if present
             if (uploadedFiles.length > 0) {
-                // Parse existing files if it's a string
-                const currentFiles = typeof deal.files === 'string' 
+                const currentFiles = typeof deal.files === 'string'
                     ? JSON.parse(deal.files)
                     : deal.files || [];
 
-                // Check for duplicate filenames
                 const duplicateFiles = uploadedFiles.filter(newFile =>
                     currentFiles.some(existingFile => existingFile.filename === newFile.originalname)
                 );
@@ -67,7 +60,6 @@ export default {
                     return responseHandler.error(res, `These files already exist in deal: ${duplicateFiles.map(f => f.originalname).join(', ')}`);
                 }
 
-                // Upload new files to S3
                 const processedFiles = await Promise.all(
                     uploadedFiles.map(async (file) => {
                         const url = await uploadToS3(file, "deal-files", file.originalname, req.user?.username);
@@ -78,13 +70,12 @@ export default {
                     })
                 );
 
-                // Combine existing and new files
                 updateData.files = [...currentFiles, ...processedFiles];
             }
 
-            await deal.update({ 
+            await deal.update({
                 ...updateData,
-                updated_by: req.user?.username 
+                updated_by: req.user?.username
             });
 
             return responseHandler.success(res, "Deal updated successfully", deal);

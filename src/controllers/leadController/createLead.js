@@ -22,6 +22,7 @@ export default {
             interest_level: Joi.string().required().valid('high', 'medium', 'low'),
             lead_members: Joi.object().allow(null),
             category: Joi.string().allow('', null),
+            status: Joi.string().allow('', null),
         })
     }),
 
@@ -33,7 +34,7 @@ export default {
                 return responseHandler.conflict(res, "Lead with this email already exists!");
             }
             const lead = await Lead.create({
-                leadStage, leadTitle, firstName, lastName, phoneCode, telephone, email, address, interest_level, lead_members, category, source, company_name, currency, leadValue, pipeline,
+                leadStage, leadTitle, firstName, lastName, phoneCode, telephone, email, address, interest_level, lead_members, category, status, source, company_name, currency, leadValue, pipeline,
                 client_id: req.des?.client_id,
                 created_by: req.user?.username
             });
