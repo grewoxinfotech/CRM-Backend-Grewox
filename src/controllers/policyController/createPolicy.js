@@ -7,7 +7,7 @@ import uploadToS3 from "../../utils/uploadToS3.js";
 export default {
     validator: validator({
         body: Joi.object({
-            branch: Joi.string().required(),
+       
             title: Joi.string().required(),
             description: Joi.string().optional().allow('', null),
         })
@@ -15,13 +15,13 @@ export default {
     handler: async (req, res) => {
         try {
             const file = req.file;
-            const { branch, title, description } = req.body;
+            const { title, description } = req.body;
             const existingPolicy = await Policy.findOne({ where: { title } });
             if (existingPolicy) {
                 return responseHandler.error(res, "Policy already exists");
             }
             const uploadedFile = await uploadToS3(file, req.user?.roleName, "policies", req.user?.username);
-            const policy = await Policy.create({ branch, title, description, file: uploadedFile, created_by: req.user?.username });
+            const policy = await Policy.create({ title, description, file: uploadedFile, created_by: req.user?.username });
             return responseHandler.success(res, "Policy created successfully", policy);
         } catch (error) {
             return responseHandler.error(res, error?.message);

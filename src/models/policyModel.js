@@ -10,10 +10,7 @@ const Policy = sequelize.define('policy', {
         primaryKey: true,
         defaultValue: () => generateId(),
     },
-    branch: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
+  
     title: {
         type: DataTypes.STRING,
         allowNull: false

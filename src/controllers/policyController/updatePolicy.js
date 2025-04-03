@@ -12,7 +12,6 @@ export default {
             id: Joi.string().required()
         }),
         body: Joi.object({
-            branch: Joi.string().optional(),
             title: Joi.string().optional(),
             description: Joi.string().optional(),
         })
@@ -21,7 +20,7 @@ export default {
         try {
             const { id } = req.params;
             const file = req.file;
-            const { branch, title, description } = req.body;
+            const { title, description } = req.body;
             const policy = await Policy.findByPk(id);
             if (!policy) {
                 return responseHandler.error(res, "Policy not found");
@@ -42,7 +41,7 @@ export default {
                 }
                 fileUrl = await uploadToS3(file, req.user?.roleName, "policies", req.user?.username);
             }
-            await policy.update({ branch, title, description, file: fileUrl, updated_by: req.user?.username });
+            await policy.update({ title, description, file: fileUrl, updated_by: req.user?.username });
             return responseHandler.success(res, "Policy updated successfully", policy);
         } catch (error) {
             return responseHandler.error(res, error?.message);
