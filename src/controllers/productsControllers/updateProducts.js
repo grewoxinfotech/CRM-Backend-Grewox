@@ -15,7 +15,8 @@ export default {
         body: Joi.object({
             name: Joi.string().required(),
             category: Joi.string().required(),
-            price: Joi.number().required(),
+            buying_price: Joi.number().min(0).required(),
+            selling_price: Joi.number().min(0).required(),
             sku: Joi.string().optional().allow('', null),
             currency: Joi.string().optional().allow('', null),
             hsn_sac: Joi.string().optional().allow('', null),
@@ -31,7 +32,7 @@ export default {
         try {
             const image = req.file;
             const { id } = req.params;
-                const { name, category, price, sku, hsn_sac, description, currency, stock_quantity, min_stock_level, max_stock_level, reorder_quantity, stock_status } = req.body;
+            const { name, category, buying_price, selling_price, sku, hsn_sac, description, currency, stock_quantity, min_stock_level, max_stock_level, reorder_quantity, stock_status } = req.body;
             const product = await Product.findByPk(id);
             if (!product) {
                 return responseHandler.error(res, "Product not found");
@@ -59,7 +60,7 @@ export default {
                 }
                 imageUrl = await uploadToS3(image, req.user?.roleName, "products", req.user?.username);
             }
-            await product.update({ name, category, price, sku, hsn_sac, description, image: imageUrl, currency, stock_quantity, min_stock_level, max_stock_level, reorder_quantity, stock_status, updated_by: req.user?.username });
+            await product.update({ name, category, buying_price, selling_price, sku, hsn_sac, description, image: imageUrl, currency, stock_quantity, min_stock_level, max_stock_level, reorder_quantity, stock_status, updated_by: req.user?.username });
             await Activity.create({
                 related_id: product.related_id,
                 activity_from: "product",
