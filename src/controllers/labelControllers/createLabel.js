@@ -111,14 +111,18 @@ export const seedDefaultLabels = async (related_id, client_id, username, type) =
 
 export default {
   validator: validator({
+    params: Joi.object({
+      id: Joi.string().required()
+    }),
     body: Joi.object({
       name: Joi.string().required(),
-      color: Joi.string().required(),
+      color: Joi.string().optional(),
       lableType: Joi.string().required()
     })
   }),
   handler: async (req, res) => {
     try {
+      const { id } = req.params;
       const { name, color, lableType } = req.body;
 
       // Check if label already exists
@@ -134,6 +138,7 @@ export default {
         name,
         color,
         lableType,
+        related_id: id,
         client_id: req.des?.client_id,
         created_by: req.user?.username
       });

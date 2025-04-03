@@ -17,20 +17,44 @@ const Product = sequelize.define('Product', {
         type: DataTypes.STRING,
         allowNull: false,
     },
-    price: {
-        type: DataTypes.INTEGER,
+    currency: {
+        type: DataTypes.STRING,
         allowNull: false,
+        defaultValue: 'INR'
+    },
+    buying_price: {
+        type: DataTypes.FLOAT,
+        allowNull: false,
+        defaultValue: 0,
+        validate: {
+            min: 0
+        }
+    },
+    selling_price: {
+        type: DataTypes.FLOAT,
+        allowNull: false,
+        validate: {
+            min: 0
+        }
+    },
+    profit_margin: {
+        type: DataTypes.VIRTUAL,
+        get() {
+            return this.selling_price - this.buying_price;
+        }
+    },
+    profit_percentage: {
+        type: DataTypes.VIRTUAL,
+        get() {
+            if (this.buying_price === 0) return 0;
+            return ((this.selling_price - this.buying_price) / this.buying_price) * 100;
+        }
     },
     category: {
         type: DataTypes.STRING,
         allowNull: false,
     },
     sku: {
-        type: DataTypes.STRING,
-        allowNull: true,
-        defaultValue: null
-    },
-    tax: {
         type: DataTypes.STRING,
         allowNull: true,
         defaultValue: null
@@ -50,6 +74,67 @@ const Product = sequelize.define('Product', {
         allowNull: true,
         defaultValue: null
     },
+    // Stock Management Fields
+    stock_quantity: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+        validate: {
+            min: 0
+        }
+    },
+    min_stock_level: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+        validate: {
+            min: 0
+        }
+    },
+    max_stock_level: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        defaultValue: null,
+        validate: {
+            min: 0
+        }
+    },
+    reorder_quantity: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        defaultValue: null,
+        validate: {
+            min: 0
+        }
+    },
+    stock_status: {
+        type: DataTypes.ENUM('in_stock', 'low_stock', 'out_of_stock'),
+        allowNull: false,
+        defaultValue: 'in_stock'
+    },
+    last_stock_update: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW
+    },
+    total_investment: {
+        type: DataTypes.VIRTUAL,
+        get() {
+            return this.buying_price * this.stock_quantity;
+        }
+    },
+    potential_revenue: {
+        type: DataTypes.VIRTUAL,
+        get() {
+            return this.selling_price * this.stock_quantity;
+        }
+    },
+    potential_profit: {
+        type: DataTypes.VIRTUAL,
+        get() {
+            return this.profit_margin * this.stock_quantity;
+        }
+    },
     client_id: {
         type: DataTypes.STRING,
         allowNull: false
@@ -66,19 +151,36 @@ const Product = sequelize.define('Product', {
     }
 });
 
-Product.beforeCreate(async (product) => {
-    let isUnique = false;
-    let newId;
-    while (!isUnique) {
-        newId = generateId();
-        const existingProduct = await Product.findOne({
-            where: { id: newId },
-        });
-        if (!existingProduct) {
-            isUnique = true;
+// Add hook to automatically update stock status when stock quantity changes
+Product.beforeSave(async (product) => {
+    // Generate unique ID for new products
+    if (!product.id) {
+        let isUnique = false;
+        let newId;
+        while (!isUnique) {
+            newId = generateId();
+            const existingProduct = await Product.findOne({
+                where: { id: newId },
+            });
+            if (!existingProduct) {
+                isUnique = true;
+            }
+        }
+        product.id = newId;
+    }
+
+    // Update stock status based on quantity
+    if (product.changed('stock_quantity')) {
+        product.last_stock_update = new Date();
+        
+        if (product.stock_quantity <= 0) {
+            product.stock_status = 'out_of_stock';
+        } else if (product.stock_quantity <= product.min_stock_level) {
+            product.stock_status = 'low_stock';
+        } else {
+            product.stock_status = 'in_stock';
         }
     }
-    product.id = newId;
 });
 
 export default Product;
