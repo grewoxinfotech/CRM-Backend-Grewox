@@ -1,6 +1,6 @@
 import express from "express";
 import { signup, login, getAllUsers, getUserById, updateUser, deleteUser, verifySignup, resendSignupOtp, forgotPassword, verifyOtp, resetPassword, verify } from "../controllers/authControllers/index.js";
-import { authenticateUser, checkUserRole, checkRole } from "../middlewares/index.js";
+import { authenticateUser, checkRole } from "../middlewares/index.js";
 import { checkSubscriptionLimits, getActiveSubscription, checkSubscriptionDates } from "../middlewares/checkSubscriptionLimits.js";
 import passCompanyDetail from "../middlewares/passCompanyDetail.js";
 
@@ -18,7 +18,7 @@ router.post("/reset-password", authenticateUser, resetPassword.validator, resetP
 router.post("/verify", authenticateUser, verify.validator, verify.handler);
 
 //Super-Admin 
-router.use(authenticateUser, checkUserRole(['super-admin', 'client']));
+router.use(authenticateUser, checkRole);
 
 router.get('/', getAllUsers.validator, getAllUsers.handler);
 router.get('/:id', getUserById.validator, getUserById.handler);
