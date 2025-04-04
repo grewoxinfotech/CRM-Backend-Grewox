@@ -28,13 +28,13 @@ export default {
 
     handler: async (req, res) => {
         try {
-            const { leadStage, leadTitle, firstName, lastName, phoneCode, telephone, email, address, interest_level, lead_members, category, source, company_name, currency, leadValue, pipeline } = req.body;
+            const { leadStage, leadTitle, firstName, lastName, phoneCode, telephone, email, address, interest_level, lead_members, category, source, company_name, currency, leadValue, pipeline,status } = req.body;
             const existingLead = await Lead.findOne({ where: { email } });
             if (existingLead) {
                 return responseHandler.conflict(res, "Lead with this email already exists!");
             }
             const lead = await Lead.create({
-                leadStage, leadTitle, firstName, lastName, phoneCode, telephone, email, address, interest_level, lead_members, category, status, source, company_name, currency, leadValue, pipeline,
+                leadStage, leadTitle, firstName, lastName, phoneCode, telephone, email, address, interest_level, lead_members, category, status, source, company_name, currency, leadValue, pipeline,status,
                 client_id: req.des?.client_id,
                 created_by: req.user?.username
             });
