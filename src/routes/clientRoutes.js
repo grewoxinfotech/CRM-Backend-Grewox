@@ -2,6 +2,7 @@ import express from "express";
 import { getAllClients, updateClient, deleteClient, createClient, updatemail } from "../controllers/clientControllers/index.js";
 import { authenticateUser, checkRole, checkUserRole } from "../middlewares/index.js";
 import upload from "../middlewares/upload.js";
+import cascadeDelete from "../middlewares/cascadeDelete.js";
 
 const router = express.Router();
 
@@ -20,8 +21,6 @@ router.use(authenticateUser, checkUserRole(['super-admin']));
 
 router.post('/', createClient.validator, createClient.handler);
 
-
-
-router.delete('/:id', deleteClient.validator, deleteClient.handler);
+router.delete('/:id', cascadeDelete, deleteClient.validator, deleteClient.handler);
 
 export default router;

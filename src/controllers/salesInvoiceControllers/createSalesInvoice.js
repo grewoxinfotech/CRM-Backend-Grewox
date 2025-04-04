@@ -21,8 +21,9 @@ export default {
                     unit_price: Joi.number().min(0).required(),
                     tax_rate: Joi.number().min(0).optional(),
                     discount: Joi.number().min(0).optional()
-                })
+                })  
             ).required().min(1),
+
             payment_status: Joi.string().valid('paid', 'unpaid', 'partially_paid').default('unpaid'),
             currency: Joi.string().required(),
             additional_notes: Joi.string().optional().allow("", null)
@@ -69,8 +70,19 @@ export default {
                 const item_cost = product.buying_price * item.quantity;
                 const item_subtotal = item.unit_price * item.quantity;
                 const item_tax = item.tax_rate ? (item_subtotal * item.tax_rate / 100) : 0;
+                
+                // Calculate discount
                 const item_discount = item.discount || 0;
-                const item_total = item_subtotal + item_tax - item_discount;
+                const item_discount_type = item.discount_type || 'percentage';
+                let item_discount_amount = 0;
+
+                if (item_discount_type === 'percentage') {
+                    item_discount_amount = (item_subtotal * item_discount) / 100;
+                } else {
+                    item_discount_amount = item_discount;
+                }
+
+                const item_total = item_subtotal + item_tax - item_discount_amount;
                 const item_profit = item_total - item_cost;
                 const item_profit_percentage = item_cost > 0 ? ((item_profit) / item_cost) * 100 : 0;
 
@@ -78,7 +90,7 @@ export default {
                 total_cost_of_goods += item_cost;
                 subtotal += item_subtotal;
                 total_tax += item_tax;
-                total_discount += item_discount;
+                total_discount += item_discount_amount;
 
                 // Add to verified products
                 verified_products.push({
@@ -87,6 +99,7 @@ export default {
                     buying_price: product.buying_price,
                     subtotal: item_subtotal,
                     tax_amount: item_tax,
+                    discount_amount: item_discount_amount,
                     total: item_total,
                     profit: item_profit,
                     profit_percentage: item_profit_percentage.toFixed(2)
@@ -140,7 +153,10 @@ export default {
                     customer,
                     description: `Payment for Invoice #${salesInvoice.id}`,
                     category: category || 'Sales',
-                    products: verified_products,
+                    products: verified_products.map(item => ({
+                        ...item,
+                        revenue: item.total
+                    })),
                     client_id: req.des?.client_id,
                     created_by: req.user?.username,
                 });
