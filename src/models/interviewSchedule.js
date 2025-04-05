@@ -23,7 +23,7 @@ const InterviewSchedule = sequelize.define('interview_schedule', {
         allowNull: false,
     },
     round: {
-        type: DataTypes.STRING,
+        type: DataTypes.JSON,
         allowNull: false,
     },
     interviewType: {
