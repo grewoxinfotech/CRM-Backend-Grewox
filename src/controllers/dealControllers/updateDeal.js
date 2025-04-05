@@ -17,6 +17,7 @@ export default {
             phone: Joi.string().optional().allow(null),
             pipeline: Joi.string().optional().allow(null),
             stage: Joi.string().optional().allow(null),
+            website: Joi.string().optional().allow(null),
             label: Joi.string().valid('Hot', 'Warm', 'Cold').optional().allow(null),
             value: Joi.number().optional().allow(null),
             status: Joi.string().valid('won', 'lost', 'pending').optional().allow(null),

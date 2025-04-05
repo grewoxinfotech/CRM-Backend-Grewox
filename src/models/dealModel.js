@@ -74,6 +74,11 @@ const Deal = sequelize.define("Deal", {
         allowNull: true,
         defaultValue: null
     },
+    website: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: null
+    },
     address: {
         type: DataTypes.STRING,
         allowNull: true,
@@ -100,8 +105,8 @@ const Deal = sequelize.define("Deal", {
     },
     is_won: {
         type: DataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: false
+        allowNull: true,
+        defaultValue: null
     },
     created_by: {
         type: DataTypes.STRING,
