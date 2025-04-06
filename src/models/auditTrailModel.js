@@ -20,19 +20,23 @@ const AuditTrail = sequelize.define('AuditTrail', {
     },
     params: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
+        defaultValue: null
     },
     query: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
+        defaultValue: null
     },
-    payload: {
+    payload_url: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
+        defaultValue: null
     },
-    response: {
+    response_url: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
+        defaultValue: null
     },
     duration: {
         type: DataTypes.STRING,

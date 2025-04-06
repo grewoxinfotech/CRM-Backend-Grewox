@@ -64,6 +64,7 @@ export default {
                 roles = await Role.findAll(
                     {
                         where: {
+                            
                             client_id: req.user.id
                         }
                     }

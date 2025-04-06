@@ -1,10 +1,11 @@
 import express from 'express';
-import { createRole, getAllRoles, updateRole, deleteRole, getRoleById } from '../controllers/roleController/index.js';
+import { createRole, getAllRoles, updateRole, deleteRole, getRoleById, getallRole } from '../controllers/roleController/index.js';
 import { authenticateUser, checkRole } from '../middlewares/index.js';
 import passCompanyDetail from '../middlewares/passCompanyDetail.js';
 
 const router = express.Router();
 
+router.get('/all', getallRole.validator, getallRole.handler);
 
 router.use(authenticateUser, checkRole, passCompanyDetail);
 
