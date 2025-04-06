@@ -29,7 +29,7 @@ app.get("/", (req, res) => {
     return responseHandler.error(res, error?.message);
   }
 });
-app.use(logAuditTrails);
+// app.use(logAuditTrails);
 
 app.use("/api/v1/", routes);
 
