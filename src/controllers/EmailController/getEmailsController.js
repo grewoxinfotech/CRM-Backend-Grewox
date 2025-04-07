@@ -59,6 +59,7 @@ export default {
                 emails = await Email.findAll({
                     where: {
                         ...whereClause,
+                        created_by: req.user.username,
                         client_id: user.client_id
                     },
                     order: [['createdAt', 'DESC']]

@@ -1,9 +1,11 @@
 import Joi from "joi";
 import SalesCreditnote from "../../models/salesCreditnoteModel.js";
 import SalesInvoice from "../../models/salesInvoiceModel.js";
+import SalesRevenue from "../../models/salesRevenueModel.js";
 import validator from "../../utils/validator.js";
 import responseHandler from "../../utils/responseHandler.js";
 import uploadToS3 from "../../utils/uploadToS3.js";
+import Activity from "../../models/activityModel.js";
 
 export default {
   validator: validator({
@@ -52,23 +54,98 @@ export default {
         );
       }
 
+      // Parse invoice items
+      const invoiceItems = JSON.parse(salesInvoice.items);
+
+      // Calculate proportional amounts for each item based on credit note amount
+      const creditNoteItems = invoiceItems.map(item => {
+        const itemPercentage = item.total / salesInvoice.total;
+        const itemCreditAmount = amount * itemPercentage;
+        const itemCostPercentage = item.buying_price / item.unit_price;
+        const itemCreditCost = itemCreditAmount * itemCostPercentage;
+
+        return {
+          ...item,
+          credit_amount: itemCreditAmount,
+          credit_cost: itemCreditCost,
+          credit_profit: itemCreditAmount - itemCreditCost,
+          credit_profit_percentage: ((itemCreditAmount - itemCreditCost) / itemCreditCost * 100).toFixed(2)
+        };
+      });
+
       // Create credit note
       const salesCreditnote = await SalesCreditnote.create({
         related_id: id,
         invoice,
-        date,
-        currency,
+        date: date || new Date(),
+        currency: currency || salesInvoice.currency,
         amount,
         description,
+        items: creditNoteItems,
         attachment: attachmentUrl,
         client_id: req.des?.client_id,
         created_by: req.user?.username,
       });
 
-      // Update invoice amount
-      const newTotal = salesInvoice.amount - amount;
+      // Calculate new total and determine payment status
+      const newTotal = salesInvoice.total;
+      const newAmount = salesInvoice.amount - amount;
+      const newTotalCredited = totalCreditedAmount + amount;
+      
+      let newPaymentStatus = salesInvoice.payment_status;
+      let shouldCreateRevenue = false;
+      
+      // If total credited equals invoice total, mark as paid
+      if (newTotalCredited >= salesInvoice.total) {
+        newPaymentStatus = 'paid';
+        shouldCreateRevenue = true;
+      } 
+      // If some amount is credited but not full, mark as partially_paid
+      else if (newTotalCredited > 0) {
+        newPaymentStatus = 'partially_paid';
+      }
+
+      // Update invoice
       await salesInvoice.update({ 
-        amount: newTotal  // Update amount field as well
+        amount: newAmount,
+        payment_status: newPaymentStatus
+      });
+
+      // If status becomes paid, create revenue entry
+      if (shouldCreateRevenue) {
+        // Calculate totals for revenue
+        const totalCost = creditNoteItems.reduce((sum, item) => sum + item.credit_cost, 0);
+        const totalProfit = amount - totalCost;
+        const profitPercentage = (totalProfit / totalCost * 100).toFixed(2);
+
+        await SalesRevenue.create({
+          related_id: id,
+          date: date || new Date(),
+          currency: currency || salesInvoice.currency,
+          amount: amount,
+          cost_of_goods: totalCost,
+          account: 'sales_credit',
+          customer: salesInvoice.customer,
+          description: `Credit Note for Invoice #${invoice}`,
+          category: salesInvoice.category || 'Sales Credit',
+          products: creditNoteItems.map(item => ({
+            ...item,
+            revenue: item.credit_amount
+          })),
+          client_id: req.des?.client_id,
+          created_by: req.user?.username,
+        });
+      }
+
+      // Log activity
+      await Activity.create({
+        related_id: id,
+        activity_from: "sales_creditnote",
+        activity_id: salesCreditnote.id,
+        action: "created",
+        performed_by: req.user?.username,
+        client_id: req.des?.client_id,
+        activity_message: `Credit note of ${amount} ${currency || salesInvoice.currency} created for invoice #${invoice}. New invoice balance: ${newAmount}. Status changed to: ${newPaymentStatus}`
       });
 
       return responseHandler.success(
@@ -78,9 +155,13 @@ export default {
           creditNote: salesCreditnote,
           updatedInvoice: {
             id: salesInvoice.id,
-            previousTotal: salesInvoice.total,
-            newTotal: newTotal,
-            creditedAmount: amount
+            previousAmount: salesInvoice.amount,
+            newAmount: newAmount,
+            creditedAmount: amount,
+            totalCreditedAmount: newTotalCredited,
+            previousStatus: salesInvoice.payment_status,
+            newStatus: newPaymentStatus,
+            items: creditNoteItems
           }
         }
       );

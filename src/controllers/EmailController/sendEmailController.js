@@ -28,6 +28,10 @@ export default {
                 scheduledFor
             } = req.body;
 
+             
+
+
+
             // First find email settings
             const emailSettings = await EmailSettings.findOne({
                 where: {
@@ -36,22 +40,30 @@ export default {
                 }
             });
 
-            if (!emailSettings) {
-                return responseHandler.error(res, "No active email settings found");
+            // Set email credentials - first try email settings, fallback to .env
+            let emailUser;
+            let emailPass;
+
+            if (emailSettings?.email && emailSettings?.app_password) {
+                emailUser = emailSettings.email;
+                emailPass = emailSettings.app_password;
+            } else {
+                emailUser = process.env.SMTP_USER;
+                emailPass = process.env.SMTP_PASS;
             }
 
-            // Create transporter
+            // Create transporter with determined credentials
             const transporter = nodemailer.createTransport({
                 service: 'gmail',
                 auth: {
-                    user: emailSettings.email,
-                    pass: emailSettings.app_password
+                    user: emailUser,
+                    pass: emailPass
                 }
             });
 
             // Prepare email data
             const mailOptions = {
-                from: `"${req.user?.username || 'System'}" <${emailSettings.email}>`,
+                from: `"${req.user?.username || 'System'}" <${emailUser}>`,
                 to: to,
                 subject: subject,
                 html: html || '',
