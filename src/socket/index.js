@@ -2,6 +2,7 @@ import { Server } from 'socket.io';
 import User from '../models/userModel.js';
 import { uploadChatFile, deleteChatFile } from '../utils/chatFileUpload.js';
 import { FRONTEND_URL, s3 } from '../config/config.js';;
+import { Op } from 'sequelize';
 
 
 function initializeSocket(server) {
@@ -83,7 +84,7 @@ function initializeSocket(server) {
 
         socket.on('send_message', async (data) => {
             try {
-                const { sender_id, receiver_id, message } = data;
+                const { sender_id, receiver_id, message, id } = data;
                 const [sender, receiver] = await Promise.all([
                     User.findOne({ where: { id: sender_id } }),
                     User.findOne({ where: { id: receiver_id } })
@@ -94,52 +95,76 @@ function initializeSocket(server) {
                 }
 
                 const newMessage = {
+                    id: id || `${Date.now()}-${sender_id}`,
                     sender_id,
                     message,
                     timestamp: new Date().toISOString()
                 };
 
                 try {
-                    // Handle conversations as objects
-                    let senderConvos = sender.conversations;
-                    let receiverConvos = receiver.conversations;
+                    let senderConvos = typeof sender.conversations === 'string'
+                        ? JSON.parse(sender.conversations || '{}')
+                        : sender.conversations || {};
 
-                    // Parse if string
-                    if (typeof senderConvos === 'string') {
-                        senderConvos = JSON.parse(senderConvos || '{}');
-                    }
-                    if (typeof receiverConvos === 'string') {
-                        receiverConvos = JSON.parse(receiverConvos || '{}');
-                    }
+                    let receiverConvos = typeof receiver.conversations === 'string'
+                        ? JSON.parse(receiver.conversations || '{}')
+                        : receiver.conversations || {};
 
-                    // Initialize if undefined
-                    senderConvos = senderConvos || {};
-                    receiverConvos = receiverConvos || {};
-
-                    // Initialize arrays if needed
                     if (!senderConvos[receiver_id]) senderConvos[receiver_id] = [];
                     if (!receiverConvos[sender_id]) receiverConvos[sender_id] = [];
 
-                    // Add messages
-                    senderConvos[receiver_id].push({ ...newMessage, status: 'sent' });
-                    receiverConvos[sender_id].push({ ...newMessage, status: 'delivered' });
+                    // Add messages with initial status
+                    senderConvos[receiver_id].push({
+                        ...newMessage,
+                        status: 'sent',
+                        delivered_at: null,
+                        read_at: null
+                    });
 
-                    // Save as strings
+                    receiverConvos[sender_id].push({
+                        ...newMessage,
+                        status: 'delivered',
+                        delivered_at: new Date().toISOString(),
+                        read_at: null
+                    });
+
                     await Promise.all([
                         sender.update({ conversations: JSON.stringify(senderConvos) }),
                         receiver.update({ conversations: JSON.stringify(receiverConvos) })
                     ]);
 
-                    // Emit messages
+                    // Emit to sender with sent status
                     io.to(sender_id).emit('receive_message', {
                         user_id: receiver_id,
-                        message: { ...newMessage, status: 'sent' }
+                        message: {
+                            ...newMessage,
+                            status: 'sent',
+                            delivered_at: null,
+                            read_at: null
+                        }
                     });
 
+                    // Emit to receiver with delivered status
                     io.to(receiver_id).emit('receive_message', {
                         user_id: sender_id,
-                        message: { ...newMessage, status: 'delivered' }
+                        message: {
+                            ...newMessage,
+                            status: 'delivered',
+                            delivered_at: new Date().toISOString(),
+                            read_at: null
+                        }
                     });
+
+                    // If receiver is online, mark as delivered immediately
+                    if (onlineUsers.has(receiver_id)) {
+                        io.to(sender_id).emit('message_status_updated', {
+                            message_id: newMessage.id,
+                            sender_id,
+                            receiver_id,
+                            status: 'delivered',
+                            delivered_at: new Date().toISOString()
+                        });
+                    }
 
                 } catch (updateError) {
                     console.error('Error updating conversations:', updateError);
@@ -148,6 +173,7 @@ function initializeSocket(server) {
 
             } catch (error) {
                 console.error('Error in send_message:', error.message);
+                socket.emit('send_error', { message: error.message });
             }
         });
 
@@ -167,6 +193,7 @@ function initializeSocket(server) {
                         ? JSON.parse(receiver.conversations || '{}')
                         : receiver.conversations || {};
 
+                    const currentTime = new Date().toISOString();
                     let hasUpdates = false;
 
                     // Update messages in sender's conversations
@@ -174,7 +201,11 @@ function initializeSocket(server) {
                         senderConvos[receiver_id] = senderConvos[receiver_id].map(msg => {
                             if (msg.sender_id === sender_id && msg.status !== 'read') {
                                 hasUpdates = true;
-                                return { ...msg, status: 'read' };
+                                return {
+                                    ...msg,
+                                    status: 'read',
+                                    read_at: currentTime
+                                };
                             }
                             return msg;
                         });
@@ -185,7 +216,11 @@ function initializeSocket(server) {
                         receiverConvos[sender_id] = receiverConvos[sender_id].map(msg => {
                             if (msg.sender_id === sender_id && msg.status !== 'read') {
                                 hasUpdates = true;
-                                return { ...msg, status: 'read' };
+                                return {
+                                    ...msg,
+                                    status: 'read',
+                                    read_at: currentTime
+                                };
                             }
                             return msg;
                         });
@@ -197,11 +232,12 @@ function initializeSocket(server) {
                             receiver.update({ conversations: JSON.stringify(receiverConvos) })
                         ]);
 
-                        // Emit status update to both users
+                        // Emit detailed status update to both users
                         io.to(sender_id).to(receiver_id).emit('message_status_updated', {
                             sender_id,
                             receiver_id,
-                            status: 'read'
+                            status: 'read',
+                            read_at: currentTime
                         });
 
                         // Also emit updated conversations
@@ -230,116 +266,162 @@ function initializeSocket(server) {
 
         socket.on('delete_message', async (data) => {
             try {
-                const { sender_id, receiver_id, message_timestamp } = data;
+                const { message_id, conversation_id, sender_id, is_group } = data;
 
-                // Get both users
-                const [sender, receiver] = await Promise.all([
-                    User.findOne({ where: { id: sender_id } }),
-                    User.findOne({ where: { id: receiver_id } })
-                ]);
+                if (is_group) {
+                    // Handle group message deletion
+                    const users = await User.findAll({
+                        where: {
+                            id: {
+                                [Op.in]: members
+                            }
+                        }
+                    });
 
-                if (!sender || !receiver) {
-                    throw new Error('Users not found');
+                    for (const user of users) {
+                        let userConvos = JSON.parse(user.conversations || '{}');
+                        if (userConvos[conversation_id]?.messages) {
+                            userConvos[conversation_id].messages = userConvos[conversation_id].messages.filter(
+                                msg => msg.id !== message_id
+                            );
+                            await user.update({ conversations: JSON.stringify(userConvos) });
+                        }
+                    }
+
+                    // Notify all group members
+                    io.to(conversation_id).emit('message_deleted', {
+                        message_id,
+                        conversation_id
+                    });
+                } else {
+                    // Handle direct message deletion
+                    const [sender, receiver] = await Promise.all([
+                        User.findOne({ where: { id: sender_id } }),
+                        User.findOne({ where: { id: conversation_id } })
+                    ]);
+
+                    if (!sender || !receiver) {
+                        throw new Error('Users not found');
+                    }
+
+                    let senderConvos = JSON.parse(sender.conversations || '{}');
+                    let receiverConvos = JSON.parse(receiver.conversations || '{}');
+
+                    // Remove message from both conversations
+                    if (senderConvos[conversation_id]) {
+                        senderConvos[conversation_id] = senderConvos[conversation_id].filter(
+                            msg => msg.id !== message_id
+                        );
+                    }
+
+                    if (receiverConvos[sender_id]) {
+                        receiverConvos[sender_id] = receiverConvos[sender_id].filter(
+                            msg => msg.id !== message_id
+                        );
+                    }
+
+                    await Promise.all([
+                        sender.update({ conversations: JSON.stringify(senderConvos) }),
+                        receiver.update({ conversations: JSON.stringify(receiverConvos) })
+                    ]);
+
+                    // Notify both users
+                    io.to(sender_id).emit('message_deleted', {
+                        message_id,
+                        conversation_id
+                    });
+
+                    io.to(conversation_id).emit('message_deleted', {
+                        message_id,
+                        conversation_id: sender_id
+                    });
                 }
-
-                // Parse conversations
-                let senderConvos = typeof sender.conversations === 'string'
-                    ? JSON.parse(sender.conversations || '{}')
-                    : sender.conversations || {};
-
-                let receiverConvos = typeof receiver.conversations === 'string'
-                    ? JSON.parse(receiver.conversations || '{}')
-                    : receiver.conversations || {};
-
-                // Remove message from both users' conversations
-                if (senderConvos[receiver_id]) {
-                    senderConvos[receiver_id] = senderConvos[receiver_id].filter(
-                        msg => msg.timestamp !== message_timestamp
-                    );
-                }
-
-                if (receiverConvos[sender_id]) {
-                    receiverConvos[sender_id] = receiverConvos[sender_id].filter(
-                        msg => msg.timestamp !== message_timestamp
-                    );
-                }
-
-                // Save updated conversations
-                await Promise.all([
-                    sender.update({ conversations: JSON.stringify(senderConvos) }),
-                    receiver.update({ conversations: JSON.stringify(receiverConvos) })
-                ]);
-
-                // Notify both users about the deletion
-                io.to(sender_id).emit('message_deleted', {
-                    message_timestamp,
-                    conversations: senderConvos
-                });
-
-                io.to(receiver_id).emit('message_deleted', {
-                    message_timestamp,
-                    conversations: receiverConvos
-                });
 
             } catch (error) {
                 console.error('Error in delete_message:', error.message);
+                socket.emit('delete_error', { message: error.message });
             }
         });
 
         socket.on('edit_message', async (data) => {
             try {
-                const { message_timestamp, new_message, sender_id, receiver_id } = data;
+                const { message_id, new_message, conversation_id, sender_id, is_group } = data;
 
-                const [sender, receiver] = await Promise.all([
-                    User.findOne({ where: { id: sender_id } }),
-                    User.findOne({ where: { id: receiver_id } })
-                ]);
+                if (is_group) {
+                    // Handle group message editing
+                    const users = await User.findAll({
+                        where: {
+                            id: {
+                                [Op.in]: members
+                            }
+                        }
+                    });
 
-                if (!sender || !receiver) {
-                    throw new Error('Users not found');
+                    for (const user of users) {
+                        let userConvos = JSON.parse(user.conversations || '{}');
+                        if (userConvos[conversation_id]?.messages) {
+                            userConvos[conversation_id].messages = userConvos[conversation_id].messages.map(msg =>
+                                msg.id === message_id ? { ...msg, message: new_message, edited: true } : msg
+                            );
+                            await user.update({ conversations: JSON.stringify(userConvos) });
+                        }
+                    }
+
+                    // Notify all group members
+                    io.to(conversation_id).emit('message_edited', {
+                        message_id,
+                        new_message,
+                        conversation_id
+                    });
+                } else {
+                    // Handle direct message editing
+                    const [sender, receiver] = await Promise.all([
+                        User.findOne({ where: { id: sender_id } }),
+                        User.findOne({ where: { id: conversation_id } })
+                    ]);
+
+                    if (!sender || !receiver) {
+                        throw new Error('Users not found');
+                    }
+
+                    let senderConvos = JSON.parse(sender.conversations || '{}');
+                    let receiverConvos = JSON.parse(receiver.conversations || '{}');
+
+                    // Update message in both conversations
+                    if (senderConvos[conversation_id]) {
+                        senderConvos[conversation_id] = senderConvos[conversation_id].map(msg =>
+                            msg.id === message_id ? { ...msg, message: new_message, edited: true } : msg
+                        );
+                    }
+
+                    if (receiverConvos[sender_id]) {
+                        receiverConvos[sender_id] = receiverConvos[sender_id].map(msg =>
+                            msg.id === message_id ? { ...msg, message: new_message, edited: true } : msg
+                        );
+                    }
+
+                    await Promise.all([
+                        sender.update({ conversations: JSON.stringify(senderConvos) }),
+                        receiver.update({ conversations: JSON.stringify(receiverConvos) })
+                    ]);
+
+                    // Notify both users
+                    io.to(sender_id).emit('message_edited', {
+                        message_id,
+                        new_message,
+                        conversation_id
+                    });
+
+                    io.to(conversation_id).emit('message_edited', {
+                        message_id,
+                        new_message,
+                        conversation_id: sender_id
+                    });
                 }
-
-                // Parse conversations
-                let senderConvos = typeof sender.conversations === 'string'
-                    ? JSON.parse(sender.conversations || '{}')
-                    : sender.conversations || {};
-
-                let receiverConvos = typeof receiver.conversations === 'string'
-                    ? JSON.parse(receiver.conversations || '{}')
-                    : receiver.conversations || {};
-
-                // Update message in both conversations
-                if (senderConvos[receiver_id]) {
-                    senderConvos[receiver_id] = senderConvos[receiver_id].map(msg =>
-                        msg.timestamp === message_timestamp
-                            ? { ...msg, message: new_message, edited: true }
-                            : msg
-                    );
-                }
-
-                if (receiverConvos[sender_id]) {
-                    receiverConvos[sender_id] = receiverConvos[sender_id].map(msg =>
-                        msg.timestamp === message_timestamp
-                            ? { ...msg, message: new_message, edited: true }
-                            : msg
-                    );
-                }
-
-                // Save updated conversations
-                await Promise.all([
-                    sender.update({ conversations: JSON.stringify(senderConvos) }),
-                    receiver.update({ conversations: JSON.stringify(receiverConvos) })
-                ]);
-
-                // Notify both users about the edit
-                io.to(sender_id).to(receiver_id).emit('message_edited', {
-                    message_timestamp,
-                    new_message,
-                    edited: true
-                });
 
             } catch (error) {
                 console.error('Error in edit_message:', error.message);
+                socket.emit('edit_error', { message: error.message });
             }
         });
 
