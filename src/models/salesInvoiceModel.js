@@ -88,6 +88,14 @@ const SalesInvoice = sequelize.define("sales_Invoice", {
             min: 0
         }
     },
+    amount: {
+        type: DataTypes.FLOAT,
+        allowNull: false,
+        defaultValue: 0,
+        validate: {
+            min: 0  
+        }
+    },
     cost_of_goods: {
         type: DataTypes.FLOAT,
         allowNull: false,

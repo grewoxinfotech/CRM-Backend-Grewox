@@ -132,6 +132,7 @@ export default {
                 subtotal,
                 tax: total_tax,
                 discount: total_discount,
+                amount: total,
                 total,
                 cost_of_goods: total_cost_of_goods,
                 profit: total_profit,

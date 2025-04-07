@@ -26,11 +26,18 @@ export default {
         return responseHandler.error(res, "Sales Invoice not found");
       }
 
-      // Check if credit amount is valid
-      if (amount > salesInvoice.total) {
+      // Get existing credit notes total for this invoice
+      const existingCreditNotes = await SalesCreditnote.findAll({
+        where: { invoice }
+      });
+      const totalCreditedAmount = existingCreditNotes.reduce((sum, note) => sum + note.amount, 0);
+
+      // Check if credit amount is valid (including existing credit notes)
+      const remainingInvoiceAmount = salesInvoice.total - totalCreditedAmount;
+      if (amount > remainingInvoiceAmount) {
         return responseHandler.error(
           res,
-          "Credit amount cannot be greater than invoice total"
+          `Credit amount cannot be greater than remaining invoice amount (${remainingInvoiceAmount})`
         );
       }
 
@@ -58,14 +65,24 @@ export default {
         created_by: req.user?.username,
       });
 
-      // Update invoice total
-      const updatedTotal = salesInvoice.total - amount;
-      await salesInvoice.update({ total: updatedTotal });
+      // Update invoice amount
+      const newTotal = salesInvoice.amount - amount;
+      await salesInvoice.update({ 
+        amount: newTotal  // Update amount field as well
+      });
 
       return responseHandler.success(
         res,
         "Sales Credit Note created successfully",
-        salesCreditnote
+        {
+          creditNote: salesCreditnote,
+          updatedInvoice: {
+            id: salesInvoice.id,
+            previousTotal: salesInvoice.total,
+            newTotal: newTotal,
+            creditedAmount: amount
+          }
+        }
       );
     } catch (error) {
       return responseHandler.error(res, error?.message);
