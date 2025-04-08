@@ -95,6 +95,8 @@ import emailRoutes from "./emailRoutes.js";
 import holidayRoutes from "./holidayRoutes.js";
 import reminderRoutes from "./reminderRoutes.js";
 import followupRoutes from "./followupRoutes.js";
+import contactRoutes from "./contactRoutes.js";
+import companyAccountRoutes from "./companyAccountRoutes.js";
 const router = express.Router();
 
 //>>>>>>>>>>>>>>  Super Admin  <<<<<<<<<<<<<<<//
@@ -215,6 +217,13 @@ router.use("/stages", stageRoutes);
 
 /** 5. Lead & Deal Followup*/
 router.use("/followups", followupRoutes);
+
+/** 6. Contact Setup*/
+router.use("/contacts", contactRoutes);
+
+/** 7. Company Account Setup*/
+router.use("/company-accounts", companyAccountRoutes);
+
 
 //>>>>>>>>>>>>>>  Project Management System  <<<<<<<<<<<<<<<//
 
