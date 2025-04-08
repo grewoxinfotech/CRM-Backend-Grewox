@@ -10,6 +10,10 @@ const Email = sequelize.define('Email', {
         allowNull: false,
         defaultValue: () => generateId()
     },
+    from: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
     to: {
         type: DataTypes.STRING,
         allowNull: false

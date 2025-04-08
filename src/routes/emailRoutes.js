@@ -1,12 +1,13 @@
 import express from 'express';
 import { sendEmailController, getEmailsController, starEmailController, importantEmailController, trashEmailController, deleteEmailController, emailSettingController } from '../controllers/EmailController/index.js';
 import { authenticateUser, checkRole } from '../middlewares/index.js';
+import upload from '../middlewares/upload.js';
 import passCompanyDetails from '../middlewares/passCompanyDetail.js';
 const router = express.Router();
 
 router.use(authenticateUser,checkRole, passCompanyDetails);
 
-router.post('/', sendEmailController.handler);
+router.post('/', upload.array('attachments', 5), sendEmailController.handler);
 router.get('/', getEmailsController.handler);
 router.delete('/:id', deleteEmailController.handler);
 // router.put('/:id', EmailController.updateEmail);

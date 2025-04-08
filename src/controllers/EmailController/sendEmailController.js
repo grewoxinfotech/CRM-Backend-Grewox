@@ -4,6 +4,7 @@ import responseHandler from "../../utils/responseHandler.js";
 import Joi from "joi";
 import validator from "../../utils/validator.js";
 import nodemailer from 'nodemailer';
+import uploadToS3 from "../../utils/uploadToS3.js";
 
 export default {
     validator: validator({
@@ -11,7 +12,6 @@ export default {
             to: Joi.string().email().required(),
             subject: Joi.string().required(),
             html: Joi.string().optional(),
-            attachments: Joi.array().items(Joi.object()).optional(),
             type: Joi.string().valid('inbox', 'sent', 'trash').default('sent'),
             isRead: Joi.boolean().default(false),
             isStarred: Joi.boolean().default(false),
@@ -23,16 +23,37 @@ export default {
     handler: async (req, res) => {
         try {
             const { 
-                to, subject, html, attachments,
+                to, subject, html,
                 type, isRead, isStarred, isImportant,
                 scheduledFor
             } = req.body;
 
-             
+            // Handle file uploads to S3
+            let attachments = [];
+            if (req.files && req.files.length > 0) {
+                console.log('Processing files:', req.files.length);
+                
+                for (const file of req.files) {
+                    try {
+                        console.log('Uploading file:', file.originalname);
+                        const s3Url = await uploadToS3(
+                            file,
+                            req.user?.username,
+                            'email-attachments'
+                        );
+                        attachments.push({
+                            name: file.originalname,
+                            size: file.size,
+                            url: s3Url
+                        });
+                        console.log('File uploaded successfully:', s3Url);
+                    } catch (error) {
+                        console.error('S3 upload error for file:', file.originalname, error);
+                    }
+                }
+            }
 
-
-
-            // First find email settings
+            // Find email settings
             const emailSettings = await EmailSettings.findOne({
                 where: {
                     client_id: req.des?.client_id,
@@ -40,19 +61,11 @@ export default {
                 }
             });
 
-            // Set email credentials - first try email settings, fallback to .env
-            let emailUser;
-            let emailPass;
+            // Set email credentials
+            let emailUser = emailSettings?.email || process.env.SMTP_USER;
+            let emailPass = emailSettings?.app_password || process.env.SMTP_PASS;
 
-            if (emailSettings?.email && emailSettings?.app_password) {
-                emailUser = emailSettings.email;
-                emailPass = emailSettings.app_password;
-            } else {
-                emailUser = process.env.SMTP_USER;
-                emailPass = process.env.SMTP_PASS;
-            }
-
-            // Create transporter with determined credentials
+            // Create transporter
             const transporter = nodemailer.createTransport({
                 service: 'gmail',
                 auth: {
@@ -67,17 +80,24 @@ export default {
                 to: to,
                 subject: subject,
                 html: html || '',
-                attachments: attachments || []
+                attachments: attachments
             };
+
+            console.log('Mail options:', {
+                to: mailOptions.to,
+                subject: mailOptions.subject,
+                attachmentsCount: mailOptions.attachments.length
+            });
 
             const status = scheduledFor ? 'scheduled' : 'sent';
 
-            // Create email record first
+            // Create email record
             const email = await Email.create({
                 to, 
                 subject,
+                from: emailUser,
                 html: html || '',
-                attachments: attachments || [],
+                attachments: JSON.stringify(attachments),
                 type,
                 isRead,
                 isStarred,
@@ -88,7 +108,7 @@ export default {
                 created_by: req.user?.username,
             });
 
-            // If it's scheduled, don't send now
+            // If scheduled, don't send now
             if (scheduledFor) {
                 return responseHandler.success(res, 'Email scheduled successfully', email);
             }
@@ -96,13 +116,9 @@ export default {
             // Send email
             try {
                 await transporter.sendMail(mailOptions);
-                
-                // Update email status if sent successfully
                 await email.update({ status: 'sent' });
-
                 return responseHandler.success(res, 'Email sent successfully', email);
             } catch (error) {
-                // Update email status if failed
                 await email.update({ status: 'failed' });
                 console.error('Send email error:', error);
                 return responseHandler.error(res, "Failed to send email: " + error.message);
