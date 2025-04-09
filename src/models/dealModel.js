@@ -108,6 +108,16 @@ const Deal = sequelize.define("Deal", {
         allowNull: true,
         defaultValue: null
     },
+    company_id: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: null
+    },
+    contact_id: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: null
+    },
     created_by: {
         type: DataTypes.STRING,
         allowNull: true,
