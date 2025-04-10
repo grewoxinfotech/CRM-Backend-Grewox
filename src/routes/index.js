@@ -97,6 +97,10 @@ import reminderRoutes from "./reminderRoutes.js";
 import followupRoutes from "./followupRoutes.js";
 import contactRoutes from "./contactRoutes.js";
 import companyAccountRoutes from "./companyAccountRoutes.js";
+import companyInquiryRoutes from "./companyInquiryRoutes.js";
+import inquiryFormRoutes from "./inquiryFormRoutes.js";
+import customFormRoutes from "./customFormRoutes.js"
+
 const router = express.Router();
 
 //>>>>>>>>>>>>>>  Super Admin  <<<<<<<<<<<<<<<//
@@ -224,6 +228,15 @@ router.use("/contacts", contactRoutes);
 /** 7. Company Account Setup*/
 router.use("/company-accounts", companyAccountRoutes);
 
+/** 8. Inquiry Setup */
+router.use("/company-inquiries", companyInquiryRoutes);
+
+/** 9. Inquiry Forms */
+router.use("/inquiries-form", inquiryFormRoutes);
+
+
+/** 10. Custom Forms */
+router.use("/custom-forms", customFormRoutes);
 
 //>>>>>>>>>>>>>>  Project Management System  <<<<<<<<<<<<<<<//
 
