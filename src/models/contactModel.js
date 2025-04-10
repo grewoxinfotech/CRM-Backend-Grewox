@@ -24,14 +24,13 @@ const Contact = sequelize.define("contacts", {
     },
     company_name: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
+        defaultValue: null
     },
     email: {
         type: DataTypes.STRING,
-        allowNull: false,
-        validate: {
-            isEmail: true
-        }
+        allowNull: true,
+        defaultValue: null
     },
     phone: {
         type: DataTypes.STRING,

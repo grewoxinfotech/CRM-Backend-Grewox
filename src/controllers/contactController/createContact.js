@@ -10,8 +10,8 @@ export default {
             contact_owner: Joi.string().required(),
             first_name: Joi.string().required(),
             last_name: Joi.string().optional().allow('', null),
-            company_name: Joi.string().required(),
-            email: Joi.string().email().optional().allow('', null),
+            company_name: Joi.string().optional().allow('', null),
+            email: Joi.string().optional().allow('', null),
             phone: Joi.string().optional().allow('', null),
             contact_source: Joi.string().optional().allow('', null),
             description: Joi.string().optional().allow('', null),
@@ -33,13 +33,13 @@ export default {
             // Check if contact with same email exists
             const existingContact = await Contact.findOne({ 
                 where: { 
-                    email,
-                    client_id: req.des?.client_id 
+                    first_name: first_name,
+                    company_name: company_name
                 } 
             });
 
             if (existingContact) {
-                return responseHandler.conflict(res, "Contact with this email already exists!");
+                return responseHandler.conflict(res, "Contact with this name already exists!");
             }
 
             // Create contact
