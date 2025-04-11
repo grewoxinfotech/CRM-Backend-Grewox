@@ -1,9 +1,8 @@
-import createFollowupTask from './createfollowupTask.js';
-import getAllFollowupTask from './getAllfollowupTask.js';
-import updateFollowupTask from './updatefollowupTask.js';
+import createFollowupTask from "./createfollowupTask.js";
+import updateFollowupTask from "./updatefollowupTask.js";
+import getAllFollowupTask from "./getAllfollowupTask.js";
+import deleteFollowupTask from "./deletefollowupTask.js";
 
-export {
-    createFollowupTask,
-    getAllFollowupTask,
-    updateFollowupTask
-};
+
+export { createFollowupTask, updateFollowupTask, getAllFollowupTask, deleteFollowupTask };
+
