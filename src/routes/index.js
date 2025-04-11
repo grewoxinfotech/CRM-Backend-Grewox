@@ -101,7 +101,7 @@ import companyAccountRoutes from "./companyAccountRoutes.js";
 import companyInquiryRoutes from "./companyInquiryRoutes.js";
 import inquiryFormRoutes from "./inquiryFormRoutes.js";
 import customFormRoutes from "./customFormRoutes.js"
-
+import followupMeetingRoutes from "./followupMettingRoutes.js";
 const router = express.Router();
 
 //>>>>>>>>>>>>>>  Super Admin  <<<<<<<<<<<<<<<//
@@ -223,6 +223,7 @@ router.use("/stages", stageRoutes);
 /** 5. Lead & Deal Followup*/
 router.use("/followups", followupRoutes);
 router.use("/followup-tasks", followupTaskRoutes);
+router.use("/followup-meetings", followupMeetingRoutes);
 /** 6. Contact Setup*/
 router.use("/contacts", contactRoutes);
 
