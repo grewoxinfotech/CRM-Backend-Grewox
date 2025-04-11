@@ -95,6 +95,7 @@ import emailRoutes from "./emailRoutes.js";
 import holidayRoutes from "./holidayRoutes.js";
 import reminderRoutes from "./reminderRoutes.js";
 import followupRoutes from "./followupRoutes.js";
+import followupTaskRoutes from "./followupTaskRoutes.js";
 import contactRoutes from "./contactRoutes.js";
 import companyAccountRoutes from "./companyAccountRoutes.js";
 import companyInquiryRoutes from "./companyInquiryRoutes.js";
@@ -221,7 +222,7 @@ router.use("/stages", stageRoutes);
 
 /** 5. Lead & Deal Followup*/
 router.use("/followups", followupRoutes);
-
+router.use("/followup-tasks", followupTaskRoutes);
 /** 6. Contact Setup*/
 router.use("/contacts", contactRoutes);
 
