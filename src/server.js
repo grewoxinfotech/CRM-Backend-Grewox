@@ -7,7 +7,6 @@ import sequelize from "./config/db.js";
 import fileUpload from "express-fileupload";
 import initializeSocket from "./socket/index.js";
 import responseHandler from "./utils/responseHandler.js";
-import logAuditTrails from "./middlewares/logAuditTrails.js";
 
 const app = express();
 

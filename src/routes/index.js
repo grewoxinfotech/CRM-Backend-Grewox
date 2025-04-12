@@ -102,6 +102,7 @@ import companyInquiryRoutes from "./companyInquiryRoutes.js";
 import inquiryFormRoutes from "./inquiryFormRoutes.js";
 import customFormRoutes from "./customFormRoutes.js"
 import followupMeetingRoutes from "./followupMettingRoutes.js";
+import formSubmissionRoutes from "./formSubmissionRoutes.js";
 const router = express.Router();
 
 //>>>>>>>>>>>>>>  Super Admin  <<<<<<<<<<<<<<<//
@@ -239,6 +240,9 @@ router.use("/inquiries-form", inquiryFormRoutes);
 
 /** 10. Custom Forms */
 router.use("/custom-forms", customFormRoutes);
+
+/** 11. Form Submissions */
+router.use("/form-submissions", formSubmissionRoutes);
 
 //>>>>>>>>>>>>>>  Project Management System  <<<<<<<<<<<<<<<//
 
