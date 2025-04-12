@@ -6,6 +6,7 @@ import validator from "../../utils/validator.js";
 import responseHandler from "../../utils/responseHandler.js";
 import Activity from "../../models/activityModel.js";
 
+
 export default {
     validator: validator({
     
@@ -114,11 +115,16 @@ export default {
                 }
             }
 
+
             // Calculate final totals
             const total = subtotal + total_tax - total_discount;
             const total_profit = total - total_cost_of_goods;
             const profit_percentage = total_cost_of_goods > 0 ? (total_profit / total_cost_of_goods) * 100 : 0;
 
+            const upiLink = `upi://pay?pa=${process.env.UPI_ID}&pn=${process.env.MERCHANT_NAME}&am=${total}&cu=INR`;
+
+            console.log(upiLink,"upiLink");
+            
             // Create invoice
             const salesInvoice = await SalesInvoice.create({ 
                 related_id: req.user.id,
@@ -138,6 +144,7 @@ export default {
                 profit: total_profit,
                 profit_percentage: profit_percentage.toFixed(2),
                 additional_notes,
+                upiLink,
                 client_id: req.des?.client_id,
                 created_by: req.user?.username
             });

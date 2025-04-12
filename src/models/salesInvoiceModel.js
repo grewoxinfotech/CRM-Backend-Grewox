@@ -36,6 +36,11 @@ const SalesInvoice = sequelize.define("sales_Invoice", {
         allowNull: true,
         defaultValue: null,
     },
+    upiLink: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: null,
+    },
     items: {
         type: DataTypes.JSON,
         allowNull: false,
