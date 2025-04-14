@@ -18,6 +18,10 @@ const FollowupMetting = sequelize.define('followup_metting', {
         type: DataTypes.ENUM('offline', 'online'),
         allowNull: false,
     },
+    meeting_status: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
     venue: {
         type: DataTypes.STRING,
         allowNull: true,
@@ -72,8 +76,8 @@ const FollowupMetting = sequelize.define('followup_metting', {
         allowNull: true,
         defaultValue: null
     },
-    deal_id: {
-        type: DataTypes.INTEGER,
+    related_id: {
+        type: DataTypes.STRING,
         allowNull: false,
     },
     client_id: {

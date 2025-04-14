@@ -9,6 +9,9 @@ import Activity from "../../models/activityModel.js";
 
 export default {
     validator: validator({
+        params: Joi.object({
+            id: Joi.string().required()
+        }),
     
         body: Joi.object({
             customer: Joi.string().required(),
@@ -42,6 +45,7 @@ export default {
                 currency,
                 additional_notes
             } = req.body;
+            const {id} = req.params;
 
             // Calculate costs and verify products
             let total_cost_of_goods = 0;
@@ -127,7 +131,7 @@ export default {
             
             // Create invoice
             const salesInvoice = await SalesInvoice.create({ 
-                related_id: req.user.id,
+                related_id: id,
                 customer,
                 issueDate,
                 dueDate,
@@ -152,7 +156,7 @@ export default {
             // If invoice is marked as paid, create sales revenue entry
             if (payment_status === 'paid') {
                 await SalesRevenue.create({
-                    related_id: req.user.id,
+                    related_id: id,
                     date: issueDate,
                     currency,
                     amount: total,
@@ -172,7 +176,7 @@ export default {
 
             // Log activity
             await Activity.create({
-                related_id: req.user.id,
+                related_id: id,
                 activity_from: "sales_invoice",
                 activity_id: salesInvoice.id,
                 action: "created",

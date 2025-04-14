@@ -2,8 +2,7 @@ import { DataTypes } from 'sequelize';
 import sequelize from '../config/db.js';
 import generateId from '../middlewares/generatorId.js';
 
-
-const FollowupTask = sequelize.define('followup_task', {
+const FollowupCall = sequelize.define('followup_call', {
     id: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -15,41 +14,41 @@ const FollowupTask = sequelize.define('followup_task', {
         type: DataTypes.STRING,
         allowNull: false,
     },
-    due_date: {
+    call_start_date: {
         type: DataTypes.DATEONLY,
         allowNull: false,
     },
-    priority: {
-        type: DataTypes.ENUM('highest', 'high', 'medium', 'low'),
-        allowNull: false,
-        defaultValue: 'medium',
-    },
-    task_reporter: {
+    call_start_time: {
         type: DataTypes.STRING,
-        allowNull: true,
+        allowNull: false,
     },
     assigned_to: {
         type: DataTypes.JSON,
         allowNull: false,
     },
-    status: {
-        type: DataTypes.ENUM('not_started', 'in_progress', 'completed', 'on_hold', 'cancelled'),
-        allowNull: false,
-        defaultValue: 'not_started',
+    call_purpose: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: null,
     },
-    reminder: {
-        type:DataTypes.JSON,
-        allowNull:true,
-        defaultValue:null,
+    call_reminder: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: null,
     },
-            repeat: {
-                type:DataTypes.JSON,
-                allowNull:true,
-                defaultValue:null,
-            },
-    description: {
+    call_notes: {
         type: DataTypes.TEXT,
         allowNull: true,
+        defaultValue: null,
+    },
+    call_type: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    call_status: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: 'not_started',
     },
     related_id: {
         type: DataTypes.STRING,
@@ -71,19 +70,19 @@ const FollowupTask = sequelize.define('followup_task', {
     }
 });
 
-FollowupTask.beforeCreate(async (followuptask) => {
+FollowupCall.beforeCreate(async (followupCall) => {
     let isUnique = false;
     let newId;
     while (!isUnique) {
         newId = generateId();
-        const existingFollowupTask = await FollowupTask.findOne({
+        const existingFollowupCall = await FollowupCall.findOne({
             where: { id: newId }
         });
-        if (!existingFollowupTask) {
+        if (!existingFollowupCall) {
             isUnique = true;
         }
     }
-    followuptask.id = newId;
+    followupCall.id = newId;
 });
 
-export default FollowupTask;
+export default FollowupCall;

@@ -15,7 +15,7 @@ export default {
             const { id } = req.params;
             const followupMetting = await FollowupMetting.findAll({
                 where: {
-                    deal_id: id,
+                    related_id: id,
                     client_id: req.des?.client_id
                 }
             });

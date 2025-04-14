@@ -103,6 +103,7 @@ import inquiryFormRoutes from "./inquiryFormRoutes.js";
 import customFormRoutes from "./customFormRoutes.js"
 import followupMeetingRoutes from "./followupMettingRoutes.js";
 import formSubmissionRoutes from "./formSubmissionRoutes.js";
+import followupCallRoutes from "./followupCallRoutes.js";
 const router = express.Router();
 
 //>>>>>>>>>>>>>>  Super Admin  <<<<<<<<<<<<<<<//
@@ -225,6 +226,7 @@ router.use("/stages", stageRoutes);
 router.use("/followups", followupRoutes);
 router.use("/followup-tasks", followupTaskRoutes);
 router.use("/followup-meetings", followupMeetingRoutes);
+router.use("/followup-calls", followupCallRoutes);
 /** 6. Contact Setup*/
 router.use("/contacts", contactRoutes);
 
