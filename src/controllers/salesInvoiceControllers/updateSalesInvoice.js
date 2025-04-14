@@ -12,22 +12,22 @@ export default {
             id: Joi.string().required()
         }),
         body: Joi.object({
-            customer: Joi.string().required(),
-            issueDate: Joi.date().required(),
-            dueDate: Joi.date().required(),
+            customer: Joi.string().optional(),
+            issueDate: Joi.date().optional(),
+            dueDate: Joi.date().optional(),
             category: Joi.string().optional().allow("", null),
             items: Joi.array().items(
                 Joi.object({
-                    product_id: Joi.string().required(),
-                    quantity: Joi.number().integer().min(1).required(),
-                    unit_price: Joi.number().min(0).required(),
+                    product_id: Joi.string().optional(),
+                    quantity: Joi.number().integer().min(1).optional(),
+                    unit_price: Joi.number().min(0).optional(),
                     tax_rate: Joi.number().min(0).optional(),
                     discount: Joi.number().min(0).optional(),
                     amount: Joi.number().min(0).optional()
                 })
             ).required().min(1),
             payment_status: Joi.string().valid('paid', 'unpaid', 'partially_paid').default('unpaid'),
-            currency: Joi.string().required(),
+            currency: Joi.string().optional(),
             additional_notes: Joi.string().optional().allow("", null)
         })
     }),

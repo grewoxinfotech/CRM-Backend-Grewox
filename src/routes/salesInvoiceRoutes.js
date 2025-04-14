@@ -8,7 +8,7 @@ const router = Router();
 router.use(authenticateUser, checkRole, passCompanyDetails);
 
 router.post("/:id", createSalesInvoice.validator, createSalesInvoice.handler);
-router.get("/:id", getAllSalesInvoice.validator, getAllSalesInvoice.handler);
+router.get("/", getAllSalesInvoice.validator, getAllSalesInvoice.handler);
 router.get("/single/:id", getSalesInvoiceById.validator, getSalesInvoiceById.handler);
 router.put("/:id", updateSalesInvoice.validator, updateSalesInvoice.handler);
 router.delete("/:id", deleteSalesInvoice.validator, deleteSalesInvoice.handler);

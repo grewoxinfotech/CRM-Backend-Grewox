@@ -5,6 +5,8 @@ import SalesRevenue from "../../models/salesRevenueModel.js";
 import validator from "../../utils/validator.js";
 import responseHandler from "../../utils/responseHandler.js";
 import Activity from "../../models/activityModel.js";
+import Notification from "../../models/notificationModel.js";
+import dayjs from "dayjs";
 
 
 export default {
@@ -184,6 +186,50 @@ export default {
                 client_id: req.des?.client_id,
                 activity_message: `Sales invoice created for ${total} ${currency} with profit of ${total_profit.toFixed(2)} (${profit_percentage.toFixed(2)}%). Status: ${payment_status}`
             });
+
+            // After creating the sales invoice, add this code:
+            if (payment_status === 'unpaid') {
+                // Create reminder for due date
+                await Notification.create({
+                    related_id: salesInvoice.id,
+                    users: [customer], // Assuming customer is the user ID
+                    title: "Invoice Due Date Reminder",
+                    notification_type: "reminder",
+                    from: req.user?.id,
+                    client_id: req.des?.client_id,
+                    date: dueDate,
+                    time: "09:00", // Set default reminder time
+                    message: `Invoice #${salesInvoice.id} is due today`,
+                    description: `💰 Invoice Due Today:
+• Invoice #: ${salesInvoice.id}
+• Amount: ${total} ${currency}
+• Due Date: ${dueDate}
+• Customer: ${customer}
+• Status: ${payment_status}`,
+                    created_by: req.user?.username,
+                });
+
+                // Create reminder for day before due date
+                const dayBeforeDue = dayjs(dueDate).subtract(1, 'day').format('YYYY-MM-DD');
+                await Notification.create({
+                    related_id: salesInvoice.id,
+                    users: [customer],
+                    title: "Invoice Due Tomorrow",
+                    notification_type: "reminder",
+                    from: req.user?.id,
+                    client_id: req.des?.client_id,
+                    date: dayBeforeDue,
+                    time: "09:00",
+                    message: `Invoice #${salesInvoice.salesInvoiceNumber} is due tomorrow`,
+                    description: `💰 Invoice Due Tomorrow:
+• Invoice #: ${salesInvoice.salesInvoiceNumber}
+• Amount: ${total} ${currency}
+• Due Date: ${dueDate}
+• Customer: ${customer}
+• Status: ${payment_status}`,
+                    created_by: req.user?.username,
+                });
+            }
 
             return responseHandler.success(res, "Sales invoice created successfully", {
                 ...salesInvoice.toJSON(),
