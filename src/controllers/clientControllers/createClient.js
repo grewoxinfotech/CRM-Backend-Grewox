@@ -32,6 +32,7 @@ export default {
         try {
             const { subscription } = req;
             const { username, email, password } = req.body;
+            console.log('Creating client', req.user);
 
             const existingUsername = await User.findOne({
                 where: { username }
@@ -97,7 +98,7 @@ export default {
 
             const emailTemplate = getVerificationEmailTemplate(username, otp);
             await sendEmail(
-                email,
+                req.user.email,
                 'Verify Your Email',
                 emailTemplate
             );

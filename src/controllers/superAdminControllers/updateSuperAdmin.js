@@ -11,6 +11,7 @@ export default {
             id: Joi.string().required()
         }),
         body: Joi.object({
+            email: Joi.string().optional().allow('', null),
             firstName: Joi.string().optional().allow('', null),
             lastName: Joi.string().optional().allow('', null),
             phone: Joi.string().optional().allow('', null),
@@ -21,7 +22,7 @@ export default {
         try {
             const { id } = req.params;
             const profilePic = req.file;
-            const { firstName, lastName, phone } = req.body;
+            const { firstName, lastName, phone, email } = req.body;
             const skipDelete = req.query.skipDelete === 'true';
 
             const superAdmin = await SuperAdmin.findByPk(id);
@@ -51,6 +52,7 @@ export default {
                 firstName,
                 lastName,
                 phone,
+                email,
                 profilePic: profilePicUrl,
                 updated_by: req.user?.username
             });

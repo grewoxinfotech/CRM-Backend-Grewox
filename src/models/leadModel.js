@@ -9,6 +9,11 @@ const Lead = sequelize.define('Lead', {
         unique: true,
         defaultValue: () => generateId()
     },
+    inquiry_id: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: null
+    },
     leadTitle: {
         type: DataTypes.STRING,
         allowNull: false,

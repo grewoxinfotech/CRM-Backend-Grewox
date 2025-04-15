@@ -126,20 +126,42 @@ export default {
             lead_members: Joi.object().allow(null),
             category: Joi.string().allow('', null),
             status: Joi.string().allow('', null),
+            inquiry_id: Joi.string().allow(null),
         })
     }),
 
     handler: async (req, res) => {
         try {
-            const { leadStage, leadTitle, firstName, lastName, phoneCode, telephone, email, address, interest_level, lead_members, category, source, company_name, currency, leadValue, pipeline, status } = req.body;
-            
+            const { leadStage, leadTitle, firstName, lastName, phoneCode, telephone, email, address, interest_level, lead_members, category, source, company_name, currency, leadValue, pipeline, status, inquiry_id } = req.body;
+
+            // Log the inquiry_id for debugging
+            console.log('Received inquiry_id:', inquiry_id);
+
             const existingLead = await Lead.findOne({ where: { email } });
             if (existingLead) {
                 return responseHandler.conflict(res, "Lead with this email already exists!");
             }
 
+            // Create lead with explicit inquiry_id handling
             const lead = await Lead.create({
-                leadStage, leadTitle, firstName, lastName, phoneCode, telephone, email, address, interest_level, lead_members, category, status, source, company_name, currency, leadValue, pipeline, status,
+                leadStage,
+                leadTitle,
+                firstName,
+                lastName,
+                phoneCode,
+                telephone,
+                email,
+                address,
+                interest_level,
+                lead_members,
+                category,
+                source,
+                company_name,
+                currency,
+                leadValue,
+                pipeline,
+                status,
+                inquiry_id: inquiry_id || null,
                 client_id: req.des?.client_id,
                 created_by: req.user?.username
             });
