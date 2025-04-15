@@ -7,14 +7,17 @@ import uploadToS3 from "../../utils/uploadToS3.js";
 export default {
     validator: validator({
         body: Joi.object({
-            termsandconditions: Joi.string().required(),
+            termsandconditions: Joi.string().optional(),
             companyName: Joi.string().required(),
             title: Joi.string().required(),
+            merchant_name: Joi.string().optional(),
+            merchant_upi_id: Joi.string().optional(),
         })
     }),
     handler: async (req, res) => {
         try {
-            const { termsandconditions, companyName, title } = req.body;
+            const { termsandconditions, companyName, title, merchant_name, merchant_upi_id } = req.body;
+
             const logo = req.files?.companylogo?.[0];
             const favicon = req.files?.favicon?.[0];
 
@@ -37,7 +40,9 @@ export default {
                 title,
                 termsandconditions,
                 client_id: req.des?.client_id,
-                created_by: req.user?.username
+                created_by: req.user?.username,
+                merchant_name,
+                merchant_upi_id
             });
 
             return responseHandler.success(res, "Setting created successfully", setting);

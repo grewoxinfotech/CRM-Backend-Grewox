@@ -19,7 +19,7 @@ export default {
             from_time: Joi.string().required(),
             to_date: Joi.string().required(),
             to_time: Joi.string().required(),
-            host: Joi.string().required(),
+            // host: Joi.string().required(),
             assigned_to: Joi.object({
                 assigned_to: Joi.array().items(Joi.string()).required()
             }).required(),

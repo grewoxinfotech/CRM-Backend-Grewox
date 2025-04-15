@@ -24,9 +24,20 @@ const Setting = sequelize.define("Setting", {
         type: DataTypes.STRING,
         allowNull: false,
     },
+    merchant_name: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: null,
+    },
+    merchant_upi_id: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: null,
+    },
     termsandconditions: {
         type: DataTypes.TEXT,
-        allowNull: false,
+        allowNull: true,
+        defaultValue: null
     },
     client_id: {
         type: DataTypes.STRING,
