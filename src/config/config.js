@@ -54,3 +54,6 @@ export const s3 = new AWS.S3({
     region: process.env.AWS_REGION,
     bucketName: process.env.AWS_BUCKET_NAME
 });
+
+export const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
+export const EMAIL_FROM = process.env.EMAIL_FROM;

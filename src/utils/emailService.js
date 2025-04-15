@@ -1,5 +1,5 @@
 import nodemailer from 'nodemailer';
-import { EMAIL_CONFIG } from '../config/config.js';
+import { EMAIL_CONFIG, SENDGRID_API_KEY } from '../config/config.js';
 import Email from '../models/emailModel.js';
 
 const transporter = nodemailer.createTransport({
@@ -33,4 +33,10 @@ export const sendEmail = async (to, subject, html) => {
     } catch (error) {
         throw new Error(error);
     }
-}; 
+};
+
+import sgMail from '@sendgrid/mail';
+
+sgMail.setApiKey(SENDGRID_API_KEY);
+
+export default sgMail;

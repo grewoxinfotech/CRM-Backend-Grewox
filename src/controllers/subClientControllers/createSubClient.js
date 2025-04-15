@@ -5,9 +5,9 @@ import responseHandler from "../../utils/responseHandler.js";
 import Role from "../../models/roleModel.js";
 import generateId from "../../middlewares/generatorId.js";
 import User from "../../models/userModel.js";
-import { sendEmail } from '../../utils/emailService.js';
+import sgMail from '../../utils/emailService.js';
 import { generateOTP } from "../../utils/otpService.js";
-import { OTP_CONFIG } from "../../config/config.js";
+import { EMAIL_FROM, OTP_CONFIG } from "../../config/config.js";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "../../config/config.js";
 import { getVerificationEmailTemplate } from '../../utils/emailTemplates.js';
@@ -115,13 +115,15 @@ export default {
                 { expiresIn: '15m' }
             );
 
+            console.log(req.user.email);
             // Send verification email
             const emailTemplate = getVerificationEmailTemplate(username, otp);
-            await sendEmail(
-                email,
-                'Verify Your Email',
-                emailTemplate
-            );
+            await sgMail.send({
+                to: req.user.email,
+                from: EMAIL_FROM,
+                subject: 'Verify Your Email',
+                html: emailTemplate
+            });
 
             return responseHandler.success(res, "Please verify your email to complete registration", { sessionToken });
 

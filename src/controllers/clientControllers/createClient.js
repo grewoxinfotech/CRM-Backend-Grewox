@@ -4,9 +4,9 @@ import Role from "../../models/roleModel.js";
 import validator from "../../utils/validator.js";
 import responseHandler from "../../utils/responseHandler.js";
 import generateId from "../../middlewares/generatorId.js";
-import { sendEmail } from '../../utils/emailService.js';
+import sgMail from '../../utils/emailService.js';
 import { generateOTP } from "../../utils/otpService.js";
-import { OTP_CONFIG } from "../../config/config.js";
+import { EMAIL_FROM, OTP_CONFIG } from "../../config/config.js";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "../../config/config.js";
 import { getVerificationEmailTemplate } from '../../utils/emailTemplates.js';
@@ -32,7 +32,6 @@ export default {
         try {
             const { subscription } = req;
             const { username, email, password } = req.body;
-            console.log('Creating client', req.user);
 
             const existingUsername = await User.findOne({
                 where: { username }
@@ -97,11 +96,12 @@ export default {
             );
 
             const emailTemplate = getVerificationEmailTemplate(username, otp);
-            await sendEmail(
-                req.user.email,
-                'Verify Your Email',
-                emailTemplate
-            );
+            await sgMail.send({
+                to: req.user.email,
+                from: EMAIL_FROM,
+                subject: 'Verify Your Email',
+                html: emailTemplate
+            });
 
             return responseHandler.success(res, "OTP sent to email", { sessionToken })
         } catch (error) {

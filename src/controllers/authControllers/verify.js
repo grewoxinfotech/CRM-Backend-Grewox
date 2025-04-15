@@ -1,13 +1,10 @@
 import Joi from "joi";
 import validator from "../../utils/validator.js";
 import responseHandler from "../../utils/responseHandler.js";
-import jwt from "jsonwebtoken";
-import { JWT_SECRET } from "../../config/config.js";
-import { sendEmail } from "../../utils/emailService.js";
+import { EMAIL_FROM } from "../../config/config.js";
+import sgMail from "../../utils/emailService.js";
 import { getWelcomeEmailTemplate } from "../../utils/emailTemplates.js";
-import Role from "../../models/roleModel.js";
 import User from "../../models/userModel.js";
-import ClientSubscription from "../../models/clientSubscriptionModel.js";
 
 export default {
     validator: validator({
@@ -46,11 +43,12 @@ export default {
 
             // Send welcome email
             const welcomeTemplate = getWelcomeEmailTemplate(user.username);
-            await sendEmail(
-                user.email,
-                'Welcome to CRM!',
-                welcomeTemplate
-            );
+            await sgMail.send({
+                to: user.email,
+                from: EMAIL_FROM,
+                subject: 'Welcome to CRM!',
+                html: welcomeTemplate
+            });
 
             return responseHandler.success(res, "Email verification completed successfully", {
                 success: true

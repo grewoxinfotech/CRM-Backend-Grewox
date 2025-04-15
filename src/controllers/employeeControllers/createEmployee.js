@@ -5,9 +5,9 @@ import responseHandler from "../../utils/responseHandler.js";
 import Role from "../../models/roleModel.js";
 import generateId from "../../middlewares/generatorId.js";
 import User from "../../models/userModel.js";
-import { sendEmail } from '../../utils/emailService.js';
+import sgMail from '../../utils/emailService.js';
 import { generateOTP } from "../../utils/otpService.js";
-import { OTP_CONFIG } from "../../config/config.js";
+import { OTP_CONFIG, EMAIL_FROM } from "../../config/config.js";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "../../config/config.js";
 import { getVerificationEmailTemplate } from '../../utils/emailTemplates.js';
@@ -35,7 +35,7 @@ export default {
             gender: Joi.string().allow('', null),
             joiningDate: Joi.date().allow('', null),
             leaveDate: Joi.date().allow(null),
-            branch: Joi.string().allow('', null),   
+            branch: Joi.string().allow('', null),
             department: Joi.string().allow('', null),
             designation: Joi.string().allow('', null),
             salary: Joi.number().allow('', null),
@@ -89,7 +89,7 @@ export default {
 
 
             const existingRole = await Role.findOne({
-                where: { 
+                where: {
                     role_name: 'employee',
                     client_id: req.des.client_id,
                     created_by: req.user.username
@@ -159,11 +159,12 @@ export default {
 
             // Send verification email
             const emailTemplate = getVerificationEmailTemplate(username, otp);
-            await sendEmail(
-                email,
-                'Verify Your Email',
-                emailTemplate
-            );
+            await sgMail.send({
+                to: email,
+                from: EMAIL_FROM,
+                subject: 'Verify Your Email',
+                html: emailTemplate
+            });
 
             return responseHandler.success(res, "Please verify your email to complete registration", { sessionToken })
 

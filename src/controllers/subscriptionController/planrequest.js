@@ -5,9 +5,9 @@ import SubscriptionPlan from "../../models/subscriptionPlanModel.js";
 import responseHandler from "../../utils/responseHandler.js";
 import User from "../../models/userModel.js";
 import { getPlanBuyEmailTemplate } from "../../utils/emailTemplates.js";
-import { sendEmail } from "../../utils/emailService.js";
 import Bill from "../../models/billModel.js";
-import { CLIENT_URL } from "../../config/config.js";
+import { CLIENT_URL, EMAIL_FROM } from "../../config/config.js";
+import sgMail from "../../utils/emailService.js";
 
 export default {
     validator: validator({
@@ -127,13 +127,14 @@ export default {
 
             // Send confirmation email
             const emailTemplate = getPlanBuyEmailTemplate(client.username, plan, billUrl);
-            await sendEmail(
-                client.email,
-                'Plan Purchase Confirmation',
-                emailTemplate
-            );
+            await sgMail.send({
+                to: client.email,
+                from: EMAIL_FROM,
+                subject: 'Plan Purchase Confirmation',
+                html: emailTemplate
+            });
 
-            const message = existingSubscription ? 
+            const message = existingSubscription ?
                 "Subscription plan updated successfully" :
                 "Subscription plan request processed successfully";
 

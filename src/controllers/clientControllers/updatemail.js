@@ -3,11 +3,11 @@ import responseHandler from "../../utils/responseHandler.js";
 import validator from "../../utils/validator.js";
 import User from "../../models/userModel.js";
 import { generateOTP } from "../../utils/otpService.js";
-import { OTP_CONFIG } from "../../config/config.js";
+import { OTP_CONFIG, EMAIL_FROM } from "../../config/config.js";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "../../config/config.js";
 import { getVerificationEmailTemplate } from '../../utils/emailTemplates.js';
-import { sendEmail } from '../../utils/emailService.js';
+import sgMail from "../../utils/emailService.js";
 
 export default {
     validator: validator({
@@ -63,11 +63,12 @@ export default {
 
             // Send verification email
             const emailTemplate = getVerificationEmailTemplate(client.username, otp);
-            await sendEmail(
-                email,
-                'Verify Your Email',
-                emailTemplate
-            );
+            await sgMail.send({
+                to: email,
+                from: EMAIL_FROM,
+                subject: 'Verify Your Email',
+                html: emailTemplate
+            });
 
             return responseHandler.success(res, "Please verify your new email address", { sessionToken });
 
