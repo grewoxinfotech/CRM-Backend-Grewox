@@ -11,6 +11,7 @@ export default {
         body: Joi.object({
             name: Joi.string().required(),
             contact: Joi.string().required(),
+            phonecode: Joi.string().optional().allow("", null),
             email: Joi.string().email().optional().allow("", null), 
             taxNumber: Joi.string().optional().allow("", null),
             address: Joi.string().optional().allow("", null),
@@ -23,7 +24,7 @@ export default {
     handler: async (req, res) => {
         try {
             const { id } = req.params;
-            const { name, contact, email, taxNumber, address, city, state, country, zipcode } = req.body;
+            const { name, contact, phonecode, email, taxNumber, address, city, state, country, zipcode } = req.body;
 
             const existingVendor = await Vendor.findByPk(id);
             if (!existingVendor) {
@@ -34,6 +35,7 @@ export default {
                 {
                     name,
                     contact,
+                    phonecode,
                     email,
                     taxNumber,
                     address,

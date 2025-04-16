@@ -34,7 +34,8 @@ const Bill = sequelize.define('Bill', {
     },
     currency: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
+        defaultValue: null
     },
     items: {
         type: DataTypes.JSON,

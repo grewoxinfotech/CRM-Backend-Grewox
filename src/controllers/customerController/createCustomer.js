@@ -8,6 +8,7 @@ export default {
         body: Joi.object({
             name: Joi.string().required(),
             contact: Joi.string().required(),
+            phonecode: Joi.string().required(),
             email: Joi.string().email().allow('', null).optional(),
             tax_number: Joi.string().optional().allow('', null),
             alternate_number: Joi.string().allow('', null),
@@ -17,7 +18,9 @@ export default {
     }),
     handler: async (req, res) => {
         try {
-            const { name, contact, email, tax_number, alternate_number, billing_address, shipping_address } = req.body;
+            const { name, contact, email, tax_number, 
+                alternate_number, billing_address, shipping_address,
+                phonecode } = req.body;
 
             
 
@@ -30,6 +33,7 @@ export default {
                 related_id: req.user?.id,
                 name,
                 contact,
+                phonecode,
                 email,
                 tax_number,
                 alternate_number,

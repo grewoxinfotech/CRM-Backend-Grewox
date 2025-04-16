@@ -2,6 +2,7 @@ import Joi from "joi";
 import SalesCreditnote from "../../models/salesCreditnoteModel.js";
 import SalesInvoice from "../../models/salesInvoiceModel.js";
 import SalesRevenue from "../../models/salesRevenueModel.js";
+import Product from "../../models/productModel.js";
 import validator from "../../utils/validator.js";
 import responseHandler from "../../utils/responseHandler.js";
 import uploadToS3 from "../../utils/uploadToS3.js";
@@ -43,6 +44,28 @@ export default {
         );
       }
 
+      // Parse invoice items
+      const invoiceItems = JSON.parse(salesInvoice.items);
+
+      // Check product stock availability before proceeding
+      const newTotalCredited = totalCreditedAmount + amount;
+      if (newTotalCredited >= salesInvoice.total) {
+        // Only check stock if this credit note will complete the invoice
+        for (const item of invoiceItems) {
+          const product = await Product.findByPk(item.product_id);
+          if (!product) {
+            return responseHandler.error(res, `Product with ID ${item.product_id} not found`);
+          }
+          
+          if (product.stock_quantity < item.quantity) {
+            return responseHandler.error(
+              res, 
+              `Insufficient stock for product ${product.name}. Available: ${product.stock_quantity}, Required: ${item.quantity}`
+            );
+          }
+        }
+      }
+
       // Handle file upload to S3
       let attachmentUrl = null;
       if (req.file) {
@@ -53,9 +76,6 @@ export default {
           req.user?.username
         );
       }
-
-      // Parse invoice items
-      const invoiceItems = JSON.parse(salesInvoice.items);
 
       // Calculate proportional amounts for each item based on credit note amount
       const creditNoteItems = invoiceItems.map(item => {
@@ -90,15 +110,16 @@ export default {
       // Calculate new total and determine payment status
       const newTotal = salesInvoice.total;
       const newAmount = salesInvoice.amount - amount;
-      const newTotalCredited = totalCreditedAmount + amount;
       
       let newPaymentStatus = salesInvoice.payment_status;
       let shouldCreateRevenue = false;
+      let shouldUpdateStock = false;
       
       // If total credited equals invoice total, mark as paid
       if (newTotalCredited >= salesInvoice.total) {
         newPaymentStatus = 'paid';
         shouldCreateRevenue = true;
+        shouldUpdateStock = true;
       } 
       // If some amount is credited but not full, mark as partially_paid
       else if (newTotalCredited > 0) {
@@ -110,6 +131,19 @@ export default {
         amount: newAmount,
         payment_status: newPaymentStatus
       });
+
+      // Update product stock if credit note completes the invoice
+      if (shouldUpdateStock) {
+        for (const item of invoiceItems) {
+          const product = await Product.findByPk(item.product_id);
+          if (product) {
+            await product.update({
+              stock_quantity: product.stock_quantity - item.quantity,
+              updated_by: req.user?.username
+            });
+          }
+        }
+      }
 
       // If status becomes paid, create revenue entry
       if (shouldCreateRevenue) {
@@ -145,7 +179,7 @@ export default {
         action: "created",
         performed_by: req.user?.username,
         client_id: req.des?.client_id,
-        activity_message: `Credit note of ${amount} ${currency || salesInvoice.currency} created for invoice #${invoice}. New invoice balance: ${newAmount}. Status changed to: ${newPaymentStatus}`
+        activity_message: `Credit note of ${amount} ${currency || salesInvoice.currency} created for invoice #${invoice}. New invoice balance: ${newAmount}. Status changed to: ${newPaymentStatus}${shouldUpdateStock ? '. Stock updated for products.' : ''}`
       });
 
       return responseHandler.success(
@@ -161,7 +195,8 @@ export default {
             totalCreditedAmount: newTotalCredited,
             previousStatus: salesInvoice.payment_status,
             newStatus: newPaymentStatus,
-            items: creditNoteItems
+            items: creditNoteItems,
+            stockUpdated: shouldUpdateStock
           }
         }
       );

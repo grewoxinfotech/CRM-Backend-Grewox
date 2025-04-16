@@ -8,6 +8,7 @@ export default {
         body: Joi.object({
             name: Joi.string().required(),
             contact: Joi.string().required(),
+            phonecode: Joi.string().optional().allow("", null),
             email: Joi.string().email().optional().allow("", null), 
             taxNumber: Joi.string().optional().allow("", null),
             address: Joi.string().optional().allow("", null),
@@ -19,7 +20,7 @@ export default {
     }),
     handler: async (req, res) => {
         try {
-            const { name, contact, email, taxNumber, address, city, state, country, zipcode } = req.body
+            const { name, contact, phonecode, email, taxNumber, address, city, state, country, zipcode } = req.body
             const existingVendor = await Vendor.findOne({ where: { email } });
             if (existingVendor) {
                 return responseHandler.error(res, "Vendor already exists");
@@ -27,6 +28,7 @@ export default {
             const vendor = await Vendor.create({
                 name,
                 contact,
+                phonecode,
                 email,
                 taxNumber,
                 address,

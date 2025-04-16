@@ -18,6 +18,11 @@ const Vendor = sequelize.define('vendor', {
         type: DataTypes.STRING,
         allowNull: false
     },
+    phonecode: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: null
+    },
     email: {
         type: DataTypes.STRING,
         allowNull: false

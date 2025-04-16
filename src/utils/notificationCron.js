@@ -74,8 +74,8 @@ const processNotifications = async () => {
     }
 };
 
-// Run every 30 seconds to check notifications
-const minuteCron = cron.schedule('*/30 * * * * *', () => {
+// Run every 5 minutes to check notifications
+const minuteCron = cron.schedule('*/5 * * * *', () => {
     processNotifications();
 });
 

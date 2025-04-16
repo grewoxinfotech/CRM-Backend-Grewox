@@ -26,6 +26,11 @@ const Customers = sequelize.define("customers", {
         type: DataTypes.STRING,
         allowNull: false,
     },
+    phonecode: {
+        type: DataTypes.STRING,
+        allowNull: true,    
+        defaultValue: null
+    },
     email: {
         type: DataTypes.STRING,
         allowNull: true,
