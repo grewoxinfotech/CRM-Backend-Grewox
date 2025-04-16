@@ -89,6 +89,52 @@ const getCommonEmailTemplate = (content) => {
             padding-top: 20px;
             border-top: 1px solid #e2e8f0;
         }
+        .invoice-details {
+            background-color: #f8fafc;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .amount {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2b6cb0;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .status-tag {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            text-transform: capitalize;
+        }
+        .status-unpaid {
+            background-color: #fee2e2;
+            color: #dc2626;
+        }
+        .status-paid {
+            background-color: #dcfce7;
+            color: #16a34a;
+        }
+        .status-partially_paid {
+            background-color: #fef9c3;
+            color: #ca8a04;
+        }
+        .buttons {
+            text-align: center;
+            margin: 30px 0;
+        }
+        .buttons a {
+            margin: 0 10px;
+        }
+        .view-button {
+            background-color: #4f46e5;
+        }
+        .pay-button {
+            background-color: #16a34a;
+        }
     </style>
 </head>
 <body>
@@ -159,6 +205,65 @@ export const getPlanBuyEmailTemplate = (username, plan, billUrl) => {
         <p style="text-align: center;">
             <a href="${billUrl}">Download Invoice</a>
         </p>
+    `;
+    return getCommonEmailTemplate(content);
+};
+
+export const getInvoiceEmailTemplate = (customerName, invoice, viewUrl) => {
+    const formatCurrency = (amount) => {
+        return new Intl.NumberFormat('en-IN', {
+            style: 'currency',
+            currency: invoice.currency || 'INR'
+        }).format(amount);
+    };
+
+    const getStatusClass = (status) => {
+        switch (status) {
+            case 'paid':
+                return 'status-paid';
+            case 'partially_paid':
+                return 'status-partially_paid';
+            default:
+                return 'status-unpaid';
+        }
+    };
+
+    const content = `
+        <h1>Invoice from Grewox CRM</h1>
+        <p>Dear ${customerName},</p>
+        <p>Please find your invoice details below:</p>
+        
+        <div class="invoice-details">
+            <ul>
+                <li><strong>Invoice Number:</strong> ${invoice.salesInvoiceNumber}</li>
+                <li><strong>Issue Date:</strong> ${new Date(invoice.issueDate).toLocaleDateString()}</li>
+                <li><strong>Due Date:</strong> ${new Date(invoice.dueDate).toLocaleDateString()}</li>
+                <li>
+                    <strong>Status:</strong> 
+                    <span class="status-tag ${getStatusClass(invoice.payment_status)}">
+                        ${invoice.payment_status}
+                    </span>
+                </li>
+            </ul>
+            
+            <div class="amount">
+                ${formatCurrency(invoice.total)}
+            </div>
+        </div>
+
+        <div class="buttons">
+            <a href="${viewUrl}" class="view-button">View Invoice</a>
+            ${invoice.payment_status !== 'paid' ? `
+                <a href="${invoice.upiLink}" class="pay-button">Pay Now</a>
+            ` : ''}
+        </div>
+
+        ${invoice.additional_notes ? `
+            <p><strong>Additional Notes:</strong></p>
+            <p>${invoice.additional_notes}</p>
+        ` : ''}
+
+        <p>If you have any questions, please don't hesitate to contact us.</p>
     `;
     return getCommonEmailTemplate(content);
 };

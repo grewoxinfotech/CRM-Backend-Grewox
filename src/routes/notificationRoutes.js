@@ -6,7 +6,7 @@ const router = Router();
 
 router.use(authenticateUser, checkRole, passCompanyDetails);
 
-router.get("/", getNotification.validator, getNotification.handler);
+router.get("/:id", getNotification.validator, getNotification.handler);
 router.put("/:id", updateNotification.validator, updateNotification.handler);
 
 export default router;

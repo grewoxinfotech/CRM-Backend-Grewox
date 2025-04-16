@@ -29,7 +29,6 @@ export default {
                     discount: Joi.number().min(0).optional()
                 })  
             ).required().min(1),
-
             payment_status: Joi.string().valid('paid', 'unpaid', 'partially_paid').default('unpaid'),
             currency: Joi.string().required(),
             additional_notes: Joi.string().optional().allow("", null)

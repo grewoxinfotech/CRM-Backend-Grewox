@@ -244,6 +244,7 @@ export default {
                 tax: total_tax,
                 discount: total_discount,
                 total,
+                amount: total,
                 cost_of_goods: total_cost_of_goods,
                 profit: total_profit,
                 profit_percentage: profit_percentage.toFixed(2),
