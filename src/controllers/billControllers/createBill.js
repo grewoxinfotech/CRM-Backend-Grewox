@@ -31,7 +31,6 @@ export default {
 
             const upiLink = `upi://pay?pa=${process.env.UPI_ID}&pn=${process.env.MERCHANT_NAME}&am=${total}&cu=INR`;
 
-            console.log(upiLink,"upiLink");
             
             // Determine bill_status based on total and updated total amounts
             const newBill = await Bill.create({ 
