@@ -28,7 +28,7 @@ export default {
 
             const { item, price, currency, purchase_date, project, description } = req.body;
 
-            const receiptUrl = await uploadToS3(bill, req.user?.roleName, "expenses", req.user?.username);
+            const receiptUrl = await uploadToS3(bill, "client", "expenses", req.user?.username);
 
             const expense = await Expense.create({
                 related_id: id, item, price, currency, purchase_date, project, bill: receiptUrl, description,

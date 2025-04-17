@@ -39,7 +39,7 @@ export default {
                     };
                     // await s3.deleteObject(s3Params).promise();
                 }
-                fileUrl = await uploadToS3(file, req.user?.roleName, "policies", req.user?.username);
+                fileUrl = await uploadToS3(file, "client", "policies", req.user?.username);
             }
             await policy.update({ title, description, file: fileUrl, updated_by: req.user?.username });
             return responseHandler.success(res, "Policy updated successfully", policy);

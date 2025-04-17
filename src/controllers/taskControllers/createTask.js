@@ -45,7 +45,7 @@ export default {
             }
             let fileUrl = null;
             if (req.file) {
-                fileUrl = await uploadToS3(req.file, req.user?.roleName, "task_files", req.user?.username);
+                fileUrl = await uploadToS3(req.file, "client", "task_files", req.user?.username);
             }
 
             const task = await Task.create({

@@ -40,7 +40,7 @@ export default {
                     };
                     await s3.deleteObject(s3Params).promise();
                 }
-                fileUrl = await uploadToS3(file, req.user?.roleName, "messages", req.user?.username);
+                fileUrl = await uploadToS3(file, "client", "messages", req.user?.username);
             }
             await messageData.update({ chooseMember, message, isRead, file: fileUrl });
 

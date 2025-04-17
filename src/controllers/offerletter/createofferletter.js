@@ -21,15 +21,15 @@ export default {
             // Check if file exists in request
             if (!req.file) {
                 return responseHandler.error(res, "Offer letter document is required");
-            }   
+            }
 
             const { job, job_applicant, currency, offer_expiry, expected_joining_date, salary, description } = req.body;
-            
+
             // Check for existing offer letter
-            const existingOfferLetter = await OfferLetter.findOne({ 
-                where: { job, job_applicant } 
+            const existingOfferLetter = await OfferLetter.findOne({
+                where: { job, job_applicant }
             });
-            
+
             if (existingOfferLetter) {
                 return responseHandler.error(res, "Offer letter already exists");
             }
@@ -37,7 +37,7 @@ export default {
             // Upload file to S3
             const fileUrl = await uploadToS3(
                 req.file,
-                req.user?.roleName,
+                "client",
                 "offer-letters",
                 req.user?.username
             );

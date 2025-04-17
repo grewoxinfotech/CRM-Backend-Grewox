@@ -65,7 +65,7 @@ export default {
           };
           await s3.deleteObject(s3Params).promise();
         }
-        fileUrl = await uploadToS3(file, req.user?.roleName, "task_files", req.user?.username);
+        fileUrl = await uploadToS3(file, "client", "task_files", req.user?.username);
       }
 
       const updatedTask = await task.update({

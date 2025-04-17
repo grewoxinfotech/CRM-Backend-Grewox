@@ -20,7 +20,7 @@ export default {
             if (existingMessage) {
                 return responseHandler.error(res, "Message already exists");
             }
-            const fileUrl = await uploadToS3(file, req.user?.roleName, "messages", req.user?.username);
+            const fileUrl = await uploadToS3(file, "client", "messages", req.user?.username);
             const messageData = await Message.create({
                 chooseMember,
                 message,

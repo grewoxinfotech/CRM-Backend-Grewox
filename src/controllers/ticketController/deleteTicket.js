@@ -23,7 +23,7 @@ export default {
                     Bucket: s3.config.bucketName,
                     Key: key,
                 };
-                // await s3.deleteObject(s3Params).promise();
+                await s3.deleteObject(s3Params).promise();
             }
             await ticket.destroy();
             return responseHandler.success(res, "Ticket deleted successfully", ticket);

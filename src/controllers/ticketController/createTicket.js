@@ -45,7 +45,7 @@ export default {
       if (req.file) {
         fileUrl = await uploadToS3(
           req.file,
-          req.user?.roleName,
+          "client",
           "support-tickets",
           req.user?.username
         );

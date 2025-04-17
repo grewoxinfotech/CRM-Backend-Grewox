@@ -47,7 +47,7 @@ export default {
                     };
                     await s3.deleteObject(s3Params).promise();
                 }
-                fileUrl = await uploadToS3(file, req.user?.roleName, "offer-letters", req.user?.username);
+                fileUrl = await uploadToS3(file, "client", "offer-letters", req.user?.username);
             }
             await offerletter.update({ job, job_applicant, currency, offer_expiry, expected_joining_date, salary, description, file: fileUrl });
             return responseHandler.success(res, "Offer letter updated successfully", offerletter);

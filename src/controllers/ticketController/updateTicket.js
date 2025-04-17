@@ -28,7 +28,7 @@ export default {
     handler: async (req, res) => {
         try {
             const file = req.file;
-            
+
             const { id } = req.params;
             const { requestor, assignGroup, agent, status, project, type, ticketSubject, description, priority, channelName, tag } = req.body;
             const ticket = await Ticket.findByPk(id);
@@ -47,9 +47,9 @@ export default {
                         Bucket: s3.config.bucketName,
                         Key: key,
                     };
-                    // await s3.deleteObject(s3Params).promise();
+                    await s3.deleteObject(s3Params).promise();
                 }
-                fileUrl = await uploadToS3(file, req.user?.roleName, "support-ticket", req.user?.username, req.user?.created_by);
+                fileUrl = await uploadToS3(file, "client", "support-ticket", req.user?.username, req.user?.created_by);
             }
 
             await ticket.update({ requestor, assignGroup, status, agent, project, type, ticketSubject, description, priority, channelName, tag, file: fileUrl, updated_by: req.user?.username });

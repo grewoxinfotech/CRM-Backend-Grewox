@@ -56,10 +56,10 @@ export default {
           if (!product) {
             return responseHandler.error(res, `Product with ID ${item.product_id} not found`);
           }
-          
+
           if (product.stock_quantity < item.quantity) {
             return responseHandler.error(
-              res, 
+              res,
               `Insufficient stock for product ${product.name}. Available: ${product.stock_quantity}, Required: ${item.quantity}`
             );
           }
@@ -71,7 +71,7 @@ export default {
       if (req.file) {
         attachmentUrl = await uploadToS3(
           req.file,
-          req.user?.roleName,
+          "client",
           "creditnotes",
           req.user?.username
         );
@@ -110,24 +110,24 @@ export default {
       // Calculate new total and determine payment status
       const newTotal = salesInvoice.total;
       const newAmount = salesInvoice.amount - amount;
-      
+
       let newPaymentStatus = salesInvoice.payment_status;
       let shouldCreateRevenue = false;
       let shouldUpdateStock = false;
-      
+
       // If total credited equals invoice total, mark as paid
       if (newTotalCredited >= salesInvoice.total) {
         newPaymentStatus = 'paid';
         shouldCreateRevenue = true;
         shouldUpdateStock = true;
-      } 
+      }
       // If some amount is credited but not full, mark as partially_paid
       else if (newTotalCredited > 0) {
         newPaymentStatus = 'partially_paid';
       }
 
       // Update invoice
-      await salesInvoice.update({ 
+      await salesInvoice.update({
         amount: newAmount,
         payment_status: newPaymentStatus
       });

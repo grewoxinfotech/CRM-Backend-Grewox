@@ -21,9 +21,11 @@ export default {
                 return responseHandler.error(res, "Document with this name already exists");
             }
 
-            const uploadedFile = await uploadToS3(file, req.user?.roleName, "documents", req.user?.username);
-            const newDocument = await Document.create({ name, role, description,
-                 file: uploadedFile, client_id: req.des?.client_id, created_by: req.user?.username });
+            const uploadedFile = await uploadToS3(file, "client", "documents", req.user?.username);
+            const newDocument = await Document.create({
+                name, role, description,
+                file: uploadedFile, client_id: req.des?.client_id, created_by: req.user?.username
+            });
             return responseHandler.success(res, "Document created successfully", newDocument);
         } catch (error) {
             return responseHandler.error(res, error.message);
