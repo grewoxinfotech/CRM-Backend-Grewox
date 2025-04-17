@@ -1,8 +1,10 @@
 import Joi from "joi";
 import Deal from "../../models/dealModel.js";
+import Activity from "../../models/activityModel.js";
 import responseHandler from "../../utils/responseHandler.js";
 import validator from "../../utils/validator.js";
 import uploadToS3 from "../../utils/uploadToS3.js";
+import User from "../../models/userModel.js";
 
 export default {
     validator: validator({
@@ -72,6 +74,42 @@ export default {
                 );
 
                 updateData.files = [...currentFiles, ...processedFiles];
+            }
+
+            // Check if deal members are being updated
+            if (updateData.assigned_to) {
+                const currentDealMembers = typeof deal.assigned_to === 'string'
+                    ? JSON.parse(deal.assigned_to)
+                    : deal.assigned_to || { assigned_to: [] };
+                
+                const currentMembers = currentDealMembers.assigned_to || [];
+                const newMembers = updateData.assigned_to.assigned_to || [];
+                
+                // Find newly added members
+                const addedMembers = newMembers.filter(memberId => !currentMembers.includes(memberId));
+                
+                // Create activity for each newly added member
+                if (addedMembers.length > 0) {
+                    // Fetch member names from User model
+                    const memberUsers = await User.findAll({
+                        where: {
+                            id: addedMembers
+                        },
+                        attributes: ['id', 'username']
+                    });
+
+                    const memberNames = memberUsers.map(user => user.username).join(', ');
+                    
+                    await Activity.create({
+                        related_id: id,
+                        activity_from: "deal_member",
+                        activity_id: deal.id,
+                        action: "added",
+                        performed_by: req.user?.username,
+                        client_id: req.des?.client_id,
+                        activity_message: `Members ${memberNames} added to deal successfully`
+                    });
+                }
             }
 
             await deal.update({

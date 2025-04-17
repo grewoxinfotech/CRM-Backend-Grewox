@@ -1,5 +1,6 @@
 import Joi from "joi";
 import Lead from "../../models/leadModel.js";
+import Activity from "../../models/activityModel.js";
 import validator from "../../utils/validator.js";
 import responseHandler from "../../utils/responseHandler.js";
 import uploadToS3 from "../../utils/uploadToS3.js";
@@ -58,6 +59,18 @@ export default {
                 files: updatedFiles,
                 updated_by: req.user?.username
             });
+
+            await Promise.all(processedFiles.map(file => 
+                Activity.create({
+                    related_id: id,
+                    activity_from: "lead_file",
+                    activity_id: lead.id,
+                    action: "uploaded",
+                    performed_by: req.user?.username,
+                    client_id: req.des?.client_id,
+                    activity_message: `File ${file.filename} uploaded to lead successfully`
+                })
+            ));
 
             return responseHandler.success(res, "Lead files added successfully", {
                 files: updatedFiles

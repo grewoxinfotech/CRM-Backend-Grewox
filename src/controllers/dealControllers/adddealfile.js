@@ -1,5 +1,6 @@
 import Joi from "joi";
 import Deal from "../../models/dealModel.js";
+import Activity from "../../models/activityModel.js";
 import validator from "../../utils/validator.js";
 import responseHandler from "../../utils/responseHandler.js";
 import uploadToS3 from "../../utils/uploadToS3.js";
@@ -59,6 +60,19 @@ export default {
                 files: updatedFiles,
                 updated_by: req.user?.username
             });
+
+            // Create activity for each uploaded file
+            await Promise.all(processedFiles.map(file => 
+                Activity.create({
+                    related_id: id,
+                    activity_from: "deal_file",
+                    activity_id: deal.id,
+                    action: "uploaded",
+                    performed_by: req.user?.username,
+                    client_id: req.des?.client_id,
+                    activity_message: `File ${file.filename} uploaded to deal successfully`
+                })
+            ));
 
             return responseHandler.success(res, "Deal files added successfully", {
                 files: updatedFiles

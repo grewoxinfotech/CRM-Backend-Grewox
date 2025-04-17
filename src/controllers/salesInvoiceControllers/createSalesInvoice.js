@@ -164,7 +164,7 @@ export default {
                     cost_of_goods: total_cost_of_goods,
                     account: 'sales',
                     customer,
-                    description: `Payment for Invoice #${salesInvoice.id}`,
+                    description: `Payment for Invoice #${salesInvoice.salesInvoiceNumber}`,
                     category: category || 'Sales',
                     products: verified_products.map(item => ({
                         ...item,
@@ -183,7 +183,7 @@ export default {
                 action: "created",
                 performed_by: req.user?.username,
                 client_id: req.des?.client_id,
-                activity_message: `Sales invoice created for ${total} ${currency} with profit of ${total_profit.toFixed(2)} (${profit_percentage.toFixed(2)}%). Status: ${payment_status}`
+                activity_message: `Sales invoice #${salesInvoice.salesInvoiceNumber} created for `
             });
 
             // After creating the sales invoice, add this code:
@@ -191,16 +191,16 @@ export default {
                 // Create reminder for due date
                 await Notification.create({
                     related_id: salesInvoice.id,
-                    users: [customer], // Assuming customer is the user ID
+                    users: [customer],
                     title: "Invoice Due Date Reminder",
                     notification_type: "reminder",
                     from: req.user?.id,
                     client_id: req.des?.client_id,
                     date: dueDate,
-                    time: "09:00", // Set default reminder time
-                    message: `Invoice #${salesInvoice.id} is due today`,
+                    time: "09:00",
+                    message: `Invoice #${salesInvoice.salesInvoiceNumber} is due today`,
                     description: `💰 Invoice Due Today:
-• Invoice #: ${salesInvoice.id}
+• Invoice #: ${salesInvoice.salesInvoiceNumber}
 • Amount: ${total} ${currency}
 • Due Date: ${dueDate}
 • Customer: ${customer}

@@ -9,7 +9,7 @@ export default {
             name: Joi.string().required(),
             contact: Joi.string().required(),
             phonecode: Joi.string().optional().allow("", null),
-            email: Joi.string().email().optional().allow("", null), 
+            email: Joi.string().email().optional(), 
             taxNumber: Joi.string().optional().allow("", null),
             address: Joi.string().optional().allow("", null),
             city: Joi.string().optional().allow("", null),
@@ -21,10 +21,10 @@ export default {
     handler: async (req, res) => {
         try {
             const { name, contact, phonecode, email, taxNumber, address, city, state, country, zipcode } = req.body
-            const existingVendor = await Vendor.findOne({ where: { email } });
-            if (existingVendor) {
-                return responseHandler.error(res, "Vendor already exists");
-            }
+            // const existi`ngVendor = await Vendor.findOne({ where: { email } });
+            // if (existingVendor) {
+            //     return responseHandler.error(res, "Vendor already exists");
+            // }`
             const vendor = await Vendor.create({
                 name,
                 contact,
