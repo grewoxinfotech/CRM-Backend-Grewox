@@ -5,6 +5,7 @@ import validator from "../../utils/validator.js";
 import Notification from "../../models/notificationModel.js";
 import isSameDay from "../../utils/isSameDay.js"
 import uploadToS3 from "../../utils/uploadToS3.js";
+import dayjs from "dayjs";
 
 export default {
     validator: validator({
@@ -66,28 +67,7 @@ export default {
 
             const taskId = task.id;
 
-            if (reminder_date) {
-                const reminderDate = new Date(reminder_date);
-                const today = new Date();
-
-                if (isSameDay(reminderDate, today)) {
-                    const dueDateDiff = Math.ceil(
-                        (new Date(dueDate) - reminderDate) / (1000 * 60 * 60 * 24)
-                    );
-                    await Notification.create({
-                        related_id: taskId,
-                        users: assignTo,
-                        title: "Task Reminder",
-                        notification_type: "reminder",
-                        from: req.user?.id,
-                        client_id: req.des?.client_id,
-                        message: `Task due: ${dueDateDiff} days. Don't forget: ${taskName}`,
-                        description: `Task Name: ${taskName}, start date: ${startDate}, due date: ${dueDate}`,
-                        created_by: req.user?.username,
-                    });
-                }
-            }
-
+            // Create task assignment notification
             await Notification.create({
                 related_id: taskId,
                 users: assignTo,
@@ -98,6 +78,43 @@ export default {
                 description: `Task Name: ${taskName}, start date: ${startDate}, due date: ${dueDate}`,
                 created_by: req.user?.username,
             });
+
+            // Create reminder notification if reminder_date is set
+            if (reminder_date) {
+                const reminderDate = dayjs(reminder_date);
+                const reminderTime = "10:00:00"; // Set reminder for 10 AM
+                const dueDateDiff = Math.ceil(
+                    (new Date(dueDate) - new Date(reminder_date)) / (1000 * 60 * 60 * 24)
+                );
+
+                await Notification.create({
+                    related_id: taskId,
+                    users: assignTo,
+                    title: "Task Reminder",
+                    notification_type: "reminder",
+                    from: req.user?.id,
+                    client_id: req.des?.client_id,
+                    date: reminderDate.format('YYYY-MM-DD'),
+                    time: reminderTime,
+                    message: `Task due in ${dueDateDiff} days: ${taskName}`,
+                    description: `⏰ Task Details:
+• Name: ${taskName}
+• Due in: ${dueDateDiff} days
+• Start Date: ${startDate}
+• Due Date: ${dueDate}
+• Priority: ${priority || 'Not set'}
+• Status: ${status || 'Not started'}
+${description ? `\nDescription: ${description}` : ''}`,
+                    created_by: req.user?.username,
+                });
+
+                console.log('Task Reminder Created:', {
+                    taskName,
+                    reminderDate: reminderDate.format('YYYY-MM-DD'),
+                    reminderTime,
+                    daysUntilDue: dueDateDiff
+                });
+            }
 
             return responseHandler.success(res, "Task created successfully", task);
         } catch (error) {

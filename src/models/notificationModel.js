@@ -39,6 +39,11 @@ const Notification = sequelize.define('Notification', {
         type: DataTypes.STRING,
         allowNull: true
     },
+    priority: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: null
+    },
     from: {
         type: DataTypes.STRING,
         allowNull: false
@@ -56,6 +61,11 @@ const Notification = sequelize.define('Notification', {
     client_id: {
         type: DataTypes.STRING,
         allowNull: false
+    },
+    is_repeat: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false
     },
     created_by: {
         type: DataTypes.STRING,

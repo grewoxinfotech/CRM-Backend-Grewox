@@ -153,6 +153,28 @@ export default {
                 created_by: req.user?.username
             });
 
+            // Create single reminder notification for due date
+            await Notification.create({
+                related_id: salesInvoice.id,
+                users: [customer],
+                title: "Invoice Due Today",
+                notification_type: "reminder",
+                from: req.user?.id,
+                client_id: req.des?.client_id,
+                date: dueDate,
+                time: "10:00:00", // Set for 10 AM on due date
+                message: `Invoice #${salesInvoice.id} is due today`,
+                description: `⚠️ Invoice Payment Due:
+• Invoice #: ${salesInvoice.id}
+• Amount Due: ${total} ${currency}
+• Due Date: ${dueDate}
+• Status: ${payment_status}
+• Items: ${verified_products.length}
+
+Please ensure timely payment to avoid any late fees.`,
+                created_by: req.user?.username,
+            });
+
             // If invoice is marked as paid, create sales revenue entry
             if (payment_status === 'paid') {
                 await SalesRevenue.create({

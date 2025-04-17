@@ -50,6 +50,11 @@ const FollowupCall = sequelize.define('followup_call', {
         allowNull: false,
         defaultValue: 'not_started',
     },
+    priority: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: null,
+    },
     related_id: {
         type: DataTypes.STRING,
         allowNull: false,

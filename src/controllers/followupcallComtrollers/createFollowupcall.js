@@ -4,6 +4,35 @@ import Joi from "joi";
 import validator from "../../utils/validator.js";
 import Notification from "../../models/notificationModel.js";
 
+// Helper function to get reminder time before call
+const getCallReminderTime = (callTime, reminderType) => {
+    const [hours, minutes, seconds] = callTime.split(':').map(Number);
+    const callDate = new Date();
+    callDate.setHours(hours, minutes, seconds);
+
+    switch (reminderType) {
+        case '5_min':
+            callDate.setMinutes(callDate.getMinutes() - 5);
+            break;
+        case '10_min':
+            callDate.setMinutes(callDate.getMinutes() - 10);
+            break;
+        case '15_min':
+            callDate.setMinutes(callDate.getMinutes() - 15);
+            break;
+        case '30_min':
+            callDate.setMinutes(callDate.getMinutes() - 30);
+            break;
+        case '1_hour':
+            callDate.setHours(callDate.getHours() - 1);
+            break;
+        default:
+            return callTime;
+    }
+
+    return callDate.toTimeString().split(' ')[0];
+};
+
 export default {
     validator: validator({
         params: Joi.object({
@@ -22,7 +51,8 @@ export default {
             call_purpose: Joi.string().optional().allow(null),
             call_notes: Joi.string().optional().allow(null),
             call_type: Joi.string().required(),
-            call_status: Joi.string().optional().allow(null)
+            call_status: Joi.string().optional().allow(null),
+            priority: Joi.string().valid('highest', 'high', 'medium', 'low').required()
         })
     }),
 
@@ -44,8 +74,9 @@ export default {
                 created_by: req.user?.username
             });
 
-            // Create notification for assigned users with status info
+            // Create notifications for each assigned user
             for (const assignedUser of callData.assigned_to.assigned_to) {
+                // 1. Create call assignment notification
                 await Notification.create({
                     related_id: call.id,
                     users: [assignedUser],
@@ -53,66 +84,50 @@ export default {
                     from: req.user?.id,
                     client_id: req.des?.client_id,
                     message: `You have been assigned to a new call: ${callData.subject}`,
+                    priority: callData.priority,
                     description: `📞 Call Details:
 • Subject: ${callData.subject}
 • Date: ${callData.call_start_date}
 • Time: ${callData.call_start_time}
 • Purpose: ${callData.call_purpose || 'N/A'}
-• Status: ${callData.call_status}`,
+• Type: ${callData.call_type}
+• Priority: ${callData.priority}
+• Status: ${callData.call_status}
+${callData.call_notes ? `\nNotes: ${callData.call_notes}` : ''}`,
                     created_by: req.user?.username,
                 });
 
-                // Calculate reminder time based on call_reminder
+                // 2. Create reminder notification if call_reminder is set
                 if (callData.call_reminder) {
-                    const [hours, minutes] = callData.call_start_time.split(':');
-                    const reminderDate = new Date(callData.call_start_date);
-                    reminderDate.setHours(parseInt(hours));
-                    reminderDate.setMinutes(parseInt(minutes));
+                    const reminderTime = getCallReminderTime(callData.call_start_time, callData.call_reminder);
 
-                    let reminderOffset = 0;
-                    switch(callData.call_reminder) {
-                        case '5_min':
-                            reminderOffset = 5;
-                            break;
-                        case '10_min':
-                            reminderOffset = 10;
-                            break;
-                        case '15_min':
-                            reminderOffset = 15;
-                            break;
-                        case '30_min':
-                            reminderOffset = 30;
-                            break;
-                        case '1_hour':
-                            reminderOffset = 60;
-                            break;
-                    }
-
-                    reminderDate.setMinutes(reminderDate.getMinutes() - reminderOffset);
-
-//                     await Notification.create({
-//                         related_id: call.id,
-//                         users: [assignedUser],
-//                         title: "Call Reminder",
-//                         notification_type: "reminder",
-//                         from: req.user?.id,
-//                         client_id: req.des?.client_id,
-//                         date: reminderDate.toISOString().split('T')[0],
-//                         time: reminderDate.toTimeString().split(' ')[0],
-//                         message: `Reminder: Upcoming call - ${callData.subject}`,
-//                         description: `📞 Call starts in ${reminderOffset} minutes:
-// • Subject: ${callData.subject}
-// • Date: ${callData.call_start_date}
-// • Time: ${callData.call_start_time}
-// • Purpose: ${callData.call_purpose || 'N/A'}
-// • Status: ${callData.call_status}`,
-//                         created_by: req.user?.username,
-//                     });
+                    await Notification.create({
+                        related_id: call.id,
+                        users: [assignedUser],
+                        title: "Call Starting Soon",
+                        notification_type: "reminder",
+                        from: req.user?.id,
+                        client_id: req.des?.client_id,
+                        date: callData.call_start_date,
+                        time: reminderTime,
+                        priority: callData.priority,
+                        message: `Call starting in ${callData.call_reminder.replace('_', ' ')}: ${callData.subject}`,
+                        description: `🔔 Upcoming Call:
+• Subject: ${callData.subject}
+• Starting at: ${callData.call_start_time}
+• Date: ${callData.call_start_date}
+• Purpose: ${callData.call_purpose || 'N/A'}
+• Type: ${callData.call_type}
+• Priority: ${callData.priority}
+${callData.call_notes ? `\nNotes: ${callData.call_notes}` : ''}`,
+                        created_by: req.user?.username,
+                    });
                 }
             }
 
             return responseHandler.success(res, "Call scheduled successfully!", call);
         } catch (error) {
+            console.error('Error creating call:', error);
             return responseHandler.error(res, error?.message);
         }
     }

@@ -1,7 +1,9 @@
 import Joi from "joi";
 import validator from "../../utils/validator.js";
 import CustomForm from "../../models/customFormModel.js";
+import Notification from "../../models/notificationModel.js";
 import responseHandler from "../../utils/responseHandler.js";
+import dayjs from "dayjs";
 
 export default {
     validator: validator({
@@ -42,8 +44,47 @@ export default {
                 created_by: req.user?.username
             });
 
+            // Get working hours notification time (10:00 AM)
+            const notificationTime = "10:00:00";
+            const formattedStartDate = dayjs(start_date).format('YYYY-MM-DD');
+
+            console.log('Creating Custom Form Notification:', {
+                title,
+                startDate: formattedStartDate,
+                notificationTime
+            });
+
+            // Create notification for the start date during working hours
+            await Notification.create({
+                related_id: customForm.id,
+                users: [req.user?.id],
+                title: "Custom Form Event Reminder",
+                notification_type: "reminder",
+                from: req.user?.id,
+                client_id: req.des?.client_id,
+                date: formattedStartDate,
+                time: notificationTime,
+                message: `Event starting today: ${event_name}`,
+                description: `📅 Event Details:
+• Title: ${title}
+• Event: ${event_name}
+• Location: ${event_location}
+• Start Date: ${formattedStartDate}
+• End Date: ${dayjs(end_date).format('YYYY-MM-DD')}
+
+${description}`,
+                created_by: req.user?.username
+            });
+
+            console.log('Custom Form Notification Created:', {
+                eventName: event_name,
+                date: formattedStartDate,
+                time: notificationTime
+            });
+
             return responseHandler.success(res, "Custom form created successfully", customForm);
         } catch (error) {
+            console.error('Custom Form Creation Error:', error);
             return responseHandler.error(res, error?.message);
         }
     }

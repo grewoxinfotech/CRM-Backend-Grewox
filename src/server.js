@@ -7,7 +7,6 @@ import sequelize from "./config/db.js";
 import fileUpload from "express-fileupload";
 import initializeSocket from "./socket/index.js";
 import responseHandler from "./utils/responseHandler.js";
-import { startNotificationCrons } from './utils/notificationCron.js';
 
 const app = express();
 
@@ -45,13 +44,14 @@ const startServer = async () => {
     console.log("✅ Database synced successfully");
 
     const io = initializeSocket(server);
+    // Make io globally available
+    global.io = io;
     console.log("✅ Socket.IO initialized");
 
     server.listen(PORT, () => {
       console.log(`✅ Server and Socket.IO running on port ${PORT}`);
       // Start notification crons
-      startNotificationCrons();
-      console.log("✅ Notification crons started");
+      
     });
 
     app.set("io", io);
