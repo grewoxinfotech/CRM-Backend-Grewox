@@ -14,6 +14,10 @@ const JobApplication = sequelize.define('job_application', {
         type: DataTypes.STRING,
         allowNull: false
     },
+    phoneCode: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
     name: {
         type: DataTypes.STRING,
         allowNull: false
@@ -53,10 +57,6 @@ const JobApplication = sequelize.define('job_application', {
         allowNull: false
     },
     applied_source: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
-    cover_letter: {
         type: DataTypes.STRING,
         allowNull: false
     },

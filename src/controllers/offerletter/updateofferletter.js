@@ -14,6 +14,7 @@ export default {
         body: Joi.object({
             job: Joi.string().required(),
             job_applicant: Joi.string().required(),
+            currency: Joi.string().required(),
             offer_expiry: Joi.date().required(),
             expected_joining_date: Joi.date().required(),
             salary: Joi.number().required(),
@@ -25,7 +26,7 @@ export default {
         try {
             const { id } = req.params;
             const file = req.file;
-            const { job, job_applicant, offer_expiry, expected_joining_date, salary, description } = req.body;
+            const { job, job_applicant, currency, offer_expiry, expected_joining_date, salary, description } = req.body;
 
 
             const offerletter = await OfferLetter.findByPk(id);
@@ -48,7 +49,7 @@ export default {
                 }
                 fileUrl = await uploadToS3(file, req.user?.roleName, "offer-letters", req.user?.username);
             }
-            await offerletter.update({ job, job_applicant, offer_expiry, expected_joining_date, salary, description, file: fileUrl });
+            await offerletter.update({ job, job_applicant, currency, offer_expiry, expected_joining_date, salary, description, file: fileUrl });
             return responseHandler.success(res, "Offer letter updated successfully", offerletter);
         } catch (error) {
             return responseHandler.error(res, error?.message);

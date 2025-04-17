@@ -15,6 +15,7 @@ export default {
             job: Joi.string().allow('', null),
             name: Joi.string().allow('', null),
             email: Joi.string().allow('', null),
+            phoneCode: Joi.string().allow('', null),
             phone: Joi.string().allow('', null),
             location: Joi.string().allow('', null),
             total_experience: Joi.number().allow('', null),
@@ -22,7 +23,6 @@ export default {
             notice_period: Joi.number().allow('', null),
             status: Joi.string().allow('', null),
             applied_source: Joi.string().allow('', null),
-            cover_letter: Joi.string().allow('', null),
         })
     }),
     handler: async (req, res) => {
@@ -31,7 +31,7 @@ export default {
             const file = req.file;
 
 
-            const { job, name, email, phone, location, total_experience, current_location, notice_period, status, applied_source, cover_letter } = req.body;
+            const { job, name, email, phoneCode, phone, location, total_experience, current_location, notice_period, status, applied_source} = req.body;
 
 
             const jobApplication = await JobApplication.findByPk(id);
@@ -40,7 +40,7 @@ export default {
                 return responseHandler.error(res, "Job application not found");
             }
 
-            const existingJobApplication = await JobApplication.findOne({ where: { job, name, email, phone, location, total_experience, current_location, notice_period, status, applied_source, cover_letter, id: { [Op.not]: id } } });
+            const existingJobApplication = await JobApplication.findOne({ where: { job, name, email, phoneCode, phone, location, total_experience, current_location, notice_period, status, applied_source  , id: { [Op.not]: id } } });
 
             if (existingJobApplication) {
                 return responseHandler.error(res, "Job application already exists");
@@ -60,7 +60,7 @@ export default {
             }
 
 
-            await jobApplication.update({ job, name, email, phone, location, total_experience, current_location, notice_period, status, applied_source, cover_letter, cv_path: cvUrl, updated_by: req.user?.username });
+            await jobApplication.update({ job, name, email, phoneCode, phone, location, total_experience, current_location, notice_period, status, applied_source, cv_path: cvUrl, updated_by: req.user?.username });
             return responseHandler.success(res, "Job application updated successfully", jobApplication);
         } catch (error) {
             return responseHandler.error(res, error?.message);

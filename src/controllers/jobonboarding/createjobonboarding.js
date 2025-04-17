@@ -10,6 +10,7 @@ export default {
             JoiningDate: Joi.string().required(),
             DaysOfWeek: Joi.string().required(),
             Salary: Joi.string().required(),
+            Currency: Joi.string().required(),
             SalaryType: Joi.string().required(),
             SalaryDuration: Joi.string().required(),
             JobType: Joi.string().required(),
@@ -18,7 +19,7 @@ export default {
     }),
     handler: async (req, res) => {
         try {
-            const { Interviewer, JoiningDate, DaysOfWeek, Salary, SalaryType, SalaryDuration, JobType, Status } = req.body;
+            const { Interviewer, JoiningDate, DaysOfWeek, Salary, Currency, SalaryType, SalaryDuration, JobType, Status } = req.body;
 
             const existingJobOnboarding = await JobOnboarding.findOne({
                 where: {
@@ -36,6 +37,7 @@ export default {
                 JoiningDate,
                 DaysOfWeek,
                 Salary,
+                Currency,
                 SalaryType,
                 SalaryDuration,
                 JobType,

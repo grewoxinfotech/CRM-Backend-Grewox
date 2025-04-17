@@ -26,6 +26,10 @@ const JobOnboarding = sequelize.define('JobOnboarding', {
         type: DataTypes.STRING,
         allowNull: true
     },
+    Currency: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
     SalaryType: {
         type: DataTypes.STRING,
         allowNull: false

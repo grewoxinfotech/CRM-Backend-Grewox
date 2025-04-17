@@ -13,6 +13,7 @@ export default {
             Interviewer: Joi.string().required(),
             JoiningDate: Joi.string().required(),
             DaysOfWeek: Joi.string().required(),
+            Currency: Joi.string().required(),
             Salary: Joi.string().required(),
             SalaryType: Joi.string().required(),
             SalaryDuration: Joi.string().required(),
@@ -23,7 +24,7 @@ export default {
     handler: async (req, res) => {
         try {
             const { id } = req.params;
-            const { Interviewer, JoiningDate, DaysOfWeek, Salary,
+            const { Interviewer, JoiningDate, DaysOfWeek, Currency, Salary,
                 SalaryType, SalaryDuration, JobType, Status } = req.body;
 
             const jobOnboarding = await JobOnboarding.findByPk(id);
@@ -49,7 +50,8 @@ export default {
                 Interviewer,
                 JoiningDate,
                 DaysOfWeek,
-                Salary,
+                Currency,
+                    Salary,
                 SalaryType,
                 SalaryDuration,
                 JobType,

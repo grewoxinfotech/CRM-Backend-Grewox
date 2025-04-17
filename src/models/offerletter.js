@@ -18,6 +18,10 @@ const OfferLetter = sequelize.define('OfferLetter', {
         type: DataTypes.STRING,
         allowNull: false
     },
+    currency: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
     offer_expiry: {
         type: DataTypes.DATE,
         allowNull: false

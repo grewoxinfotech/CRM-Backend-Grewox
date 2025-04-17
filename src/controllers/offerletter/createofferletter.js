@@ -9,6 +9,7 @@ export default {
         body: Joi.object({
             job: Joi.string().required(),
             job_applicant: Joi.string().required(),
+            currency: Joi.string().required(),
             offer_expiry: Joi.date().required(),
             expected_joining_date: Joi.date().required(),
             salary: Joi.string().required(),
@@ -22,7 +23,7 @@ export default {
                 return responseHandler.error(res, "Offer letter document is required");
             }   
 
-            const { job, job_applicant, offer_expiry, expected_joining_date, salary, description } = req.body;
+            const { job, job_applicant, currency, offer_expiry, expected_joining_date, salary, description } = req.body;
             
             // Check for existing offer letter
             const existingOfferLetter = await OfferLetter.findOne({ 
@@ -45,6 +46,7 @@ export default {
             const offerletter = await OfferLetter.create({
                 job,
                 job_applicant,
+                currency,
                 offer_expiry,
                 expected_joining_date,
                 salary,
