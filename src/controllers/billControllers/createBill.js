@@ -29,6 +29,10 @@ export default {
             const { id } = req.params;
             const { vendor, billDate, discription, status, discount, tax, currency, items, total, note, subTotal } = req.body;
 
+            const upiLink = `upi://pay?pa=${process.env.UPI_ID}&pn=${process.env.MERCHANT_NAME}&am=${total}&cu=INR`;
+
+            console.log(upiLink,"upiLink");
+            
             // Determine bill_status based on total and updated total amounts
             const newBill = await Bill.create({ 
                 related_id: id,
@@ -39,6 +43,7 @@ export default {
                 discount,
                 tax, 
                 currency,
+                upiLink,
                 items,
                 total,
                 note,
@@ -47,6 +52,8 @@ export default {
                 client_id: req.des?.client_id,
                 created_by: req.user?.username
             });
+
+           
 
             return responseHandler.success(res, "Bill created successfully", newBill);
         } catch (error) {

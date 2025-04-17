@@ -20,6 +20,11 @@ const Bill = sequelize.define('Bill', {
         type: DataTypes.STRING,
         allowNull: false,
     },
+    upiLink: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: null,
+    },
     billDate: {
         type: DataTypes.DATE,
         allowNull: false,
