@@ -17,19 +17,6 @@ const Task = sequelize.define('Task', {
         type: DataTypes.STRING,
         allowNull: false
     },
-    category: {
-        type: DataTypes.STRING,
-        allowNull: true
-    },
-    project: {
-        type: DataTypes.STRING,
-        allowNull: true
-    },
-    lead: {
-        type: DataTypes.STRING,
-        allowNull: true,
-        defaultValue: null
-    },
     file: {
         type: DataTypes.STRING,
         allowNull: true,

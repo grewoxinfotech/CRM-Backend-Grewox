@@ -74,6 +74,7 @@ export default {
                 }
             }
             const otp = generateOTP(OTP_CONFIG.LENGTH);
+
             const hashedPassword = await bcrypt.hash(password, 12);
             const tempUser = {
                 id: req.user.id,
@@ -103,7 +104,7 @@ export default {
             // Send verification email
             const emailTemplate = getVerificationEmailTemplate(username, otp);
             await sgMail.send({
-                to: email,
+                to: req.user.email,
                 from: EMAIL_FROM,
                 subject: 'Verify Your Email',
                 html: emailTemplate

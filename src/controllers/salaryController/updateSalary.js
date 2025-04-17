@@ -10,13 +10,13 @@ export default {
             id: Joi.string().required()
         }),
         body: Joi.object({
-            status: Joi.string().required().allow('paid'),
-            paymentDate: Joi.date().required(),
-            currency: Joi.string().required(),
-            netSalary: Joi.string().required(),
-            salary: Joi.string().required(),
-            bankAccount: Joi.string().required(),
-            employeeId: Joi.string().required(),
+            status: Joi.string().optional(),
+            paymentDate: Joi.date().optional(),
+            currency: Joi.string().optional(),
+            netSalary: Joi.string().optional(),
+            salary: Joi.string().optional(),
+            bankAccount: Joi.string().optional(),
+            employeeId: Joi.string().optional(),
         })
     }),
     handler: async (req, res) => {

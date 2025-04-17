@@ -4,6 +4,8 @@ import getAllDeal from "./getAllDeal.js";
 import updateDeal from "./updateDeal.js";
 import getDealById from "./getDealById.js";
 import addDealFiles from "./adddealfile.js";
+import deleteDealFiles from "./deleteDealFile.js";
+
 
 export {
     createDeal,
@@ -11,5 +13,6 @@ export {
     getAllDeal,
     updateDeal,
     getDealById,
-    addDealFiles
+    addDealFiles,
+    deleteDealFiles
 }   

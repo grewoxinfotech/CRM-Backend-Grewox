@@ -18,7 +18,7 @@ export default {
             if (!e_signatures) {
                 return responseHandler.error(res, "E-signature file is required");
             }
-            // const esignatureUrl = await uploadToS3(esignature, "esignatures", esignature_name, req.user?.username);
+
             let esignatureUrl = e_signatures;
             if (e_signatures) {
                 if (e_signatures.e_signatures) {

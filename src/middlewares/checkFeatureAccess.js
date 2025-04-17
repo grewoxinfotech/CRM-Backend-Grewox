@@ -1,3 +1,5 @@
+import responseHandler from "../utils/responseHandler.js";
+
 export const checkFeatureAccess = (feature) => {
     return async (req, res, next) => {
         try {
@@ -17,10 +19,3 @@ export const checkFeatureAccess = (feature) => {
     };
 };
 
-// Usage in routes
-router.post('/hrm/employees',
-    authenticateUser,
-    checkSubscriptionStatus,
-    checkFeatureAccess('hrm'),
-    createEmployee.handler
-); 

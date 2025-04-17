@@ -27,7 +27,7 @@ const SubscriptionPlan = sequelize.define('SubscriptionPlan', {
         allowNull: false
     },
     trial_period: {
-        type: DataTypes.STRING,     
+        type: DataTypes.STRING,
         allowNull: true,
         defaultValue: null
     },
@@ -61,7 +61,7 @@ const SubscriptionPlan = sequelize.define('SubscriptionPlan', {
         allowNull: false,
         defaultValue: 'active'
     },
-    
+
     created_by: {
         type: DataTypes.STRING,
         allowNull: true,

@@ -53,7 +53,7 @@ export default {
                         Bucket: s3.config.bucketName,
                         Key: key,
                     };
-                    // await s3.deleteObject(s3Params).promise();
+                    await s3.deleteObject(s3Params).promise();
                 }
                 profilePicUrl = await uploadToS3(profilePic, "employee", "profile-pic", employee.username, employee.created_by);
             }

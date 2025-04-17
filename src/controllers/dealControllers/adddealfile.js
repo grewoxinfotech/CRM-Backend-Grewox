@@ -32,7 +32,7 @@ export default {
                 : deal.files || [];
 
             // Check for duplicate filenames
-            const duplicateFiles = uploadedFiles.filter(newFile => 
+            const duplicateFiles = uploadedFiles.filter(newFile =>
                 currentFiles.some(existingFile => existingFile.filename === newFile.originalname)
             );
 
@@ -43,7 +43,7 @@ export default {
             // Upload files to S3 and create file entries
             const processedFiles = await Promise.all(
                 uploadedFiles.map(async (file) => {
-                    const url = await uploadToS3(file, "deal-files", file.originalname, req.user?.username);
+                    const url = await uploadToS3(file, "client", "deal-files", req.user?.username);
                     return {
                         filename: file.originalname,
                         url: url

@@ -13,6 +13,7 @@ export default {
       netSalary: Joi.string().required(),
       salary: Joi.string().required(),
       bankAccount: Joi.string().required(),
+      status: Joi.string().optional(),
     }),
   }),
   handler: async (req, res) => {
@@ -21,10 +22,11 @@ export default {
         employeeId,
         payslipType,
         currency,
-          paymentDate,
+        paymentDate,
         netSalary,
         salary,
         bankAccount,
+        status,
       } = req.body;
       const existingSalary = await Salary.findOne({ where: { employeeId } });
       if (existingSalary) {
@@ -38,6 +40,7 @@ export default {
         netSalary,
         salary,
         bankAccount,
+        status,
         client_id: req.des?.client_id,
         created_by: req.user?.username,
       });

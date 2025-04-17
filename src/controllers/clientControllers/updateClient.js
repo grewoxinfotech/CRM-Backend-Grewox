@@ -29,6 +29,8 @@ export default {
             country: Joi.string().optional().allow('', null),
             zipcode: Joi.string().optional().allow('', null),
             address: Joi.string().optional().allow('', null),
+            storage_limit: Joi.number().optional().allow('', null),
+            storage_used: Joi.number().optional().allow('', null)
         })
     }),
     handler: async (req, res) => {
@@ -43,7 +45,7 @@ export default {
             const { id } = req.params;
             const { firstName, lastName, phoneCode,
                 phone, bankname, ifsc, banklocation, website, accountholder, accountnumber, gstIn,
-                city, state, country, zipcode, address, accounttype } = req.body;
+                city, state, country, zipcode, address, accounttype, storage_limit, storage_used } = req.body;
 
             const client = await User.findByPk(id);
             if (!client) {
@@ -93,7 +95,7 @@ export default {
 
             await client.update({
                 firstName, lastName, phoneCode, phone, bankname, website, profilePic: profilePicUrl, ifsc, banklocation, accountholder, accountnumber, gstIn,
-                city, state, country, zipcode, address, accounttype, updated_by: req.user?.username
+                city, state, country, zipcode, address, accounttype, storage_limit, storage_used, updated_by: req.user?.username
             });
             return responseHandler.success(res, "Client updated successfully", client);
 

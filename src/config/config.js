@@ -52,7 +52,19 @@ export const s3 = new AWS.S3({
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
     region: process.env.AWS_REGION,
-    bucketName: process.env.AWS_BUCKET_NAME
+    params: {
+        Bucket: process.env.AWS_BUCKET_NAME
+    },
+    signatureVersion: 'v4',
+    maxRetries: 3
+});
+
+export const S3_BUCKET_NAME = process.env.AWS_BUCKET_NAME;
+
+s3.config.getCredentials((err) => {
+    if (err) {
+        console.error('AWS Credentials Error:', err);
+    }
 });
 
 export const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;

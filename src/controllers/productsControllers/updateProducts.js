@@ -58,7 +58,7 @@ export default {
                         console.error('Error deleting old product image:', error);
                     }
                 }
-                imageUrl = await uploadToS3(image, req.user?.roleName, "products", req.user?.username);
+                imageUrl = await uploadToS3(image, "client", "products", req.user?.username);
             }
             await product.update({ name, category, buying_price, selling_price, sku, hsn_sac, description, image: imageUrl, currency, stock_quantity, min_stock_level, max_stock_level, reorder_quantity, stock_status, updated_by: req.user?.username });
             await Activity.create({

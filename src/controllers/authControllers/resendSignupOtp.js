@@ -16,11 +16,13 @@ export default {
 
             const newOTP = generateOTP(OTP_CONFIG.LENGTH);
 
+            // Update user object with new OTP
+            user.verificationOTP = newOTP;
+            user.verificationOTPExpiry = Date.now() + OTP_CONFIG.EXPIRY.DEFAULT;
+
             const newSessionToken = jwt.sign(
                 {
                     ...user,
-                    verificationOTP: newOTP,
-                    verificationOTPExpiry: Date.now() + OTP_CONFIG.EXPIRY.DEFAULT,
                     type: 'signup_verification'
                 },
                 JWT_SECRET

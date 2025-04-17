@@ -134,9 +134,6 @@ export default {
         try {
             const { leadStage, leadTitle, firstName, lastName, phoneCode, telephone, email, address, interest_level, lead_members, category, source, company_name, currency, leadValue, pipeline, status, inquiry_id } = req.body;
 
-            // Log the inquiry_id for debugging
-            console.log('Received inquiry_id:', inquiry_id);
-
             const existingLead = await Lead.findOne({ where: { email } });
             if (existingLead) {
                 return responseHandler.conflict(res, "Lead with this email already exists!");

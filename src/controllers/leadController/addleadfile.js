@@ -3,7 +3,6 @@ import Lead from "../../models/leadModel.js";
 import validator from "../../utils/validator.js";
 import responseHandler from "../../utils/responseHandler.js";
 import uploadToS3 from "../../utils/uploadToS3.js";
-import { Op } from "sequelize";
 
 export default {
     validator: validator({
@@ -32,7 +31,7 @@ export default {
                 : lead.files || [];
 
             // Check for duplicate filenames
-            const duplicateFiles = uploadedFiles.filter(newFile => 
+            const duplicateFiles = uploadedFiles.filter(newFile =>
                 currentFiles.some(existingFile => existingFile.filename === newFile.originalname)
             );
 
@@ -43,7 +42,7 @@ export default {
             // Upload files to S3 and create file entries
             const processedFiles = await Promise.all(
                 uploadedFiles.map(async (file) => {
-                    const url = await uploadToS3(file, "lead-files", file.originalname, req.user?.username);
+                    const url = await uploadToS3(file, "client", "lead-files", req.user?.username);
                     return {
                         filename: file.originalname,
                         url: url

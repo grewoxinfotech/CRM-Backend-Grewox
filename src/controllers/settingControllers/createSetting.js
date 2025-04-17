@@ -30,8 +30,8 @@ export default {
 
 
             // Upload logo to S3
-            const logoUrl = await uploadToS3(logo, "company-logos", `logo-${req.user?.id}`, req.user?.username);
-            const faviconUrl = await uploadToS3(favicon, "company-logos", `favicon-${req.user?.id}`, req.user?.username);
+            const logoUrl = await uploadToS3(logo, "client", "company-logos", req.user?.username);
+            const faviconUrl = await uploadToS3(favicon, "client", "company-logos", req.user?.username);
 
             const setting = await Setting.create({
                 companylogo: logoUrl,

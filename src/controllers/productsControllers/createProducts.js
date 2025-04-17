@@ -17,7 +17,7 @@ export default {
             buying_price: Joi.number().min(0).required(),
             selling_price: Joi.number().min(0).required(),
             sku: Joi.string().optional().allow('', null),
-            currency: Joi.string().optional().allow('', null),  
+            currency: Joi.string().optional().allow('', null),
             hsn_sac: Joi.string().optional().allow('', null),
             description: Joi.string().optional().allow('', null),
             // Stock Management Fields
@@ -30,15 +30,15 @@ export default {
     }),
     handler: async (req, res) => {
         try {
-            const { 
+            const {
                 name, category, buying_price, selling_price, sku, hsn_sac, description,
-                stock_quantity, min_stock_level, max_stock_level, 
+                stock_quantity, min_stock_level, max_stock_level,
                 reorder_quantity, stock_status, currency
             } = req.body;
-            
+
             const image = req.file;
-            const imageUrl = await uploadToS3(image, req.user?.roleName, "products", req.user?.username);
-            
+            const imageUrl = await uploadToS3(image, "client", "products", req.user?.username);
+
             // Calculate initial stock status if not provided
             let calculatedStockStatus = stock_status;
             if (!stock_status) {

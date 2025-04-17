@@ -24,7 +24,7 @@ export default {
                     Bucket: s3.config.bucketName,
                     Key: key,
                 };
-                // await s3.deleteObject(s3Params).promise();
+                await s3.deleteObject(s3Params).promise();
             }
             await offerletter.destroy();
             return responseHandler.success(res, "Offer letter deleted successfully", offerletter);

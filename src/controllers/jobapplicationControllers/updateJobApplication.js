@@ -31,7 +31,7 @@ export default {
             const file = req.file;
 
 
-            const { job, name, email, phoneCode, phone, location, total_experience, current_location, notice_period, status, applied_source} = req.body;
+            const { job, name, email, phoneCode, phone, location, total_experience, current_location, notice_period, status, applied_source } = req.body;
 
 
             const jobApplication = await JobApplication.findByPk(id);
@@ -40,27 +40,41 @@ export default {
                 return responseHandler.error(res, "Job application not found");
             }
 
-            const existingJobApplication = await JobApplication.findOne({ where: { job, name, email, phoneCode, phone, location, total_experience, current_location, notice_period, status, applied_source  , id: { [Op.not]: id } } });
+            const existingJobApplication = await JobApplication.findOne({ where: { job, name, email, phoneCode, phone, location, total_experience, current_location, notice_period, status, applied_source, id: { [Op.not]: id } } });
 
             if (existingJobApplication) {
                 return responseHandler.error(res, "Job application already exists");
             }
 
-             let cvUrl = jobApplication.file;
+            let cvUrl = jobApplication.cv_path;
             if (file) {
-                if (jobApplication.file) {
-                    const key = decodeURIComponent(jobApplication.file.split(".com/").pop());
+                if (jobApplication.cv_path) {
+                    const key = decodeURIComponent(jobApplication.cv_path.split(".com/").pop());
                     const s3Params = {
                         Bucket: s3.config.bucketName,
                         Key: key,
                     };
                     await s3.deleteObject(s3Params).promise();
                 }
-                cvUrl = await uploadToS3(file, req.user?.roleName, "jobapplication", req.user?.username, req.user?.created_by);
+                cvUrl = await uploadToS3(file, "client", "jobapplication", req.user?.username);
             }
 
 
-            await jobApplication.update({ job, name, email, phoneCode, phone, location, total_experience, current_location, notice_period, status, applied_source, cv_path: cvUrl, updated_by: req.user?.username });
+            await jobApplication.update({
+                job,
+                name,
+                email,
+                phoneCode,
+                phone,
+                location,
+                total_experience,
+                current_location,
+                notice_period,
+                status,
+                applied_source,
+                cv_path: cvUrl,
+                updated_by: req.user?.username
+            });
             return responseHandler.success(res, "Job application updated successfully", jobApplication);
         } catch (error) {
             return responseHandler.error(res, error?.message);
