@@ -171,11 +171,11 @@ export default {
             }
             const currentDate = moment().format('YYYY-MM-DD');
             const currentTime = moment().format('HH:mm:00');
-            console.log('Current Date Time:', {
-                currentDate,
-                currentTime,
-                timestamp: new Date().toISOString()
-            });
+            // console.log('Current Date Time:', {
+            //     currentDate,
+            //     currentTime,
+            //     timestamp: new Date().toISOString()
+            // });
             const whereClause = {
                 read: false,
                 [Op.or]: [
@@ -215,19 +215,19 @@ export default {
 
             // Log all notifications for debugging
             notifications.forEach(notification => {
-                console.log('Notification Details:', {
-                    id: notification.id,
-                    type: notification.notification_type,
-                    title: notification.title,
-                    message: notification.message,
-                    date: notification.date,
-                    time: notification.time,
-                    users: notification.users,
-                    client_id: notification.client_id,
-                    read: notification.read,
-                    created_at: notification.createdAt,
-                    updated_at: notification.updatedAt
-                });
+                // console.log('Notification Details:', {
+                //     id: notification.id,
+                //     type: notification.notification_type,
+                //     title: notification.title,
+                //     message: notification.message,
+                //     date: notification.date,
+                //     time: notification.time,
+                //     users: notification.users,
+                //     client_id: notification.client_id,
+                //     read: notification.read,
+                //     created_at: notification.createdAt,
+                //     updated_at: notification.updatedAt
+                // });
             });
 
             // Separate and log passed and upcoming reminders for today
@@ -245,36 +245,36 @@ export default {
                 // Log the status for debugging
                 if (dateMatch) {
                     if (timeDiff < 0) {
-                        console.log('Passed Due Reminder:', {
-                            id: notif.id,
-                            title: notif.title,
-                            scheduledTime: notif.time,
-                            currentTime: currentTime,
-                            minutesPassed: Math.abs(timeDiff),
-                            status: 'PASSED_DUE',
-                            willShow: true
-                        });
+                        // console.log('Passed Due Reminder:', {
+                        //     id: notif.id,
+                        //     title: notif.title,
+                        //     scheduledTime: notif.time,
+                        //     currentTime: currentTime,
+                        //     minutesPassed: Math.abs(timeDiff),
+                        //     status: 'PASSED_DUE',
+                        //     willShow: true
+                        // });
                         return true; // Show passed due reminders
                     } else if (timeMatch) {
-                        console.log('Current Time Reminder:', {
-                            id: notif.id,
-                            title: notif.title,
-                            scheduledTime: notif.time,
-                            currentTime: currentTime,
-                            status: 'CURRENT',
-                            willShow: true
-                        });
+                        // console.log('Current Time Reminder:', {
+                        //     id: notif.id,
+                        //     title: notif.title,
+                        //     scheduledTime: notif.time,
+                        //     currentTime: currentTime,
+                        //     status: 'CURRENT',
+                        //     willShow: true
+                        // });
                         return true; // Show current time reminders
                     } else {
-                        console.log('Upcoming Reminder:', {
-                            id: notif.id,
-                            title: notif.title,
-                            scheduledTime: notif.time,
-                            currentTime: currentTime,
-                            minutesUntilDue: timeDiff,
-                            status: 'UPCOMING',
-                            willShow: false
-                        });
+                        // console.log('Upcoming Reminder:', {
+                        //     id: notif.id,
+                        //     title: notif.title,
+                        //     scheduledTime: notif.time,
+                        //     currentTime: currentTime,
+                        //     minutesUntilDue: timeDiff,
+                        //     status: 'UPCOMING',
+                        //     willShow: false
+                        // });
                         return false; // Don't show upcoming reminders
                     }
                 }
@@ -283,11 +283,11 @@ export default {
             });
 
             // Log final filtered notifications
-            console.log('Sending to frontend:', {
-                total: filteredNotifications.length,
-                normal: filteredNotifications.filter(n => n.notification_type === 'normal').length,
-                reminders: filteredNotifications.filter(n => n.notification_type === 'reminder').length
-            });
+            // console.log('Sending to frontend:', {
+            //     total: filteredNotifications.length,
+            //     normal: filteredNotifications.filter(n => n.notification_type === 'normal').length,
+            //     reminders: filteredNotifications.filter(n => n.notification_type === 'reminder').length
+            // });
 
             return responseHandler.success(res, "Notifications fetched successfully", filteredNotifications);
         } catch (error) {

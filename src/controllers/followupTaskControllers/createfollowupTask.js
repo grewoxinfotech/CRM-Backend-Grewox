@@ -119,12 +119,32 @@ ${taskData.description ? `\nDescription: ${taskData.description}` : ''}`,
                     created_by: req.user?.username,
                 });
 
-                // 2. Create reminder notifications for each repeat date
-                if (reminder || repeat) {
-                    const reminderTime = reminder?.reminder_time || "09:00:00";
-                    const reminderDate = reminder?.reminder_date || taskData.due_date;
+                // 2. Create reminder notification if configured
+                if (reminder) {
+                    await Notification.create({
+                        related_id: task.id,
+                        users: [assignedUser],
+                        title: "Task Reminder",
+                        notification_type: "reminder",
+                        from: req.user?.id,
+                        client_id: req.des?.client_id,
+                        date: reminder.reminder_date,
+                        time: reminder.reminder_time,
+                        message: `Task reminder: ${taskData.subject}`,
+                        priority: taskData.priority,
+                        description: `⚠️ Task Reminder:
+• Subject: ${taskData.subject}
+• Due Date: ${taskData.due_date}
+• Priority: ${taskData.priority}
+• Status: ${taskData.status}
+${taskData.description ? `\nDescription: ${taskData.description}` : ''}`,
+                        created_by: req.user?.username,
+                        is_repeat: false
+                    });
+                }
 
-                    // Create a notification for each repeat date
+                // 3. Create notifications for repeat dates if configured
+                if (repeat) {
                     for (const date of repeatDates) {
                         await Notification.create({
                             related_id: task.id,
@@ -134,18 +154,18 @@ ${taskData.description ? `\nDescription: ${taskData.description}` : ''}`,
                             from: req.user?.id,
                             client_id: req.des?.client_id,
                             date: date,
-                            time: repeat?.repeat_start_time || reminderTime, // Use repeat time if available
+                            time: repeat.repeat_start_time,
                             message: `Task due: ${taskData.subject}`,
                             priority: taskData.priority,
-                            description: `⚠️ Task Due Reminder:
+                            description: `⚠️ Task Due:
 • Subject: ${taskData.subject}
 • Due Date: ${date}
 • Priority: ${taskData.priority}
 • Status: ${taskData.status}
-${repeat ? `• Repeat Type: ${repeat.repeat_type}` : ''}
+• Repeat Type: ${repeat.repeat_type}
 ${taskData.description ? `\nDescription: ${taskData.description}` : ''}`,
                             created_by: req.user?.username,
-                            is_repeat: repeat ? true : false
+                            is_repeat: true
                         });
                     }
                 }
