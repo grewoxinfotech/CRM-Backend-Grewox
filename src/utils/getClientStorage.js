@@ -20,7 +20,7 @@ async function getClientStorageUsage(clientName) {
         }
 
         // Construct the prefix for the client's folder
-        const prefix = `CRM_07-02-2025/clients/${clientName}/`;
+        const prefix = `GREWOX CRM/clients/${clientName}/`;
         console.log('Checking path:', prefix);
 
         let totalSize = 0;

@@ -25,19 +25,19 @@ const uploadToS3 = async (file, role, type, name, i1, i2) => {
     let key = '';
     switch (role) {
       case 'super-admin':
-        key = `GEWOX CRM/superadmin/${name}/${type}/${yearMonth}/${type}_${uniqueId}.${fileExtension}`;
+        key = `GREWOX CRM/superadmin/${name}/${type}/${yearMonth}/${type}_${uniqueId}.${fileExtension}`;
         break;
       case 'client':
-        key = `GEWOX CRM/clients/${name}/${type}/${yearMonth}/${type}_${uniqueId}.${fileExtension}`;
+        key = `GREWOX CRM/clients/${name}/${type}/${yearMonth}/${type}_${uniqueId}.${fileExtension}`;
         break;
       case 'sub-client':
-        key = `GEWOX CRM/clients/${i1}/subClients/${name}/${type}/${yearMonth}/${type}_${uniqueId}.${fileExtension}`;
+        key = `GREWOX CRM/clients/${i1}/subClients/${name}/${type}/${yearMonth}/${type}_${uniqueId}.${fileExtension}`;
         break;
       case 'employee':
-        key = `GEWOX CRM/clients/${i1}/employees/${name}/${type}/${yearMonth}/${type}_${uniqueId}.${fileExtension}`;
+        key = `GREWOX CRM/clients/${i1}/employees/${name}/${type}/${yearMonth}/${type}_${uniqueId}.${fileExtension}`;
         break;
       default:
-        key = `GEWOX CRM/others/${type}/${yearMonth}/${type}_${uniqueId}.${fileExtension}`;
+        key = `GREWOX CRM/others/${type}/${yearMonth}/${type}_${uniqueId}.${fileExtension}`;
     }
 
     const params = {
@@ -83,13 +83,13 @@ const getS3StorageUsageByRole = async (role, name, i1 = '') => {
     let prefix = '';
     switch (role) {
       case 'client':
-        prefix = `GEWOX CRM/clients/${name}/`;
+        prefix = `GREWOX CRM/clients/${name}/`;
         break;
       case 'sub-client':
-        prefix = `GEWOX CRM/clients/${i1}/subClients/${name}/`;
+        prefix = `GREWOX CRM/clients/${i1}/subClients/${name}/`;
         break;
       case 'employee':
-        prefix = `GEWOX CRM/clients/${i1}/employees/${name}/`;
+        prefix = `GREWOX CRM/clients/${i1}/employees/${name}/`;
         break;
       default:
         throw new Error('Invalid role provided.');
