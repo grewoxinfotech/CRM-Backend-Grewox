@@ -46,10 +46,10 @@ export default {
             if (updateData.lead_members) {
                 const currentLeadMembers = typeof lead.lead_members === 'string'
                     ? JSON.parse(lead.lead_members)
-                    : lead.lead_members || { assigned_to: [] };
+                    : lead.lead_members || { lead_members: [] };
                 
-                const currentMembers = currentLeadMembers.assigned_to || [];
-                const newMembers = updateData.lead_members.assigned_to || [];
+                const currentMembers = currentLeadMembers.lead_members || [];
+                const newMembers = updateData.lead_members.lead_members || [];
                 
                 // Find newly added members
                 const addedMembers = newMembers.filter(memberId => !currentMembers.includes(memberId));
@@ -64,17 +64,43 @@ export default {
                         attributes: ['id', 'username']
                     });
 
-                    const memberNames = memberUsers.map(user => user.username).join(', ');
-                    
-                    await Activity.create({
-                        related_id: id,
-                        activity_from: "lead_member",
-                        activity_id: lead.id,
-                        action: "added",
-                        performed_by: req.user?.username,
-                        client_id: req.des?.client_id,
-                        activity_message: `Members ${memberNames} added to lead successfully`
+                    for (const user of memberUsers) {
+                        await Activity.create({
+                            related_id: id,
+                            activity_from: "lead_member",
+                            activity_id: lead.id,
+                            action: "added",
+                            performed_by: req.user?.username,
+                            client_id: req.des?.client_id,
+                            activity_message: user.username
+                        });
+                    }
+                }
+
+                // Find removed members
+                const removedMembers = currentMembers.filter(memberId => !newMembers.includes(memberId));
+                
+                // Create activity for each removed member
+                if (removedMembers.length > 0) {
+                    // Fetch member names from User model
+                    const memberUsers = await User.findAll({
+                        where: {
+                            id: removedMembers
+                        },
+                        attributes: ['id', 'username']
                     });
+
+                    for (const user of memberUsers) {
+                        await Activity.create({
+                            related_id: id,
+                            activity_from: "lead_member",
+                            activity_id: lead.id,
+                            action: "removed",
+                            performed_by: req.user?.username,
+                            client_id: req.des?.client_id,
+                            activity_message: user.username
+                        });
+                    }
                 }
             }
 
