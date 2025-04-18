@@ -23,7 +23,6 @@ export default {
             const billData = await Bill.findOne({ 
                 where: { 
                     id: bill,
-                    
                 } 
             });
             
@@ -31,14 +30,23 @@ export default {
                 return responseHandler.error(res, "Bill not found");
             }
 
-            // Check if debit amount is valid
-            if (amount > billData.total) {
-                return responseHandler.error(res, "Debit amount cannot be greater than bill total");
+            // Get existing debit notes total for this bill
+            const existingDebitNotes = await BillDebitnote.findAll({
+                where: { bill }
+            });
+            const totalDebitedAmount = existingDebitNotes.reduce((sum, note) => sum + note.amount, 0);
+
+            // Check if debit amount is valid (including existing debit notes)
+            const remainingBillAmount = billData.total - totalDebitedAmount;
+            if (amount > remainingBillAmount) {
+                return responseHandler.error(
+                    res,
+                    `Debit amount cannot be greater than remaining bill amount (${remainingBillAmount})`
+                );
             }
 
             // Create debit note
             const billDebitnote = await BillDebitnote.create({ 
-                // related_id: id, 
                 bill, 
                 date, 
                 currency, 
@@ -48,18 +56,40 @@ export default {
                 created_by: req.user?.username 
             });
 
-            // Calculate updated total based on whether updated_total exists
-            let updatedTotal;
-            if (billData.updated_total === 0 || billData.updated_total === null) {
-                updatedTotal = billData.total - amount;
-            } else {
-                updatedTotal = billData.updated_total - amount;
+            // Calculate new total and determine payment status
+            const newTotal = billData.total;
+            const newAmount = billData.amount - amount;
+            const newTotalDebited = totalDebitedAmount + amount;
+
+            let newPaymentStatus = billData.status;
+
+            // If total debited equals bill total, mark as paid
+            if (newTotalDebited >= billData.total) {
+                newPaymentStatus = 'paid';
+            }
+            // If some amount is debited but not full, mark as partially_paid
+            else if (newTotalDebited > 0) {
+                newPaymentStatus = 'partially_paid';
             }
 
-            // Update bill total
-            await billData.update({ updated_total: updatedTotal });
+            // Update bill
+            await billData.update({
+                amount: newAmount,
+                status: newPaymentStatus
+            });
 
-            return responseHandler.success(res, "Bill Debit Note created successfully", billDebitnote);
+            return responseHandler.success(res, "Bill Debit Note created successfully", {
+                debitNote: billDebitnote,
+                updatedBill: {
+                    id: billData.id,
+                    previousAmount: billData.amount,
+                    newAmount: newAmount,
+                    debitedAmount: amount,
+                    totalDebitedAmount: newTotalDebited,
+                    previousStatus: billData.status,
+                    newStatus: newPaymentStatus
+                }
+            });
         } catch (error) {
             return responseHandler.error(res, error?.message);
         }

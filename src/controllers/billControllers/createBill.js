@@ -44,6 +44,7 @@ export default {
                 currency,
                 upiLink,
                 items,
+                amount: total,
                 total,
                 note,
                 subTotal,

@@ -146,7 +146,7 @@ export default {
                 total,
                 cost_of_goods: total_cost_of_goods,
                 profit: total_profit,
-                profit_percentage: profit_percentage.toFixed(2),
+            profit_percentage: profit_percentage.toFixed(2),
                 additional_notes,
                 upiLink,
                 client_id: req.des?.client_id,
