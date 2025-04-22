@@ -5,12 +5,11 @@ import Role from "../../models/roleModel.js";
 import validator from "../../utils/validator.js";
 import responseHandler from "../../utils/responseHandler.js";
 import { generateOTP } from "../../utils/otpService.js";
-import { EMAIL_FROM, OTP_CONFIG } from "../../config/config.js";
+import { OTP_CONFIG } from "../../config/config.js";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "../../config/config.js";
 import { getVerificationEmailTemplate } from '../../utils/emailTemplates.js';
-import sgMail from "../../utils/emailService.js";
-
+import { sendEmail } from "../../utils/emailService.js";
 export default {
     validator: validator({
         body: Joi.object({
@@ -103,12 +102,16 @@ export default {
 
             // Send verification email
             const emailTemplate = getVerificationEmailTemplate(username, otp);
-            await sgMail.send({
-                to: req.user.email,
-                from: EMAIL_FROM,
-                subject: 'Verify Your Email',
-                html: emailTemplate
-            });
+            await sendEmail(req.user.email, 'Verify Your Email', emailTemplate);
+
+            // // Send verification email
+            // const emailTemplate = getVerificationEmailTemplate(username, otp);
+            // await sgMail.send({
+            //     to: req.user.email,
+            //     from: EMAIL_FROM,
+            //     subject: 'Verify Your Email',
+            //     html: emailTemplate
+            // });
 
             return responseHandler.success(res, "Please verify your email to complete registration", { sessionToken })
 

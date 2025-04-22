@@ -3,7 +3,7 @@ import validator from "../../utils/validator.js";
 import responseHandler from "../../utils/responseHandler.js";
 import jwt from "jsonwebtoken";
 import { EMAIL_FROM, JWT_SECRET } from "../../config/config.js";
-import sgMail from "../../utils/emailService.js";
+import { sendEmail } from "../../utils/emailService.js";
 import { getWelcomeEmailTemplate } from "../../utils/emailTemplates.js";
 import Role from "../../models/roleModel.js";
 import User from "../../models/userModel.js";
@@ -127,12 +127,16 @@ export default {
 
             // Send welcome email
             const welcomeTemplate = getWelcomeEmailTemplate(newUser.username);
-            await sgMail.send({
-                to: newUser.email,
-                from: EMAIL_FROM,
-                subject: 'Welcome to CRM!',
-                html: welcomeTemplate
-            });
+            await sendEmail(newUser.email, 'Welcome to CRM!', welcomeTemplate);
+
+            // // Send welcome email
+            // const welcomeTemplate = getWelcomeEmailTemplate(newUser.username);
+            // await sgMail.send({
+            //     to: newUser.email,
+            //     from: EMAIL_FROM,
+            //     subject: 'Welcome to CRM!',
+            //     html: welcomeTemplate
+            // });
 
             return responseHandler.success(res, "Registration completed successfully", {
                 success: true,

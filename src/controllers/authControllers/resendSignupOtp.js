@@ -3,7 +3,7 @@ import { EMAIL_FROM, JWT_SECRET, OTP_CONFIG } from "../../config/config.js";
 import { generateOTP } from "../../utils/otpService.js";
 import { getVerificationEmailTemplate } from "../../utils/emailTemplates.js";
 import responseHandler from "../../utils/responseHandler.js";
-import sgMail from "../../utils/emailService.js";
+import { sendEmail } from "../../utils/emailService.js";
 
 export default {
     handler: async (req, res) => {
@@ -29,12 +29,15 @@ export default {
             );
 
             const emailTemplate = getVerificationEmailTemplate(user.username, newOTP);
-            await sgMail.send({
-                to: user.email,
-                from: EMAIL_FROM,
-                subject: 'Verify Your Email',
-                html: emailTemplate
-            });
+            await sendEmail(user.email, 'Verify Your Email', emailTemplate);
+
+            // const emailTemplate = getVerificationEmailTemplate(user.username, newOTP);
+            // await sgMail.send({
+            //     to: user.email,
+            //     from: EMAIL_FROM,
+            //     subject: 'Verify Your Email',
+            //     html: emailTemplate
+            // });
 
             return responseHandler.success(res, "New OTP sent successfully", { sessionToken: newSessionToken });
         } catch (error) {

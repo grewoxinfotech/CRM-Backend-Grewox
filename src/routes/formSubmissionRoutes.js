@@ -1,5 +1,4 @@
 import express from "express";
-import { authenticateUser, checkRole } from "../middlewares/index.js";
 import {
     getAllFormSubmissions,
     getFormSubmissionById,
@@ -7,12 +6,8 @@ import {
     updateFormSubmission,
     deleteFormSubmission
 } from "../controllers/formSubmissionController/index.js";
-import passCompanyDetails from "../middlewares/passCompanyDetail.js";
 
 const router = express.Router();
-
-// Protected routes that require authentication
-router.use(authenticateUser, checkRole, passCompanyDetails);
 
 // Form submission management routes (protected)
 router.get("/:formId/submissions", getAllFormSubmissions.validator, getAllFormSubmissions.handler);

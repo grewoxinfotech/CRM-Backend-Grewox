@@ -19,8 +19,7 @@ export default {
 
             const submission = await FormSubmission.findOne({
                 where: {
-                    id,
-                    client_id: req.user.client_id
+                    id
                 }
             });
 
@@ -30,7 +29,7 @@ export default {
 
             await submission.update({
                 submission_data,
-                updated_by: req.user?.username
+                updated_by: "Public User"
             });
 
             return responseHandler.success(res, "Form submission updated successfully", submission);

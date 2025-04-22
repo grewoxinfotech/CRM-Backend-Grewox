@@ -24,7 +24,7 @@ export default {
             });
 
             if (!form) {
-                return responseHandler.error(res, "Form not found", 404);
+                return responseHandler.error(res, "Form not found");
             }
 
             // Check if form has expired
@@ -32,7 +32,7 @@ export default {
             const endDate = new Date(form.end_date);
 
             if (currentDate > endDate) {
-                return responseHandler.error(res, "Form has expired", 400);
+                return responseHandler.error(res, "Form has expired");
             }
 
             // Validate required fields from form schema
@@ -42,7 +42,7 @@ export default {
 
             for (const [fieldName, fieldConfig] of Object.entries(formFields)) {
                 if (fieldConfig.required && !submission_data[fieldName]) {
-                    return responseHandler.error(res, `Field '${fieldName}' is required`, 400);
+                    return responseHandler.error(res, `Field '${fieldName}' is required`);
                 }
             }
 
@@ -51,7 +51,7 @@ export default {
                 form_id: formId,
                 submission_data,
                 client_id: form.client_id,
-                created_by: req.user?.username || 'Public User'
+                created_by: "Public User"
             });
 
             return responseHandler.success(res, "Form submitted successfully", submission);

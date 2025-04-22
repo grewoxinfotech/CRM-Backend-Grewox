@@ -14,8 +14,7 @@ const deleteFormSubmission = {
             const { id } = req.params;
             const submission = await FormSubmission.findOne({
                 where: {
-                    id,
-                    client_id: req.des?.client_id
+                    id
                 }
             });
 

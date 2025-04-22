@@ -15,8 +15,7 @@ export default {
 
             const submission = await FormSubmission.findOne({
                 where: {
-                    id,
-                    client_id: req.user.client_id
+                    id
                 }
             });
 
