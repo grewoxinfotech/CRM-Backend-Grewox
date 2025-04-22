@@ -7,6 +7,7 @@ import responseHandler from "../../utils/responseHandler.js";
 import Activity from "../../models/activityModel.js";
 import Notification from "../../models/notificationModel.js";
 import dayjs from "dayjs";
+import Setting from "../../models/settingModel.js";
 
 export default {
   validator: validator({
@@ -146,7 +147,13 @@ export default {
           ? (total_profit / total_cost_of_goods) * 100
           : 0;
 
-      const upiLink = `upi://pay?pa=${process.env.UPI_ID}&pn=${process.env.MERCHANT_NAME}&am=${total}&cu=INR`;
+      // Get settings for UPI details
+      const settings = await Setting.findOne({
+        where: { client_id: req.des?.client_id }
+      });
+
+      // Create UPI link using settings
+      const upiLink = `upi://pay?pa=${settings?.merchant_upi_id || ''}&pn=${settings?.merchant_name || ''}&am=${total}&cu=INR`;
 
       // Create invoice
       const salesInvoice = await SalesInvoice.create({

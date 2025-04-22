@@ -5,6 +5,7 @@ import SalesRevenue from "../../models/salesRevenueModel.js";
 import validator from "../../utils/validator.js";
 import responseHandler from "../../utils/responseHandler.js";
 import Activity from "../../models/activityModel.js";
+import Setting from "../../models/settingModel.js";
 
 export default {
   validator: validator({
@@ -250,6 +251,14 @@ export default {
           ? (total_profit / total_cost_of_goods) * 100
           : 0;
 
+      // Get settings for UPI details
+      const settings = await Setting.findOne({
+        where: { client_id: req.des?.client_id }
+      });
+
+      // Create UPI link using settings
+      const upiLink = `upi://pay?pa=${settings?.merchant_upi_id || ''}&pn=${settings?.merchant_name || ''}&am=${total}&cu=INR`;
+
       // Update invoice
       await salesInvoice.update({
         customer,
@@ -268,6 +277,7 @@ export default {
         profit: total_profit,
         profit_percentage: profit_percentage.toFixed(2),
         additional_notes,
+        upiLink,
         updated_by: req.user?.username,
       });
 
