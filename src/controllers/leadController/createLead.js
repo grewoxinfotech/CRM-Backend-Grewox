@@ -134,12 +134,6 @@ export default {
         try {
             const { leadStage, leadTitle, firstName, lastName, phoneCode, telephone, email, address, interest_level, lead_members, category, source, company_name, currency, leadValue, pipeline, status, inquiry_id } = req.body;
 
-            const existingLead = await Lead.findOne({ where: { email } });
-            if (existingLead) {
-                return responseHandler.conflict(res, "Lead with this email already exists!");
-            }
-
-            // Create lead with explicit inquiry_id handling
             const lead = await Lead.create({
                 leadStage,
                 leadTitle,

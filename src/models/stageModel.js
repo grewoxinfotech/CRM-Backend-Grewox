@@ -25,6 +25,11 @@ const Stage = sequelize.define("stage", {
         type: DataTypes.STRING,
         allowNull: false
     },
+    isDefault: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false
+    },
     created_by: {
         type: DataTypes.STRING,
         allowNull: true,
@@ -34,7 +39,7 @@ const Stage = sequelize.define("stage", {
         type: DataTypes.STRING,
         allowNull: true,
         defaultValue: null
-    }
+    },
 })
 
 export default Stage;

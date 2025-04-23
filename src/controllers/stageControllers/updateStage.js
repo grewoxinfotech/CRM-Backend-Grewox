@@ -12,12 +12,13 @@ export default {
         body: Joi.object({
             stageName: Joi.string().required(),
             pipeline: Joi.string().required(),
+            isDefault: Joi.boolean().required()
         })
     }),
     handler: async (req, res) => {
         try {
             const { id } = req.params;
-            const { stageName, pipeline } = req.body;
+            const { stageName, pipeline, isDefault } = req.body;
             const stage = await Stage.findByPk(id)
             if (!stage) {
                 return responseHandler.notFound(res, "Stage not found");
@@ -26,7 +27,7 @@ export default {
             if (existingStage) {
                 return responseHandler.error(res, "Stage already exists");
             }
-            await stage.update({ stageName, pipeline, updated_by: req.user.username });
+            await stage.update({ stageName, pipeline, isDefault: isDefault || false, updated_by: req.user.username });
             return responseHandler.success(res, "Stage updated successfully", stage);
         } catch (error) {
             return responseHandler.error(res, error?.message);

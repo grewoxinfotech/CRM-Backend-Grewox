@@ -6,21 +6,21 @@ import Pipeline from "../../models/pipelineModel.js";
 
 const defaultStages = {
     sales: [
-        { stageName: "New Lead", stageType: "lead" },
+        { stageName: "New Lead", stageType: "lead", isDefault: true },
         { stageName: "Qualified", stageType: "lead" },
         { stageName: "Negotiation", stageType: "lead" },
         { stageName: "Closed Won", stageType: "lead" },
-        { stageName: "Initial Contact", stageType: "deal" },
+        { stageName: "Initial Contact", stageType: "deal", isDefault: true },
         { stageName: "Meeting Scheduled", stageType: "deal" },
         { stageName: "Proposal Made", stageType: "deal" },
         { stageName: "Contract Sent", stageType: "deal" }
     ],
     marketing: [
-        { stageName: "Lead Received", stageType: "deal" },
+        { stageName: "Lead Received", stageType: "deal", isDefault: true },
         { stageName: "Initial Contact", stageType: "deal" },
         { stageName: "Proposal Sent", stageType: "deal" },
         { stageName: "Deal Closed", stageType: "deal" },
-        { stageName: "New Lead", stageType: "lead" },
+        { stageName: "New Lead", stageType: "lead", isDefault: true },
         { stageName: "Lead Qualified", stageType: "lead" },
         { stageName: "Marketing Engaged", stageType: "lead" },
         { stageName: "Campaign Active", stageType: "lead" }
@@ -50,8 +50,9 @@ export const seedDefaultStages = async (pipeline_id, client_id, username) => {
                             stageType: stage.stageType,
                             pipeline: pipeline_id,
                             order: stage.order,
+                            isDefault: stage.isDefault || false,
                             client_id,
-                            created_by: username
+                            created_by: username,
                         });
                     } catch (error) {
                         console.error("Error creating stage:", error);
@@ -75,11 +76,12 @@ export default {
             stageType: Joi.string().valid('lead', 'deal').required(),
             stageName: Joi.string().required(),
             pipeline: Joi.string().required(),
+            isDefault: Joi.boolean().default(false)
         })
     }),
     handler: async (req, res) => {
         try {
-            const { stageType, stageName, pipeline } = req.body;
+            const { stageType, stageName, pipeline, isDefault } = req.body;
             const existingStage = await Stage.findOne({ where: { stageName, pipeline } });
             if (existingStage) {
                 return responseHandler.error(res, "Stage already exists");
@@ -88,8 +90,9 @@ export default {
                 stageType,
                 stageName,
                 pipeline,
+                isDefault,
                 client_id: req.des?.client_id,
-                created_by: req.user.username
+                created_by: req.user.username,
             });
             return responseHandler.success(res, "Stage created successfully", stage);
         } catch (error) {
