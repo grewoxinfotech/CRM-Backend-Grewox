@@ -31,7 +31,8 @@ const Bill = sequelize.define('Bill', {
     },
     discription: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
+        defaultValue: null,
     },
     subTotal: {
         type: DataTypes.INTEGER,

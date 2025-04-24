@@ -12,7 +12,7 @@ export default {
         body: Joi.object({
             vendor: Joi.string().optional(),
             billDate: Joi.date().optional(),
-            discription: Joi.string().optional(),
+            discription: Joi.string().optional().allow('', null),
             status: Joi.string().optional(),
             discount: Joi.number().optional(),
             tax: Joi.number().optional(),
@@ -47,6 +47,7 @@ export default {
                 status, 
                 discount, 
                 tax, 
+                amount: total,
                 total, 
                 subTotal, 
                 currency, 

@@ -36,7 +36,7 @@ export default {
       const totalCreditedAmount = existingCreditNotes.reduce((sum, note) => sum + note.amount, 0);
 
       // Check if credit amount is valid (including existing credit notes)
-      const remainingInvoiceAmount = salesInvoice.total - totalCreditedAmount;
+      const remainingInvoiceAmount = salesInvoice.amount;
       if (amount > remainingInvoiceAmount) {
         return responseHandler.error(
           res,
@@ -79,17 +79,23 @@ export default {
 
       // Calculate proportional amounts for each item based on credit note amount
       const creditNoteItems = invoiceItems.map(item => {
+        // Calculate credit amount for this item based on its proportion of total invoice
         const itemPercentage = item.total / salesInvoice.total;
         const itemCreditAmount = amount * itemPercentage;
-        const itemCostPercentage = item.buying_price / item.unit_price;
-        const itemCreditCost = itemCreditAmount * itemCostPercentage;
+
+        // Use the same profit percentage as original item
+        const originalProfitPercentage = (item.profit / item.total) * 100;
+        
+        // Calculate credit cost to maintain same profit percentage
+        const itemCreditCost = (itemCreditAmount * 100) / (100 + originalProfitPercentage);
+        const itemCreditProfit = itemCreditAmount - itemCreditCost;
 
         return {
-          ...item,
-          credit_amount: itemCreditAmount,
-          credit_cost: itemCreditCost,
-          credit_profit: itemCreditAmount - itemCreditCost,
-          credit_profit_percentage: ((itemCreditAmount - itemCreditCost) / itemCreditCost * 100).toFixed(2)
+            ...item,
+            credit_amount: itemCreditAmount,
+            credit_cost: itemCreditCost,
+            credit_profit: itemCreditProfit,
+            credit_profit_percentage: originalProfitPercentage.toFixed(2)
         };
       });
 
@@ -115,14 +121,14 @@ export default {
       let shouldCreateRevenue = false;
       let shouldUpdateStock = false;
 
-      // If total credited equals invoice total, mark as paid
-      if (newTotalCredited >= salesInvoice.total) {
+      // If new amount is 0 or total credited equals invoice total, mark as paid
+      if (newAmount === 0 || Math.abs(newTotalCredited - salesInvoice.total) < 0.01) {
         newPaymentStatus = 'paid';
         shouldCreateRevenue = true;
         shouldUpdateStock = true;
       }
-      // If some amount is credited but not full, mark as partially_paid
-      else if (newTotalCredited > 0) {
+      // If some amount is remaining, mark as partially_paid
+      else if (newAmount > 0) {
         newPaymentStatus = 'partially_paid';
       }
 
@@ -147,10 +153,11 @@ export default {
 
       // If status becomes paid, create revenue entry
       if (shouldCreateRevenue) {
-        // Calculate totals for revenue
-        const totalCost = creditNoteItems.reduce((sum, item) => sum + item.credit_cost, 0);
+        // Calculate totals for revenue using original profit percentage
+        const originalProfitPercentage = (salesInvoice.profit / salesInvoice.total) * 100;
+        const totalCost = (amount * 100) / (100 + originalProfitPercentage);
         const totalProfit = amount - totalCost;
-        const profitPercentage = (totalProfit / totalCost * 100).toFixed(2);
+        const profitPercentage = originalProfitPercentage.toFixed(2);
 
         await SalesRevenue.create({
           related_id: id,
@@ -162,6 +169,7 @@ export default {
           customer: salesInvoice.customer,
           description: `Credit Note for Invoice #${invoice}`,
           category: salesInvoice.category || 'Sales Credit',
+          profit  :salesInvoice.profit, 
           products: creditNoteItems.map(item => ({
             ...item,
             revenue: item.credit_amount

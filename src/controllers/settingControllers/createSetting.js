@@ -9,7 +9,7 @@ export default {
         body: Joi.object({
             termsandconditions: Joi.string().optional(),
             companyName: Joi.string().required(),
-            title: Joi.string().required(),
+            title: Joi.string().optional().allow('', null),
             merchant_name: Joi.string().optional(),
             merchant_upi_id: Joi.string().optional(),
         })
@@ -24,14 +24,15 @@ export default {
             if (!logo) {
                 return responseHandler.error(res, "Company logo is required");
             }
-            if (!favicon) {
-                return responseHandler.error(res, "Favicon is required");
-            }
-
 
             // Upload logo to S3
             const logoUrl = await uploadToS3(logo, "client", "company-logos", req.user?.username);
-            const faviconUrl = await uploadToS3(favicon, "client", "company-logos", req.user?.username);
+            
+            // Only upload favicon if provided
+            let faviconUrl = null;
+            if (favicon) {
+                faviconUrl = await uploadToS3(favicon, "client", "company-logos", req.user?.username);
+            }
 
             const setting = await Setting.create({
                 companylogo: logoUrl,

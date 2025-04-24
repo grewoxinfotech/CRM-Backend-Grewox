@@ -14,7 +14,8 @@ const Setting = sequelize.define("Setting", {
     },
     title: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
+        defaultValue: null,
     },
     companylogo: {
         type: DataTypes.STRING,
@@ -22,7 +23,8 @@ const Setting = sequelize.define("Setting", {
     },
     favicon: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
+        defaultValue: null,
     },
     merchant_name: {
         type: DataTypes.STRING,
