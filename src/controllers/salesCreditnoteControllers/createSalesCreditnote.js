@@ -7,6 +7,7 @@ import validator from "../../utils/validator.js";
 import responseHandler from "../../utils/responseHandler.js";
 import uploadToS3 from "../../utils/uploadToS3.js";
 import Activity from "../../models/activityModel.js";
+import Setting from "../../models/settingModel.js";
 
 export default {
   validator: validator({
@@ -131,10 +132,13 @@ export default {
       else if (newAmount > 0) {
         newPaymentStatus = 'partially_paid';
       }
-
+      const settings = await Setting.findOne({
+        where: { client_id: req.des?.client_id }
+      });
       // Update invoice
       await salesInvoice.update({
         amount: newAmount,
+        upiLink: `upi://pay?pa=${settings?.merchant_upi_id || ''}&pn=${settings?.merchant_name || ''}&am=${newAmount}&cu=INR`,
         payment_status: newPaymentStatus
       });
 
