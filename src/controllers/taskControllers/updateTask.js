@@ -65,7 +65,12 @@ export default {
           };
           await s3.deleteObject(s3Params).promise();
         }
-        fileUrl = await uploadToS3(file, "client", "task_files", req.user?.username);
+        fileUrl = await uploadToS3(
+          file,
+          "client",
+          "task_files",
+          req.user?.username
+        );
       }
 
       const updatedTask = await task.update({
@@ -82,6 +87,63 @@ export default {
         updated_by: req.user?.username,
       });
 
+      // Handle notifications based on assignTo changes
+      if (assignTo) {
+        // Get existing assigned users
+        const existingAssignedUsers = task.assignTo?.assignedusers || [];
+        const newAssignedUsers = assignTo.assignedusers || [];
+
+        // Find removed users
+        const removedUsers = existingAssignedUsers.filter(
+          (user) => !newAssignedUsers.includes(user)
+        );
+
+        // Delete notifications for removed users
+        if (removedUsers.length > 0) {
+          await Notification.destroy({
+            where: {
+              related_id: id,
+              users: removedUsers,
+            },
+          });
+        }
+
+        // Update existing notification
+        const existingNotification = await Notification.findOne({
+          where: { related_id: id },
+        });
+
+        if (existingNotification) {
+          await existingNotification.update({
+            users: assignTo.assignedusers,
+            title: "Task Updated",
+            message: `${req.user?.username} updated the task: ${taskName}`,
+            description: `Task Name: ${taskName}, start date: ${startDate}, due date: ${dueDate}`,
+            updated_by: req.user?.username,
+            client_id: req.des?.client_id,
+          });
+        } else {
+          // Create new notification if none exists
+          await Notification.create({
+            related_id: id,
+            users: assignTo.assignedusers,
+            title: "Task Updated",
+            message: `${req.user?.username} updated the task: ${taskName}`,
+            section: section,
+
+            description: `Task Name: ${taskName}, start date: ${startDate}, due date: ${dueDate}`,
+            from: req.user?.id,
+            client_id: req.des?.client_id,
+            created_by: req.user?.username,
+          });
+        }
+      } else {
+        // If assignTo is removed, delete all notifications
+        await Notification.destroy({
+          where: { related_id: id },
+        });
+      }
+
       if (reminder_date) {
         const reminderDate = new Date(reminder_date);
         const today = new Date();
@@ -89,14 +151,26 @@ export default {
           const dueDateDiff = Math.ceil(
             (new Date(dueDate) - reminderDate) / (1000 * 60 * 60 * 24)
           );
-          await Notification.create({
-            related_id: id,
-            users: assignTo,
-            title: "Task Reminder",
-            notification_type: "reminder",
-            from: req.user?.id,
-            message: `Task due: ${dueDateDiff} days. Don't forget: ${taskName}`,
+
+          // Update existing reminder notification instead of creating new one
+          const existingReminderNotification = await Notification.findOne({
+            where: {
+              related_id: id,
+              notification_type: "reminder",
+            },
           });
+
+          if (existingReminderNotification) {
+            await existingReminderNotification.update({
+              users: assignTo.assignedusers,
+              title: "Task Reminder",
+              notification_type: "reminder",
+              from: req.user?.id,
+              client_id: req.des?.client_id,
+              message: `Task due: ${dueDateDiff} days. Don't forget: ${taskName}`,
+              updated_by: req.user?.username,
+            });
+          }
         }
       }
 

@@ -6,114 +6,103 @@ import validator from "../../utils/validator.js";
 import dayjs from "dayjs";
 
 export default {
-    validator: validator({
-        body: Joi.object({
-            taskName: Joi.string().required(),
-            taskDate: Joi.date().required(),
-            taskTime: Joi.string().required(),
-            taskDescription: Joi.string().required()
-        }),
+  validator: validator({
+    body: Joi.object({
+      taskName: Joi.string().required(),
+      section: Joi.string().required(),
+      taskDate: Joi.date().required(),
+      taskTime: Joi.string().required(),
+      taskDescription: Joi.string().required(),
     }),
-    handler: async (req, res) => {
-        try {
-            const { taskName, taskDate, taskTime, taskDescription } = req.body;
-            
-            console.log('Creating Task Calendar:', {
-                name: taskName,
-                date: taskDate,
-                time: taskTime,
-                description: taskDescription
-            });
+  }),
+  handler: async (req, res) => {
+    try {
+      const { taskName, taskDate, taskTime, section, taskDescription } =
+        req.body;
 
-            const existingTask = await TaskCalendar.findOne({ where: { taskName, taskDate, taskTime, taskDescription } });
-            if (existingTask) {
-                return responseHandler.error(res, "Task already exists");
-            }
+      const existingTask = await TaskCalendar.findOne({
+        where: { taskName, taskDate, taskTime, taskDescription },
+      });
+      if (existingTask) {
+        return responseHandler.error(res, "Task already exists");
+      }
 
-            // Create the task calendar entry
-            const task = await TaskCalendar.create({ 
-                taskName, 
-                taskDate, 
-                taskTime, 
-                taskDescription, 
-                client_id: req.des?.client_id,
-                created_by: req.user?.username 
-            });
+      // Create the task calendar entry
+      const task = await TaskCalendar.create({
+        taskName,
+        taskDate,
+        taskTime,
+        taskDescription,
+        client_id: req.des?.client_id,
+        created_by: req.user?.username,
+      });
 
-            // Parse task time to calculate reminder time
-            const [hours, minutes] = taskTime.split(':').map(Number);
-            let reminderHours = hours;
-            let reminderMinutes = minutes - 2;
+      // Parse task time to calculate reminder time
+      const [hours, minutes] = taskTime.split(":").map(Number);
+      let reminderHours = hours;
+      let reminderMinutes = minutes - 2;
 
-            // Handle minute rollover
-            if (reminderMinutes < 0) {
-                reminderHours = hours - 1;
-                reminderMinutes = 58; // 60 - 2
-                
-                // Handle hour rollover
-                if (reminderHours < 0) {
-                    reminderHours = 23;
-                }
-            }
+      // Handle minute rollover
+      if (reminderMinutes < 0) {
+        reminderHours = hours - 1;
+        reminderMinutes = 58; // 60 - 2
 
-            // Format reminder time with padding
-            const reminderTime = `${String(reminderHours).padStart(2, '0')}:${String(reminderMinutes).padStart(2, '0')}:00`;
+        // Handle hour rollover
+        if (reminderHours < 0) {
+          reminderHours = 23;
+        }
+      }
 
-            console.log('Time Calculations:', {
-                originalTime: taskTime,
-                reminderTime: reminderTime
-            });
+      // Format reminder time with padding
+      const reminderTime = `${String(reminderHours).padStart(2, "0")}:${String(
+        reminderMinutes
+      ).padStart(2, "0")}:00`;
 
-            // 1. Create notification for task start time
-            await Notification.create({
-                related_id: task.id,
-                users: [req.user?.id],
-                title: "Task Calendar Event",
-                notification_type: "reminder",
-                from: req.user?.id,
-                client_id: req.des?.client_id,
-                date: dayjs(taskDate).format('YYYY-MM-DD'),
-                time: taskTime,
-                message: `Task starting: ${taskName}`,
-                description: `📅 Task Details:
+      // 1. Create notification for task start time
+      await Notification.create({
+        related_id: task.id,
+        users: [req.user?.id],
+        title: "Task Calendar Event",
+        notification_type: "reminder",
+        from: req.user?.id,
+        client_id: req.des?.client_id,
+        date: dayjs(taskDate).format("YYYY-MM-DD"),
+        section: section,
+        parent_id: req.user?.id,
+        time: taskTime,
+        message: `Task starting: ${taskName}`,
+        description: `📅 Task Details:
 • Name: ${taskName}
 • Time: ${taskTime}
 • Description: ${taskDescription}`,
-                created_by: req.user?.username
-            });
+        created_by: req.user?.username,
+      });
 
-            // 2. Create reminder notification (2 minutes before)
-            await Notification.create({
-                related_id: task.id,
-                users: [req.user?.id],
-                title: "Task Starting Soon",
-                notification_type: "reminder",
-                from: req.user?.id,
-                client_id: req.des?.client_id,
-                date: dayjs(taskDate).format('YYYY-MM-DD'),
-                time: reminderTime,
-                message: `Task starting in 2 minutes: ${taskName}`,
-                description: `⏰ Upcoming Task:
+      // 2. Create reminder notification (2 minutes before)
+      await Notification.create({
+        related_id: task.id,
+        users: [req.user?.id],
+        title: "Task Starting Soon",
+        notification_type: "reminder",
+        from: req.user?.id,
+        client_id: req.des?.client_id,
+        date: dayjs(taskDate).format("YYYY-MM-DD"),
+        time: reminderTime,
+        section: section,
+        parent_id: req.user?.id,
+        message: `Task starting in 2 minutes: ${taskName}`,
+        description: `⏰ Upcoming Task:
 • Name: ${taskName}
 • Starts in: 2 minutes
 • Start Time: ${taskTime}
 • Description: ${taskDescription}`,
-                created_by: req.user?.username
-            });
+        created_by: req.user?.username,
+      });
 
-            console.log('Task Calendar Notifications Created:', {
-                taskName,
-                taskDate: dayjs(taskDate).format('YYYY-MM-DD'),
-                taskTime,
-                reminderTime,
-                notificationCount: 2
-            });
-
-            return responseHandler.success(res, "Task created successfully", task);
-        } catch (error) {
-            console.error('Task Calendar Creation Error:', error);
-            return responseHandler.error(res, error?.message);
-        }
+      return responseHandler.success(res, "Task created successfully", task);
+    } catch (error) {
+      console.error("Task Calendar Creation Error:", error);
+      return responseHandler.error(res, error?.message);
     }
-}
-
+  },
+};

@@ -5,7 +5,9 @@ import SalesRevenue from "../../models/salesRevenueModel.js";
 import validator from "../../utils/validator.js";
 import responseHandler from "../../utils/responseHandler.js";
 import Activity from "../../models/activityModel.js";
+import Notification from "../../models/notificationModel.js";
 import Setting from "../../models/settingModel.js";
+import dayjs from "dayjs";
 
 export default {
   validator: validator({
@@ -14,6 +16,7 @@ export default {
     }),
     body: Joi.object({
       customer: Joi.string().optional(),
+      section: Joi.string().optional(),
       issueDate: Joi.date().optional(),
       dueDate: Joi.date().optional(),
       category: Joi.string().optional().allow("", null),
@@ -37,6 +40,7 @@ export default {
         payment_status,
         currency,
         additional_notes,
+        section,
       } = req.body;
 
       // Find the invoice
@@ -44,6 +48,15 @@ export default {
       if (!salesInvoice) {
         return responseHandler.error(res, "SalesInvoice not found");
       }
+
+      // Delete existing notifications for this invoice
+      await Notification.destroy({
+        where: {
+          related_id: id,
+          section: section || salesInvoice.section,
+        },
+        force: true,
+      });
 
       const isBecomingPaid =
         payment_status === "paid" && salesInvoice.payment_status !== "paid";
@@ -113,6 +126,56 @@ export default {
             performed_by: req.user?.username,
             client_id: req.des?.client_id,
             activity_message: `Payment received for invoice ${salesInvoice.salesInvoiceNumber}. Amount: ${salesInvoice.total} ${currency}`,
+          });
+        }
+
+        // Create notifications for unpaid invoices
+        if (payment_status === "unpaid") {
+          // Create reminder for due date
+          await Notification.create({
+            related_id: salesInvoice.id,
+            users: [customer],
+            title: "Invoice Due Date Reminder",
+            notification_type: "reminder",
+            from: req.user?.id,
+            client_id: req.des?.client_id,
+            date: dueDate,
+            time: "09:00",
+            section: section || salesInvoice.section,
+            parent_id: salesInvoice.related_id,
+            message: `Invoice #${salesInvoice.salesInvoiceNumber} is due today`,
+            description: `💰 Invoice Due Today:
+• Invoice #: ${salesInvoice.salesInvoiceNumber}
+• Amount: ${salesInvoice.total} ${currency}
+• Due Date: ${dueDate}
+• Customer: ${customer}
+• Status: ${payment_status}`,
+            created_by: req.user?.username,
+          });
+
+          // Create reminder for day before due date
+          const dayBeforeDue = dayjs(dueDate)
+            .subtract(1, "day")
+            .format("YYYY-MM-DD");
+          await Notification.create({
+            related_id: salesInvoice.id,
+            users: [customer],
+            title: "Invoice Due Tomorrow",
+            notification_type: "reminder",
+            from: req.user?.id,
+            client_id: req.des?.client_id,
+            date: dayBeforeDue,
+            time: "09:00",
+            section: section || salesInvoice.section,
+            parent_id: salesInvoice.related_id,
+            message: `Invoice #${salesInvoice.salesInvoiceNumber} is due tomorrow`,
+            description: `💰 Invoice Due Tomorrow:
+• Invoice #: ${salesInvoice.salesInvoiceNumber}
+• Amount: ${salesInvoice.total} ${currency}
+• Due Date: ${dueDate}
+• Customer: ${customer}
+• Status: ${payment_status}`,
+            created_by: req.user?.username,
           });
         }
 
@@ -253,11 +316,13 @@ export default {
 
       // Get settings for UPI details
       const settings = await Setting.findOne({
-        where: { client_id: req.des?.client_id }
+        where: { client_id: req.des?.client_id },
       });
 
       // Create UPI link using settings
-      const upiLink = `upi://pay?pa=${settings?.merchant_upi_id || ''}&pn=${settings?.merchant_name || ''}&am=${total}&cu=INR`;
+      const upiLink = `upi://pay?pa=${settings?.merchant_upi_id || ""}&pn=${
+        settings?.merchant_name || ""
+      }&am=${total}&cu=INR`;
 
       // Update invoice
       await salesInvoice.update({
@@ -310,6 +375,56 @@ export default {
           performed_by: req.user?.username,
           client_id: req.des?.client_id,
           activity_message: `Payment received for invoice ${salesInvoice.salesInvoiceNumber}. Amount: ${total} ${currency}`,
+        });
+      }
+
+      // Create notifications for unpaid invoices
+      if (payment_status === "unpaid") {
+        // Create reminder for due date
+        await Notification.create({
+          related_id: salesInvoice.id,
+          users: [customer],
+          title: "Invoice Due Date Reminder",
+          notification_type: "reminder",
+          from: req.user?.id,
+          client_id: req.des?.client_id,
+          date: dueDate,
+          time: "09:00",
+          section: section || salesInvoice.section,
+          parent_id: salesInvoice.related_id,
+          message: `Invoice #${salesInvoice.salesInvoiceNumber} is due today`,
+          description: `💰 Invoice Due Today:
+• Invoice #: ${salesInvoice.salesInvoiceNumber}
+• Amount: ${total} ${currency}
+• Due Date: ${dueDate}
+• Customer: ${customer}
+• Status: ${payment_status}`,
+          created_by: req.user?.username,
+        });
+
+        // Create reminder for day before due date
+        const dayBeforeDue = dayjs(dueDate)
+          .subtract(1, "day")
+          .format("YYYY-MM-DD");
+        await Notification.create({
+          related_id: salesInvoice.id,
+          users: [customer],
+          title: "Invoice Due Tomorrow",
+          notification_type: "reminder",
+          from: req.user?.id,
+          client_id: req.des?.client_id,
+          date: dayBeforeDue,
+          time: "09:00",
+          section: section || salesInvoice.section,
+          parent_id: salesInvoice.related_id,
+          message: `Invoice #${salesInvoice.salesInvoiceNumber} is due tomorrow`,
+          description: `💰 Invoice Due Tomorrow:
+• Invoice #: ${salesInvoice.salesInvoiceNumber}
+• Amount: ${total} ${currency}
+• Due Date: ${dueDate}
+• Customer: ${customer}
+• Status: ${payment_status}`,
+          created_by: req.user?.username,
         });
       }
 

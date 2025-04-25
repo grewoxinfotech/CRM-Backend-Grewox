@@ -17,6 +17,7 @@ export default {
 
     body: Joi.object({
       customer: Joi.string().required(),
+      section: Joi.string().required(),
       issueDate: Joi.date().required(),
       dueDate: Joi.date().required(),
       category: Joi.string().optional().allow("", null),
@@ -52,6 +53,7 @@ export default {
         payment_status,
         currency,
         additional_notes,
+        section,
       } = req.body;
 
       const { id } = req.params;
@@ -149,11 +151,13 @@ export default {
 
       // Get settings for UPI details
       const settings = await Setting.findOne({
-        where: { client_id: req.des?.client_id }
+        where: { client_id: req.des?.client_id },
       });
 
       // Create UPI link using settings
-      const upiLink = `upi://pay?pa=${settings?.merchant_upi_id || ''}&pn=${settings?.merchant_name || ''}&am=${total}&cu=INR`;
+      const upiLink = `upi://pay?pa=${settings?.merchant_upi_id || ""}&pn=${
+        settings?.merchant_name || ""
+      }&am=${total}&cu=INR`;
 
       // Create invoice
       const salesInvoice = await SalesInvoice.create({
@@ -188,7 +192,9 @@ export default {
         from: req.user?.id,
         client_id: req.des?.client_id,
         date: dueDate,
-        time: "10:00:00", // Set for 10 AM on due date
+        time: "10:00:00",
+        section: section,
+        parent_id: id,
         message: `Invoice #${salesInvoice.id} is due today`,
         description: `⚠️ Invoice Payment Due:
 • Invoice #: ${salesInvoice.id}
@@ -245,6 +251,8 @@ Please ensure timely payment to avoid any late fees.`,
           client_id: req.des?.client_id,
           date: dueDate,
           time: "09:00",
+          section: section,
+          parent_id: id,
           message: `Invoice #${salesInvoice.salesInvoiceNumber} is due today`,
           description: `💰 Invoice Due Today:
 • Invoice #: ${salesInvoice.salesInvoiceNumber}
@@ -268,6 +276,8 @@ Please ensure timely payment to avoid any late fees.`,
           client_id: req.des?.client_id,
           date: dayBeforeDue,
           time: "09:00",
+          section: section,
+          parent_id: id,
           message: `Invoice #${salesInvoice.salesInvoiceNumber} is due tomorrow`,
           description: `💰 Invoice Due Tomorrow:
 • Invoice #: ${salesInvoice.salesInvoiceNumber}

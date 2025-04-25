@@ -39,23 +39,26 @@ export default {
       id: Joi.string().required(),
     }),
     body: Joi.object({
-      subject: Joi.string().required(),
-      section: Joi.string().required(),
-      call_start_date: Joi.string().required(),
-      call_duration: Joi.string().optional(),
-      call_start_time: Joi.string().required(),
-      call_end_time: Joi.string().optional(),
+      subject: Joi.string().optional().allow(null),
+      section: Joi.string().optional().allow(null),
+      call_start_date: Joi.string().optional().allow(null),
+      call_duration: Joi.string().optional().allow(null),
+      call_start_time: Joi.string().optional().allow(null),
+      call_end_time: Joi.string().optional().allow(null),
       call_reminder: Joi.string().optional().allow(null),
       assigned_to: Joi.object({
-        assigned_to: Joi.array().items(Joi.string()).required(),
-      }).required(),
+        assigned_to: Joi.array().items(Joi.string()).optional().allow(null),
+      })
+        .optional()
+        .allow(null),
       call_purpose: Joi.string().optional().allow(null),
       call_notes: Joi.string().optional().allow(null),
-      call_type: Joi.string().required(),
+      call_type: Joi.string().optional().allow(null),
       call_status: Joi.string().optional().allow(null),
       priority: Joi.string()
         .valid("highest", "high", "medium", "low")
-        .required(),
+        .optional()
+        .allow(null),
     }),
   }),
 
@@ -64,34 +67,43 @@ export default {
       const { id } = req.params;
       const callData = req.body;
 
-  
-      // Set default status if not provided
-      if (!callData.call_status) {
-        callData.call_status = "not_started";
+      // Find existing call
+      const existingCall = await FollowupCall.findByPk(id);
+      if (!existingCall) {
+        return responseHandler.error(res, "Call not found");
       }
 
-      // Create the call with all fields from model
-      const call = await FollowupCall.create({
-        ...callData,
-        client_id: req.des?.client_id,
-        related_id: id,
-        created_by: req.user?.username,
+      // Delete existing notifications
+      await Notification.destroy({
+        where: { related_id: id },
       });
 
-      // Create notifications for each assigned user
+      // Update the call
+      await FollowupCall.update(
+        {
+          ...callData,
+          updated_by: req.user?.username,
+          updated_at: new Date(),
+        },
+        {
+          where: { id },
+        }
+      );
+
+      // Create new notifications for each assigned user
       for (const assignedUser of callData.assigned_to.assigned_to) {
         // 1. Create call assignment notification
         await Notification.create({
-          related_id: call.id,
+          related_id: id,
           users: [assignedUser],
-          title: "New Call Assignment",
+          title: "Call Updated",
           from: req.user?.id,
           client_id: req.des?.client_id,
-          message: `You have been assigned to a new call: ${callData.subject}`,
-          section: callData.section,
-          parent_id: id.replace(/^(lead_|deal_)/, ""),
+          message: `Call details have been updated: ${callData.subject}`,
           priority: callData.priority,
-          description: `📞 Call Details:
+          section: callData.section,
+          parent_id: existingCall.related_id,
+          description: `📞 Updated Call Details:
 • Subject: ${callData.subject}
 • Date: ${callData.call_start_date}
 • Time: ${callData.call_start_time}
@@ -111,7 +123,7 @@ ${callData.call_notes ? `\nNotes: ${callData.call_notes}` : ""}`,
           );
 
           await Notification.create({
-            related_id: call.id,
+            related_id: id,
             users: [assignedUser],
             title: "Call Starting Soon",
             notification_type: "reminder",
@@ -121,7 +133,7 @@ ${callData.call_notes ? `\nNotes: ${callData.call_notes}` : ""}`,
             time: reminderTime,
             priority: callData.priority,
             section: callData.section,
-            parent_id: id.replace(/^(lead_|deal_)/, ""),
+            parent_id: existingCall.related_id,
             message: `Call starting in ${callData.call_reminder.replace(
               "_",
               " "
@@ -139,9 +151,13 @@ ${callData.call_notes ? `\nNotes: ${callData.call_notes}` : ""}`,
         }
       }
 
-      return responseHandler.success(res, "Call scheduled successfully!", call);
+      return responseHandler.success(
+        res,
+        "Call updated successfully!",
+        callData
+      );
     } catch (error) {
-      console.error("Error creating call:", error);
+      console.error("Error updating call:", error);
       return responseHandler.error(res, error?.message);
     }
   },

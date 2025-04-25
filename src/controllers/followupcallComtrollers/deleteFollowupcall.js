@@ -1,4 +1,4 @@
-import FollowupTask from "../../models/followupTaskModel.js";
+import FollowupCall from "../../models/followupCallModel.js";
 import responseHandler from "../../utils/responseHandler.js";
 import Joi from "joi";
 import validator from "../../utils/validator.js";
@@ -15,22 +15,22 @@ export default {
     try {
       const { id } = req.params;
 
-      const followupTask = await FollowupTask.findByPk(id);
-      if (!followupTask) {
-        return responseHandler.error(res, "Followup task not found");
+      const followupCall = await FollowupCall.findByPk(id);
+      if (!followupCall) {
+        return responseHandler.error(res, "Followup call not found");
       }
 
-      // Delete all notifications related to this task
+      // Delete all notifications related to this call
       await Notification.destroy({
         where: { related_id: id },
       });
 
-      // Delete the task
-      await FollowupTask.destroy({
+      // Delete the call
+      await FollowupCall.destroy({
         where: { id },
       });
 
-      return responseHandler.success(res, "Followup task deleted successfully");
+      return responseHandler.success(res, "Followup call deleted successfully");
     } catch (error) {
       return responseHandler.error(res, error?.message);
     }
