@@ -108,9 +108,8 @@ export default {
         }
 
         const item_total = item_subtotal + item_tax - item_discount_amount;
-        const item_profit = item_total - item_cost;
-        const item_profit_percentage =
-          item_cost > 0 ? (item_profit / item_cost) * 100 : 0;
+        const item_profit = product.profit_margin * item.quantity;
+        const item_profit_percentage = product.profit_percentage;
 
         // Update running totals
         total_cost_of_goods += item_cost;
@@ -129,7 +128,7 @@ export default {
           discount_type: item_discount_type,
           total: item_total,
           profit: item_profit,
-          profit_percentage: item_profit_percentage.toFixed(2),
+          profit_percentage: item_profit_percentage,
         });
 
         // Update product stock if invoice is marked as paid

@@ -32,16 +32,19 @@ export default {
 
       // Get existing credit notes total for this invoice
       const existingCreditNotes = await SalesCreditnote.findAll({
-        where: { invoice }
+        where: { invoice },
       });
-      const totalCreditedAmount = existingCreditNotes.reduce((sum, note) => sum + note.amount, 0);
+      const totalCreditedAmount = existingCreditNotes.reduce(
+        (sum, note) => sum + Number(note.amount),
+        0
+      );
+      const newTotalCredited = totalCreditedAmount + Number(amount);
 
-      // Check if credit amount is valid (including existing credit notes)
-      const remainingInvoiceAmount = salesInvoice.amount;
-      if (amount > remainingInvoiceAmount) {
+      // Check if credit amount is valid
+      if (newTotalCredited > salesInvoice.total) {
         return responseHandler.error(
           res,
-          `Credit amount cannot be greater than remaining invoice amount (${remainingInvoiceAmount})`
+          `Total credited amount (${newTotalCredited}) cannot exceed invoice amount (${salesInvoice.total})`
         );
       }
 
@@ -49,13 +52,15 @@ export default {
       const invoiceItems = JSON.parse(salesInvoice.items);
 
       // Check product stock availability before proceeding
-      const newTotalCredited = totalCreditedAmount + amount;
       if (newTotalCredited >= salesInvoice.total) {
         // Only check stock if this credit note will complete the invoice
         for (const item of invoiceItems) {
           const product = await Product.findByPk(item.product_id);
           if (!product) {
-            return responseHandler.error(res, `Product with ID ${item.product_id} not found`);
+            return responseHandler.error(
+              res,
+              `Product with ID ${item.product_id} not found`
+            );
           }
 
           if (product.stock_quantity < item.quantity) {
@@ -79,26 +84,24 @@ export default {
       }
 
       // Calculate proportional amounts for each item based on credit note amount
-      const creditNoteItems = invoiceItems.map(item => {
-        // Calculate credit amount for this item based on its proportion of total invoice
-        const itemPercentage = item.total / salesInvoice.total;
-        const itemCreditAmount = amount * itemPercentage;
+      const creditNoteItems = await Promise.all(
+        invoiceItems.map(async (item) => {
+          // Get the product to access its profit margin
+          const product = await Product.findByPk(item.product_id);
+          if (!product) {
+            throw new Error(`Product with ID ${item.product_id} not found`);
+          }
 
-        // Use the same profit percentage as original item
-        const originalProfitPercentage = (item.profit / item.total) * 100;
-        
-        // Calculate credit cost to maintain same profit percentage
-        const itemCreditCost = (itemCreditAmount * 100) / (100 + originalProfitPercentage);
-        const itemCreditProfit = itemCreditAmount - itemCreditCost;
+          // Calculate credit amount for this item based on its proportion of total invoice
+          const itemPercentage = item.total / salesInvoice.total;
+          const itemCreditAmount = amount * itemPercentage;
 
-        return {
+          return {
             ...item,
             credit_amount: itemCreditAmount,
-            credit_cost: itemCreditCost,
-            credit_profit: itemCreditProfit,
-            credit_profit_percentage: originalProfitPercentage.toFixed(2)
-        };
-      });
+          };
+        })
+      );
 
       // Create credit note
       const salesCreditnote = await SalesCreditnote.create({
@@ -114,32 +117,34 @@ export default {
         created_by: req.user?.username,
       });
 
-      // Calculate new total and determine payment status
-      const newTotal = salesInvoice.total;
+      // Calculate new amount and determine payment status
       const newAmount = salesInvoice.amount - amount;
-
       let newPaymentStatus = salesInvoice.payment_status;
       let shouldCreateRevenue = false;
       let shouldUpdateStock = false;
 
-      // If new amount is 0 or total credited equals invoice total, mark as paid
-      if (newAmount === 0 || Math.abs(newTotalCredited - salesInvoice.total) < 0.01) {
-        newPaymentStatus = 'paid';
+      // If total credited equals invoice total, mark as paid
+      if (Math.abs(newTotalCredited - salesInvoice.total) < 0.01) {
+        newPaymentStatus = "paid";
         shouldCreateRevenue = true;
         shouldUpdateStock = true;
       }
-      // If some amount is remaining, mark as partially_paid
-      else if (newAmount > 0) {
-        newPaymentStatus = 'partially_paid';
+      // If some amount is credited but not complete, mark as partially_paid
+      else if (newTotalCredited > 0) {
+        newPaymentStatus = "partially_paid";
       }
+
       const settings = await Setting.findOne({
-        where: { client_id: req.des?.client_id }
+        where: { client_id: req.des?.client_id },
       });
-      // Update invoice
+
+      // Update invoice amount
       await salesInvoice.update({
         amount: newAmount,
-        upiLink: `upi://pay?pa=${settings?.merchant_upi_id || ''}&pn=${settings?.merchant_name || ''}&am=${newAmount}&cu=INR`,
-        payment_status: newPaymentStatus
+        upiLink: `upi://pay?pa=${settings?.merchant_upi_id || ""}&pn=${
+          settings?.merchant_name || ""
+        }&am=${newAmount}&cu=INR`,
+        payment_status: newPaymentStatus,
       });
 
       // Update product stock if credit note completes the invoice
@@ -149,34 +154,36 @@ export default {
           if (product) {
             await product.update({
               stock_quantity: product.stock_quantity - item.quantity,
-              updated_by: req.user?.username
+              updated_by: req.user?.username,
             });
           }
         }
       }
 
-      // If status becomes paid, create revenue entry
+      // If this is the final credit note that completes the invoice, create revenue
       if (shouldCreateRevenue) {
-        // Calculate totals for revenue using original profit percentage
-        const originalProfitPercentage = (salesInvoice.profit / salesInvoice.total) * 100;
-        const totalCost = (amount * 100) / (100 + originalProfitPercentage);
-        const totalProfit = amount - totalCost;
-        const profitPercentage = originalProfitPercentage.toFixed(2);
+        // Calculate revenue based on invoice total and total cost of goods
+        const totalRevenue = salesInvoice.total;
+        const totalCost = salesInvoice.cost_of_goods;
+        const totalProfit = salesInvoice.profit;
+        const profitPercentage = salesInvoice.profit_percentage;
 
+        // Create revenue entry with total profit from invoice
         await SalesRevenue.create({
           related_id: id,
           date: date || new Date(),
           currency: currency || salesInvoice.currency,
-          amount: amount,
+          amount: totalRevenue,
           cost_of_goods: totalCost,
-          account: 'sales_credit',
+          account: "sales_credit",
           customer: salesInvoice.customer,
           description: `Credit Note for Invoice #${invoice}`,
-          category: salesInvoice.category || 'Sales Credit',
-          profit  :salesInvoice.profit, 
-          products: creditNoteItems.map(item => ({
+          category: salesInvoice.category || "Sales Credit",
+          profit: totalProfit,
+          profit_margin_percentage: profitPercentage,
+          products: invoiceItems.map((item) => ({
             ...item,
-            revenue: item.credit_amount
+            revenue: item.total,
           })),
           client_id: req.des?.client_id,
           created_by: req.user?.username,
@@ -191,7 +198,11 @@ export default {
         action: "created",
         performed_by: req.user?.username,
         client_id: req.des?.client_id,
-        activity_message: `Credit note of ${amount} ${currency || salesInvoice.currency} created for invoice #${invoice}. New invoice balance: ${newAmount}. Status changed to: ${newPaymentStatus}${shouldUpdateStock ? '. Stock updated for products.' : ''}`
+        activity_message: `Credit note of ${amount} ${
+          currency || salesInvoice.currency
+        } created for invoice #${invoice}. New invoice balance: ${newAmount}. Status changed to: ${newPaymentStatus}${
+          shouldUpdateStock ? ". Stock updated for products." : ""
+        }`,
       });
 
       return responseHandler.success(
@@ -208,8 +219,7 @@ export default {
             previousStatus: salesInvoice.payment_status,
             newStatus: newPaymentStatus,
             items: creditNoteItems,
-            stockUpdated: shouldUpdateStock
-          }
+          },
         }
       );
     } catch (error) {
