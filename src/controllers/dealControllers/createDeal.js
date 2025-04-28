@@ -2,8 +2,6 @@ import Joi from "joi";
 import Deal from "../../models/dealModel.js";
 import responseHandler from "../../utils/responseHandler.js";
 import validator from "../../utils/validator.js";
-import CompanyAccount from "../../models/companyAccountModel.js";
-import Contact from "../../models/contactModel.js";
 
 export default {
     validator: validator({
@@ -14,16 +12,10 @@ export default {
             pipeline: Joi.string().required(),
             stage: Joi.string().required(),
             source: Joi.string().required(),
+            category: Joi.string().allow('', null),
             closedDate: Joi.date().required(),
-            products: Joi.object({
-                products: Joi.array().items(Joi.string()).optional()
-            }).optional().allow("", null),
-            firstName: Joi.string().optional().allow("", null),
-            lastName: Joi.string().optional().allow("", null),
-            email: Joi.string().optional().allow("", null),
-            phone: Joi.string().optional().allow("", null),
-            company_name: Joi.string().optional().allow("", null),
-            address: Joi.string().optional().allow("", null),
+            company_id: Joi.string().allow('', null),
+            contact_id: Joi.string().allow('', null),
         })
     }),
     handler: async (req, res) => {
@@ -35,32 +27,22 @@ export default {
                 pipeline,
                 stage,
                 source,
+                category,
                 closedDate,
-                products,
-                firstName,
-                lastName,
-                email,
-                phone,
-                company_name,
-                address,
+                company_id,
+                contact_id,
             } = req.body;
 
-            const existingDeal = await Deal.findOne({ where: { dealTitle } });
+            const existingDeal = await Deal.findOne({
+                where: {
+                    dealTitle,
+                    client_id: req.des?.client_id
+                }
+            });
+
             if (existingDeal) {
                 return responseHandler.error(res, "Deal already exists");
             }
-
-            let companyData, contactData;
-            if (company_name) {
-                companyData = await CompanyAccount.findOne({ where: { id: company_name } });
-            }
-            if (firstName) {
-                contactData = await Contact.findOne({ where: { id: firstName } });
-            }
-
-            // Add null checks and default values
-            const companyname = companyData?.company_name;
-            const contactname = contactData?.first_name;
 
             const deal = await Deal.create({
                 dealTitle,
@@ -69,18 +51,13 @@ export default {
                 pipeline,
                 stage,
                 source,
+                category,
                 closedDate,
-                products,
-                firstName: contactname,
-                lastName,
-                email,
-                phone,
-                company_name: companyname,
-                address,
-                company_id: company_name,
-                contact_id: firstName,
+                company_id,
+                contact_id,
                 client_id: req.des?.client_id,
-                created_by: req.user?.username
+                created_by: req.user?.username,
+                deal_members: { deal_members: [] }
             });
 
             return responseHandler.success(res, "Deal created successfully", deal);

@@ -34,35 +34,12 @@ const Lead = sequelize.define('Lead', {
         type: DataTypes.INTEGER,
         allowNull: false,
     },
-    company_name: {
+    company_id: {
         type: DataTypes.STRING,
         allowNull: true,
         defaultValue: null
     },
-    firstName: {
-        type: DataTypes.STRING,
-        allowNull: true,
-        defaultValue: null
-    },
-    lastName: {
-        type: DataTypes.STRING,
-        allowNull: true,
-        defaultValue: null
-    },
-    phoneCode: {
-        type: DataTypes.STRING,
-        allowNull: true,
-    },
-    telephone: {
-        type: DataTypes.STRING,
-        allowNull: true,
-    },
-    email: {
-        type: DataTypes.STRING,
-        allowNull: true,
-        defaultValue: null,
-    },
-    address: {
+    contact_id: {
         type: DataTypes.STRING,
         allowNull: true,
         defaultValue: null

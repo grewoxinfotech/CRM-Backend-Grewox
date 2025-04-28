@@ -34,32 +34,7 @@ const Deal = sequelize.define("Deal", {
         allowNull: false,
         defaultValue: 'pending'
     },
-    label: {
-        type: DataTypes.ENUM('Hot', 'Warm', 'Cold'),
-        allowNull: false,
-        defaultValue: 'Cold'
-    },
-    closedDate: {
-        type: DataTypes.DATE,
-        allowNull: true,
-        defaultValue: null
-    },
-    firstName: {
-        type: DataTypes.STRING,
-        allowNull: true,
-        defaultValue: null
-    },
-    lastName: {
-        type: DataTypes.STRING,
-        allowNull: true,
-        defaultValue: null
-    },
-    email: {
-        type: DataTypes.STRING,
-        allowNull: true,
-        defaultValue: null
-    },
-    phone: {
+    category: {
         type: DataTypes.STRING,
         allowNull: true,
         defaultValue: null
@@ -69,42 +44,8 @@ const Deal = sequelize.define("Deal", {
         allowNull: true,
         defaultValue: null
     },
-    company_name: {
-        type: DataTypes.STRING,
-        allowNull: true,
-        defaultValue: null
-    },
-    website: {
-        type: DataTypes.STRING,
-        allowNull: true,
-        defaultValue: null
-    },
-    address: {
-        type: DataTypes.STRING,
-        allowNull: true,
-        defaultValue: null
-    },
-    products: {
-        type: DataTypes.JSON,
-        allowNull: true,
-        defaultValue: null
-    },
-    files: {
-        type: DataTypes.JSON,
-        allowNull: true,
-        defaultValue: null
-    },
-    assigned_to: {
-        type: DataTypes.JSON,
-        allowNull: true,
-        defaultValue: null
-    },
-    client_id: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
-    is_won: {
-        type: DataTypes.BOOLEAN,
+    closedDate: {
+        type: DataTypes.DATE,
         allowNull: true,
         defaultValue: null
     },
@@ -115,6 +56,25 @@ const Deal = sequelize.define("Deal", {
     },
     contact_id: {
         type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: null
+    },
+    deal_members: {
+        type: DataTypes.JSON,
+        allowNull: true,
+        defaultValue: null
+    },
+    files: {
+        type: DataTypes.JSON,
+        allowNull: true,
+        defaultValue: null
+    },
+    client_id: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    is_won: {
+        type: DataTypes.BOOLEAN,
         allowNull: true,
         defaultValue: null
     },
@@ -129,7 +89,6 @@ const Deal = sequelize.define("Deal", {
         defaultValue: null
     }
 });
-
 
 Deal.beforeCreate(async (deal) => {
     let isUnique = false;

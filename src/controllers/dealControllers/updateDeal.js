@@ -12,28 +12,22 @@ export default {
             id: Joi.string().required()
         }),
         body: Joi.object({
-            dealTitle: Joi.string().optional().allow(null),
-            firstName: Joi.string().optional().allow(null),
-            lastName: Joi.string().optional().allow(null),
-            email: Joi.string().optional().allow(null),
-            phone: Joi.string().optional().allow(null),
-            pipeline: Joi.string().optional().allow(null),
-            stage: Joi.string().optional().allow(null),
-            website: Joi.string().optional().allow(null),
-            label: Joi.string().valid('Hot', 'Warm', 'Cold').optional().allow(null),
-            value: Joi.number().optional().allow(null),
-            status: Joi.string().valid('won', 'lost', 'pending').optional().allow(null),
-            currency: Joi.string().optional().allow(null),
+            dealTitle: Joi.string().optional(),
+            currency: Joi.string().optional(),
+            value: Joi.number().optional(),
+            pipeline: Joi.string().optional(),
+            stage: Joi.string().optional(),
+            status: Joi.string().valid('won', 'lost', 'pending').optional(),
+            category: Joi.string().optional().allow(null),
+            source: Joi.string().optional().allow(null),
             closedDate: Joi.date().optional().allow(null),
-            company_name: Joi.string().optional().allow(null),
-            address: Joi.string().optional().allow(null),
+            company_id: Joi.string().optional().allow(null),
+            contact_id: Joi.string().optional().allow(null),
+            deal_members: Joi.object().optional().allow(null),
             files: Joi.array().items(Joi.object({
                 filename: Joi.string().required(),
                 url: Joi.string().required()
             })).optional(),
-            assigned_to: Joi.object().optional().allow(null),
-            products: Joi.object().optional().allow(null),
-            source: Joi.string().optional().allow(null),
             client_id: Joi.string().optional(),
             is_won: Joi.boolean().optional().allow(null)
         })
@@ -77,17 +71,17 @@ export default {
             }
 
             // Check if deal members are being updated
-            if (updateData.assigned_to) {
-                const currentDealMembers = typeof deal.assigned_to === 'string'
-                    ? JSON.parse(deal.assigned_to)
-                    : deal.assigned_to || { assigned_to: [] };
-                
-                const currentMembers = currentDealMembers.assigned_to || [];
-                const newMembers = updateData.assigned_to.assigned_to || [];
-                
+            if (updateData.deal_members) {
+                const currentDealMembers = typeof deal.deal_members === 'string'
+                    ? JSON.parse(deal.deal_members)
+                    : deal.deal_members || { deal_members: [] };
+
+                const currentMembers = currentDealMembers.deal_members || [];
+                const newMembers = updateData.deal_members.deal_members || [];
+
                 // Find newly added members
                 const addedMembers = newMembers.filter(memberId => !currentMembers.includes(memberId));
-                
+
                 // Create activity for each newly added member
                 if (addedMembers.length > 0) {
                     // Fetch member names from User model
@@ -99,7 +93,7 @@ export default {
                     });
 
                     const memberNames = memberUsers.map(user => user.username).join(', ');
-                    
+
                     await Activity.create({
                         related_id: id,
                         activity_from: "deal_member",

@@ -18,6 +18,7 @@ export default {
             company_category: Joi.string().optional().allow('', null),
             company_industry: Joi.string().optional().allow('', null),
             company_revenue: Joi.string().optional().allow('', null),
+            phone_code: Joi.string().optional().allow('', null),
             phone_number: Joi.string().optional().allow('', null),
             website: Joi.string().optional().allow('', null),
             fax: Joi.string().optional().allow('', null),
@@ -39,20 +40,20 @@ export default {
     handler: async (req, res) => {
         try {
             const { id } = req.params;
-                    const { account_owner, company_name, company_site, company_number, company_type, company_category, company_industry, company_revenue, phone_number, website, fax, ownership, number_of_employees, billing_address, billing_city, billing_state, billing_pincode, billing_country, shipping_address, shipping_city, shipping_state, shipping_pincode, shipping_country, description } = req.body;
-                    
+            const { account_owner, company_name, company_site, company_number, company_type, company_category, company_industry, company_revenue, phone_code, phone_number, website, fax, ownership, number_of_employees, billing_address, billing_city, billing_state, billing_pincode, billing_country, shipping_address, shipping_city, shipping_state, shipping_pincode, shipping_country, description } = req.body;
+
             const companyAccount = await CompanyAccount.findByPk(id);
             if (!companyAccount) {
                 return responseHandler.error(res, "Company Account not found");
             }
-            
+
             const existingCompanyAccount = await CompanyAccount.findOne({ where: { company_name, id: { [Op.not]: id } } });
             if (existingCompanyAccount) {
                 return responseHandler.error(res, "Company Account already exists");
             }
 
-            await companyAccount.update({ account_owner, company_name, company_site, company_number, company_type, company_category, company_industry, company_revenue, phone_number, website, fax, ownership, number_of_employees, billing_address, billing_city, billing_state, billing_pincode, billing_country, shipping_address, shipping_city, shipping_state, shipping_pincode, shipping_country, description, updated_by: req.user?.username });
-                return responseHandler.success(res, "Company Account updated successfully", companyAccount);
+            await companyAccount.update({ account_owner, company_name, company_site, company_number, company_type, company_category, company_industry, company_revenue, phone_code, phone_number, website, fax, ownership, number_of_employees, billing_address, billing_city, billing_state, billing_pincode, billing_country, shipping_address, shipping_city, shipping_state, shipping_pincode, shipping_country, description, updated_by: req.user?.username });
+            return responseHandler.success(res, "Company Account updated successfully", companyAccount);
         } catch (error) {
             return responseHandler.error(res, error?.message);
         }

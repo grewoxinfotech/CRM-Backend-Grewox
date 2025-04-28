@@ -32,6 +32,10 @@ const Contact = sequelize.define("contacts", {
         allowNull: true,
         defaultValue: null
     },
+    phone_code: {
+        type: DataTypes.STRING,
+        allowNull: true,
+    },
     phone: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -59,6 +63,11 @@ const Contact = sequelize.define("contacts", {
     country: {
         type: DataTypes.STRING,
         allowNull: true,
+    },
+    related_id: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: null
     },
     client_id: {
         type: DataTypes.STRING,
@@ -90,4 +99,4 @@ Contact.beforeCreate(async (contact) => {
     contact.id = newId;
 });
 
-export default Contact; 
+export default Contact;

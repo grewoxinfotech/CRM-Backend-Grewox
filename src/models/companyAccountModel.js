@@ -42,6 +42,10 @@ const CompanyAccount = sequelize.define("company_accounts", {
         type: DataTypes.STRING,
         allowNull: true,
     },
+    phone_code: {
+        type: DataTypes.STRING,
+        allowNull: true,
+    },
     phone_number: {
         type: DataTypes.STRING,
         allowNull: true,

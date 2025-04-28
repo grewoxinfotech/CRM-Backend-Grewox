@@ -12,6 +12,7 @@ export default {
             last_name: Joi.string().optional().allow('', null),
             company_name: Joi.string().optional().allow('', null),
             email: Joi.string().optional().allow('', null),
+            phone_code: Joi.string().optional().allow('', null),
             phone: Joi.string().optional().allow('', null),
             contact_source: Joi.string().optional().allow('', null),
             description: Joi.string().optional().allow('', null),
@@ -19,23 +20,24 @@ export default {
             city: Joi.string().optional().allow('', null),
             state: Joi.string().optional().allow('', null),
             country: Joi.string().optional().allow('', null),
+            related_id: Joi.string().optional().allow('', null),
         })
     }),
 
     handler: async (req, res) => {
         try {
-            const { 
+            const {
                 contact_owner, first_name, last_name, company_name,
-                email, phone, contact_source, description,
-                address, city, state, country 
+                email, phone_code, phone, contact_source, description,
+                address, city, state, country, related_id
             } = req.body;
 
             // Check if contact with same email exists
-            const existingContact = await Contact.findOne({ 
-                where: { 
+            const existingContact = await Contact.findOne({
+                where: {
                     first_name: first_name,
                     company_name: company_name
-                } 
+                }
             });
 
             if (existingContact) {
@@ -49,6 +51,7 @@ export default {
                 last_name,
                 company_name,
                 email,
+                phone_code,
                 phone,
                 contact_source,
                 description,
@@ -56,6 +59,7 @@ export default {
                 city,
                 state,
                 country,
+                related_id,
                 client_id: req.des?.client_id,
                 created_by: req.user?.username
             });
