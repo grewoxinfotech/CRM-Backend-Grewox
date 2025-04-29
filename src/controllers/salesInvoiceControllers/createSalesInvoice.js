@@ -156,9 +156,8 @@ export default {
       });
 
       // Create UPI link using settings
-      const upiLink = `upi://pay?pa=${settings?.merchant_upi_id || ""}&pn=${
-        settings?.merchant_name || ""
-      }&am=${total}&cu=INR`;
+      const upiLink = `upi://pay?pa=${settings?.merchant_upi_id || ""}&pn=${settings?.merchant_name || ""
+        }&am=${total}&cu=INR`;
 
       // Create invoice
       const salesInvoice = await SalesInvoice.create({
@@ -308,7 +307,7 @@ Please ensure timely payment to avoid any late fees.`,
         }
       );
     } catch (error) {
-      return responseHandler.error(res, error?.message);
+      return responseHandler.error(res, error);
     }
   },
 };
