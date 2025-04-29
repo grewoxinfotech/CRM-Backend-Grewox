@@ -16,7 +16,7 @@ const Customers = sequelize.define("customers", {
     },
     customerNumber: {
         type: DataTypes.STRING,
-        unique: true,
+        unique: false,
     },
     name: {
         type: DataTypes.STRING,
@@ -69,29 +69,29 @@ const Customers = sequelize.define("customers", {
     }
 });
 
-Customers.beforeCreate(async (customer) => {
-    let isUnique = false;
-    let newId;
-    while (!isUnique) {
-        newId = generateId();
-        const existingCustomer = await Customers.findOne({ where: { id: newId } });
-        if (!existingCustomer) {
-            isUnique = true;
-        }
-    }
-    customer.id = newId;
+// Customers.beforeCreate(async (customer) => {
+//     let isUnique = false;
+//     let newId;
+//     while (!isUnique) {
+//         newId = generateId();
+//         const existingCustomer = await Customers.findOne({ where: { id: newId } });
+//         if (!existingCustomer) {
+//             isUnique = true;
+//         }
+//     }
+//     customer.id = newId;
 
-    const lastCustomer = await Customers.findOne({
-        order: [['customerNumber', 'DESC']]
-    });
+//     const lastCustomer = await Customers.findOne({
+//         order: [['customerNumber', 'DESC']]
+//     });
 
-    let nextNumber = 1;
-    if (lastCustomer && lastCustomer.customerNumber) {
-        const lastNumber = parseInt(lastCustomer.customerNumber.replace('CN#', ''));
-        nextNumber = lastNumber + 1;
-    }
+//     let nextNumber = 1;
+//     if (lastCustomer && lastCustomer.customerNumber) {
+//         const lastNumber = parseInt(lastCustomer.customerNumber.replace('CN#', ''));
+//         nextNumber = lastNumber + 1;
+//     }
 
-    customer.customerNumber = `CN#${nextNumber}`;
-});
+//     customer.customerNumber = `CN#${nextNumber}`;
+// });
 
 export default Customers;

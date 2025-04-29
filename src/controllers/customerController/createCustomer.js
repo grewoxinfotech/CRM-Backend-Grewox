@@ -6,6 +6,7 @@ import validator from "../../utils/validator.js";
 export default {
   validator: validator({
     body: Joi.object({
+      customerNumber: Joi.string().optional().allow("", null),
       name: Joi.string().required(),
       contact: Joi.string().required(),
       phonecode: Joi.string().optional().allow("", null),
@@ -19,6 +20,7 @@ export default {
   handler: async (req, res) => {
     try {
       const {
+        customerNumber,
         name,
         contact,
         email,
@@ -38,6 +40,7 @@ export default {
         related_id: req.user?.id,
         name,
         contact,
+        customerNumber,
         phonecode,
         email,
         tax_number,
