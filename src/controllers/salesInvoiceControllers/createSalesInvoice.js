@@ -16,6 +16,7 @@ export default {
     }),
 
     body: Joi.object({
+      salesInvoiceNumber: Joi.string().optional(),
       customer: Joi.string().required(),
       section: Joi.string().required(),
       issueDate: Joi.date().required(),
@@ -49,6 +50,7 @@ export default {
         issueDate,
         dueDate,
         category,
+        salesInvoiceNumber,
         items,
         payment_status,
         currency,
@@ -165,6 +167,7 @@ export default {
         issueDate,
         dueDate,
         category,
+        salesInvoiceNumber,
         items: verified_products,
         payment_status,
         currency,

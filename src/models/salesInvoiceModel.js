@@ -11,9 +11,7 @@ const SalesInvoice = sequelize.define("sales_Invoice", {
   },
   salesInvoiceNumber: {
     type: DataTypes.STRING,
-    unique: true,
-    allowNull: false,
-    defaultValue: "S-INV-#1",
+    unique: false,
   },
   related_id: {
     type: DataTypes.STRING,
@@ -157,23 +155,8 @@ SalesInvoice.beforeCreate(async (salesInvoice) => {
     }
     salesInvoice.id = newId;
 
-    // Generate invoice number
-    const lastInvoice = await SalesInvoice.findOne({
-      where: { client_id: salesInvoice.client_id },
-      order: [["createdAt", "DESC"]],
-    });
-
-    let nextNumber = 1;
-    if (lastInvoice && lastInvoice.salesInvoiceNumber) {
-      // Extract number from last invoice number (S-INV-#X)
-      const match = lastInvoice.salesInvoiceNumber.match(/#(\d+)$/);
-      if (match && match[1]) {
-        nextNumber = parseInt(match[1]) + 1;
-      }
-    }
-
-    // Set the new invoice number
-    salesInvoice.setDataValue("salesInvoiceNumber", `S-INV-#${nextNumber}`);
+    // Remove auto-generation of invoice number
+    // Let it be set from the frontend
   } catch (error) {
     console.error("Error in beforeCreate hook:", error);
     throw error;
