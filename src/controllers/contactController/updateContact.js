@@ -1,8 +1,10 @@
 import Joi from "joi";
 import Contact from "../../models/contactModel.js";
+import Notification from "../../models/notificationModel.js";
 import responseHandler from "../../utils/responseHandler.js";
 import validator from "../../utils/validator.js";
 import { Op } from "sequelize";
+import dayjs from "dayjs";
 
 export default {
     validator: validator({
@@ -35,8 +37,16 @@ export default {
             }
 
 
-            const updatedContact = await contact.update({
-                contact_owner,
+            // Delete existing notifications for this contact
+            await Notification.destroy({
+                where: {
+                    related_id: id,
+                    section: "contact"
+                },
+                force: true
+            });
+
+            await contact.update({ contact_owner,
                 first_name,
                 last_name,
                 company_name,
@@ -49,10 +59,31 @@ export default {
                 state,
                 country,
                 phone_code,
-                updated_by: req.user?.username
+                updated_by: req.user?.username});
+            
+            // Create notification for contact update
+            await Notification.create({
+                related_id: contact.id,
+                users: [contact_owner], // Send notification to contact owner
+                title: "Contact Updated",
+                notification_type: "update",
+                from: req.user?.id,
+                client_id: req.des?.client_id,
+                date: dayjs().format("YYYY-MM-DD"),
+                time: dayjs().format("HH:mm:ss"),
+                section: "contact",
+                parent_id: req.user?.id,
+                message: `Contact updated: ${first_name} ${last_name || ''}`,
+                description: `📋 Contact Details:
+• Name: ${first_name} ${last_name || ''}
+• Company: ${company_name}
+• Email: ${email}
+• Phone: ${phone}
+• Address: ${address ? `${address}, ${city || ''} ${state || ''} ${country || ''}` : 'Not provided'}`,
+                created_by: req.user?.username,
             });
 
-            return responseHandler.success(res, "Contact updated successfully", updatedContact);
+            return responseHandler.success(res, "Contact updated successfully", contact);
         } catch (error) {
             return responseHandler.error(res, error?.message);
         }

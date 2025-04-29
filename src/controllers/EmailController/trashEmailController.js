@@ -20,7 +20,8 @@ export default {
             }
 
             await email.update({ 
-                isTrash: true,
+                // isTrash: false,
+                isTrash:!email.isTrash,
                 type: 'trash',
                 updated_by: req.user?.username 
             });

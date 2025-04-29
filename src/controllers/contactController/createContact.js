@@ -66,10 +66,12 @@ export default {
 
             // Create notification
             await Notification.create({
-                related_id: req.user?.id,
+                related_id: contact.id,
                 users: [contact_owner], // Send notification to contact owner
                 title: "New Contact Added",
                 from: req.user?.id,
+                section: "contact",
+                parent_id: req.user?.id,
                 client_id: req.des?.client_id,
                 message: `A new contact "${first_name} ${last_name || ''}" has been added`,
                 description: `Contact Details:\n• Email: ${email}\n• Phone: ${phone}`,

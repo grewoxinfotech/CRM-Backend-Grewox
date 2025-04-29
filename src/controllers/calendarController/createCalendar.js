@@ -50,6 +50,8 @@ export default {
                 users: [req.user?.id],
                 title: "Calendar Event Starting",
                 notification_type: "reminder",
+                section: "calendar",
+                parent_id: req.user?.id,
                 from: req.user?.id,
                 client_id: req.des?.client_id,
                 date: eventDate,
@@ -68,6 +70,8 @@ export default {
                 users: [req.user?.id],
                 title: "Event Starting Soon",
                 notification_type: "reminder",
+                section: "calendar",
+                parent_id: req.user?.id,
                 from: req.user?.id,
                 client_id: req.des?.client_id,
                 date: eventDate,
@@ -84,6 +88,7 @@ export default {
             console.log('Calendar Created Successfully:', {
                 id: calendar.id,
                 name: calendar.name,
+                
                 startDate: new Date(calendar.startDate).toLocaleString(),
                 endDate: new Date(calendar.endDate).toLocaleString(),
                 createdBy: calendar.created_by,
