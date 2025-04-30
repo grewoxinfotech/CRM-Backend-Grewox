@@ -22,6 +22,8 @@ export default {
       subTotal: Joi.number().optional(),
       currency: Joi.string().optional(),
       items: Joi.array().optional(),
+      discountType: Joi.string().optional(),
+      discountValue: Joi.number().optional(),
     }),
   }),
   handler: async (req, res) => {
@@ -38,6 +40,8 @@ export default {
         subTotal,
         currency,
         items,
+        discountType,
+        discountValue,
       } = req.body;
 
       // Find existing bill
@@ -152,6 +156,8 @@ export default {
         items,
         upiLink,
         updated_by: req.user?.username,
+        discountType,
+        discountValue,
       });
 
       return responseHandler.success(

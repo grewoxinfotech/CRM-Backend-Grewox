@@ -47,6 +47,16 @@ const Bill = sequelize.define("Bill", {
     type: DataTypes.JSON,
     allowNull: false,
   },
+  discountType: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    defaultValue: null,
+  },
+  discountValue: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    defaultValue: null,
+  },
   status: {
     type: DataTypes.STRING,
     allowNull: false,

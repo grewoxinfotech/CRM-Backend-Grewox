@@ -24,6 +24,8 @@ export default {
       total: Joi.number().required(),
       note: Joi.string().optional(),
       subTotal: Joi.number().required(),
+      discountType: Joi.string().optional(),
+      discountValue: Joi.number().optional(),
     }),
   }),
   handler: async (req, res) => {
@@ -42,6 +44,8 @@ export default {
         total,
         note,
         subTotal,
+        discountType,
+        discountValue,
       } = req.body;
 
       // Get settings for UPI details
@@ -68,6 +72,8 @@ export default {
         upiLink,
         items,
         amount: total,
+        discountType,
+        discountValue,
         total,
         note,
         subTotal,
