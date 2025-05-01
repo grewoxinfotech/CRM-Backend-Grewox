@@ -17,16 +17,38 @@ export default {
         try {
             const { id } = req.params;
             const { pipeline_name } = req.body;
+            const client_id = req.des?.client_id;
 
-            const pipeline = await Pipeline.findByPk(id);
+            // Find pipeline and verify it belongs to the client
+            const pipeline = await Pipeline.findOne({
+                where: {
+                    id,
+                    client_id
+                }
+            });
+
             if (!pipeline) {
                 return responseHandler.notFound(res, "Pipeline not found");
             }
-            const existingPipeline = await Pipeline.findOne({ where: { pipeline_name, id: { [Op.not]: id } } });
+
+            // Check if another pipeline with same name exists for this client
+            const existingPipeline = await Pipeline.findOne({
+                where: {
+                    pipeline_name,
+                    client_id,
+                    id: { [Op.not]: id }
+                }
+            });
+
             if (existingPipeline) {
                 return responseHandler.error(res, "Pipeline already exists");
             }
-            const updatedPipeline = await pipeline.update({ pipeline_name, updated_by: req.user?.username });
+
+            const updatedPipeline = await pipeline.update({
+                pipeline_name,
+                updated_by: req.user?.username
+            });
+
             return responseHandler.success(res, "Pipeline updated successfully", updatedPipeline);
         } catch (error) {
             return responseHandler.error(res, error?.message);

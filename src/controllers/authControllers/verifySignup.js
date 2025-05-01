@@ -9,6 +9,8 @@ import Role from "../../models/roleModel.js";
 import User from "../../models/userModel.js";
 import ClientSubscription from "../../models/clientSubscriptionModel.js";
 import { seedDefaultLabels } from "../labelControllers/createLabel.js";
+import { seedDefaultPipelines } from "../pipelineControllers/createPipeline.js";
+import { seedDefaultStages } from "../stageControllers/createStage.js";
 
 export default {
     validator: validator({
@@ -85,23 +87,55 @@ export default {
                 created_by: user.created_by
             });
 
-            // If this is a client, seed their labels
+            // If this is a client, seed their data
             if (role.role_name === 'client') {
                 try {
                     const labelTypes = ['source', 'status', 'tag', 'contract_type', 'category', 'followup', 'label'];
+                    const labelResults = await Promise.all(labelTypes.map(async type => {
+                        try {
+                            const labels = await seedDefaultLabels(
+                                newUser.id,    // related_id
+                                newUser.id,    // client_id
+                                'system',      // created_by
+                                type          // label type
+                            );
+                            return { type, count: labels.length, success: true };
+                        } catch (error) {
+                            console.error(`Error seeding ${type} labels:`, error.message);
+                            return { type, count: 0, success: false, error: error.message };
+                        }
+                    }));
 
-                    // Seed labels in parallel
-                    await Promise.all(labelTypes.map(type =>
-                        seedDefaultLabels(
-                            newUser.id,    // related_id
-                            newUser.id,    // client_id
-                            'system',      // created_by
-                            type          // label type
-                        )
-                    ));
-                } catch (labelError) {
-                    console.error('Error seeding labels:', labelError);
-                    // Continue with verification even if label seeding fails
+                    const pipelines = await seedDefaultPipelines(
+                        newUser.id,       // client_id
+                        newUser.username  // created_by
+                    );
+
+                    const stageResults = await Promise.all(pipelines.map(async pipeline => {
+                        try {
+                            const stages = await seedDefaultStages(
+                                pipeline.id,    // pipeline_id
+                                newUser.id,     // client_id
+                                newUser.username // created_by
+                            );
+                            return {
+                                pipeline_name: pipeline.pipeline_name,
+                                stages_count: stages.length,
+                                success: true
+                            };
+                        } catch (error) {
+                            console.error(`Error seeding stages for pipeline ${pipeline.pipeline_name}:`, error.message);
+                            return {
+                                pipeline_name: pipeline.pipeline_name,
+                                stages_count: 0,
+                                success: false,
+                                error: error.message
+                            };
+                        }
+                    }));
+
+                } catch (error) {
+                    console.error('Error in client data seeding:', error.message);
                 }
             }
 
@@ -130,15 +164,6 @@ export default {
             // Send welcome email
             const welcomeTemplate = getWelcomeEmailTemplate(newUser.username);
             await sendEmail(newUser.email, 'Welcome to CRM!', welcomeTemplate);
-
-            // // Send welcome email
-            // const welcomeTemplate = getWelcomeEmailTemplate(newUser.username);
-            // await sgMail.send({
-            //     to: newUser.email,
-            //     from: EMAIL_FROM,
-            //     subject: 'Welcome to CRM!',
-            //     html: welcomeTemplate
-            // });
 
             return responseHandler.success(res, "Registration completed successfully", {
                 success: true,
