@@ -51,6 +51,26 @@ const SalesInvoice = sequelize.define("sales_Invoice", {
     //   this.setDataValue("items", JSON.stringify(value));
     // },
   },
+  discount: {
+    type: DataTypes.FLOAT,
+    allowNull: true,
+    defaultValue: null,
+  },
+  tax: {
+    type: DataTypes.FLOAT,
+    allowNull: true,
+    defaultValue: null,
+  },
+  subtotal: {
+    type: DataTypes.FLOAT,
+    allowNull: true,
+    defaultValue: null,
+  },
+  total: {
+    type: DataTypes.FLOAT,
+    allowNull: true,
+    defaultValue: null,
+  },
   payment_status: {
     type: DataTypes.ENUM("paid", "unpaid", "partially_paid"),
     allowNull: false,

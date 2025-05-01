@@ -47,13 +47,28 @@ const Bill = sequelize.define("Bill", {
     type: DataTypes.JSON,
     allowNull: false,
   },
-  discountType: {
+  overallDiscountType: {
     type: DataTypes.STRING,
     allowNull: true,
     defaultValue: null,
   },
-  discountValue: {
+  overallDiscount: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    defaultValue: null,
+  },
+  overallDiscountAmount: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    defaultValue: null,
+  },
+  overallTax: {
     type: DataTypes.STRING,
+    allowNull: true,
+    defaultValue: null,
+  },
+  overallTaxAmount: {
+    type: DataTypes.INTEGER,
     allowNull: true,
     defaultValue: null,
   },
