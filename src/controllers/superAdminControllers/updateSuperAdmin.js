@@ -59,8 +59,7 @@ export default {
 
             return responseHandler.success(res, "Super admin updated successfully", superAdmin);
         } catch (error) {
-            console.error("Update error:", error);
-            return responseHandler.error(res, error?.message);
+            return responseHandler.error(res, error);
         }
     }
 };
