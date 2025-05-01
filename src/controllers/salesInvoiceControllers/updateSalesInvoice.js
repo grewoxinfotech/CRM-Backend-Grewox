@@ -8,6 +8,7 @@ import Activity from "../../models/activityModel.js";
 import Notification from "../../models/notificationModel.js";
 import Setting from "../../models/settingModel.js";
 import dayjs from "dayjs";
+import Tax from "../../models/taxModel.js";
 
 export default {
   validator: validator({
@@ -258,11 +259,8 @@ export default {
         // Calculate item level metrics
         const item_cost = product.buying_price * item.quantity;
         const item_subtotal = item.unit_price * item.quantity;
-        const item_tax = item.tax_rate
-          ? (item_subtotal * item.tax_rate) / 100
-          : 0;
 
-        // Calculate discount
+        // Calculate discount first
         const item_discount = item.discount || 0;
         const item_discount_type = item.discount_type || "percentage";
         let item_discount_amount = 0;
@@ -273,7 +271,20 @@ export default {
           item_discount_amount = item_discount;
         }
 
-        const item_total = item_subtotal + item_tax - item_discount_amount;
+        // Calculate amount after discount
+        const amount_after_discount = item_subtotal - item_discount_amount;
+
+        // Calculate tax on discounted amount
+        let item_tax = 0;
+        if (item.tax) {
+          const taxData = await Tax.findByPk(item.tax);
+          if (taxData) {
+            const taxPercentage = parseFloat(taxData.gstPercentage);
+            item_tax = (amount_after_discount * taxPercentage) / 100;
+          }
+        }
+
+        const item_total = amount_after_discount + item_tax;
         const item_profit = item_total - item_cost;
         const item_profit_percentage =
           item_cost > 0 ? (item_profit / item_cost) * 100 : 0;
@@ -292,6 +303,7 @@ export default {
           subtotal: item_subtotal,
           tax_amount: item_tax,
           discount_amount: item_discount_amount,
+          amount_after_discount: amount_after_discount,
           total: item_total,
           profit: item_profit,
           profit_percentage: item_profit_percentage.toFixed(2),

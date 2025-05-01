@@ -18,6 +18,7 @@ app.use(
     credentials: true,
   })
 );
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -51,7 +52,6 @@ const startServer = async () => {
     server.listen(PORT, () => {
       console.log(`✅ Server and Socket.IO running on port ${PORT}`);
       // Start notification crons
-
     });
 
     app.set("io", io);

@@ -18,12 +18,16 @@ export default {
       status: Joi.string().optional(),
       discount: Joi.number().optional(),
       tax: Joi.number().optional(),
-      total: Joi.number().optional(),
-      subTotal: Joi.number().optional(),
       currency: Joi.string().optional(),
       items: Joi.array().optional(),
-      discountType: Joi.string().optional(),
-      discountValue: Joi.number().optional(),
+      total: Joi.number().optional(),
+      note: Joi.string().optional(),
+      subTotal: Joi.number().optional(),
+      overallDiscountType: Joi.string().optional(),
+      overallDiscount: Joi.number().optional(),
+      overallDiscountAmount: Joi.number().optional(),
+      overallTax: Joi.string().optional(),
+      overallTaxAmount: Joi.number().optional(),
     }),
   }),
   handler: async (req, res) => {
@@ -36,12 +40,16 @@ export default {
         status,
         discount,
         tax,
-        total,
-        subTotal,
         currency,
         items,
-        discountType,
-        discountValue,
+        total,
+        note,
+        subTotal,
+        overallDiscountType,
+        overallDiscount,
+        overallDiscountAmount,
+        overallTax,
+        overallTaxAmount,
       } = req.body;
 
       // Find existing bill
@@ -141,7 +149,7 @@ export default {
         settings?.merchant_name || ""
       }&am=${total || existingBill.total}&cu=INR`;
 
-      // Update bill
+      // Update bill with new fields
       await existingBill.update({
         vendor,
         billDate,
@@ -149,15 +157,19 @@ export default {
         status,
         discount,
         tax,
-        amount: total,
-        total,
-        subTotal,
         currency,
-        items,
         upiLink,
+        items,
+        amount: total,
+        overallDiscountType,
+        overallDiscount,
+        overallDiscountAmount,
+        overallTax,
+        overallTaxAmount,
+        total,
+        note,
+        subTotal,
         updated_by: req.user?.username,
-        discountType,
-        discountValue,
       });
 
       return responseHandler.success(

@@ -1,6 +1,7 @@
 import Joi from "joi";
 import SalesInvoice from "../../models/salesInvoiceModel.js";
 import Product from "../../models/productModel.js";
+import Tax from "../../models/taxModel.js";
 import SalesRevenue from "../../models/salesRevenueModel.js";
 import validator from "../../utils/validator.js";
 import responseHandler from "../../utils/responseHandler.js";
@@ -36,6 +37,10 @@ export default {
       //     .min(1),
 
       items: Joi.array().required(),
+      tax: Joi.number().optional().allow("", null),
+      discount: Joi.number().optional().allow("", null),
+      subtotal: Joi.number().optional().allow("", null),
+      total: Joi.number().optional().allow("", null),
       payment_status: Joi.string()
         .valid("paid", "unpaid", "partially_paid")
         .default("unpaid"),
@@ -56,6 +61,8 @@ export default {
         currency,
         additional_notes,
         section,
+        tax,
+        discount,
       } = req.body;
 
       const { id } = req.params;
@@ -94,11 +101,8 @@ export default {
         // Calculate item level metrics
         const item_cost = product.buying_price * item.quantity;
         const item_subtotal = item.unit_price * item.quantity;
-        const item_tax = item.tax_rate
-          ? (item_subtotal * item.tax_rate) / 100
-          : 0;
 
-        // Calculate discount
+        // Calculate discount first
         const item_discount = item.discount || 0;
         const item_discount_type = item.discount_type;
         let item_discount_amount = 0;
@@ -109,7 +113,20 @@ export default {
           item_discount_amount = item_discount;
         }
 
-        const item_total = item_subtotal + item_tax - item_discount_amount;
+        // Calculate amount after discount
+        const amount_after_discount = item_subtotal - item_discount_amount;
+
+        // Get tax percentage and calculate tax on discounted amount
+        let item_tax = 0;
+        if (item.tax) {
+          const taxData = await Tax.findByPk(item.tax);
+          if (taxData) {
+            const taxPercentage = parseFloat(taxData.gstPercentage);
+            item_tax = (amount_after_discount * taxPercentage) / 100;
+          }
+        }
+
+        const item_total = amount_after_discount + item_tax;
         const item_profit = product.profit_margin * item.quantity;
         const item_profit_percentage = product.profit_percentage;
 
@@ -128,6 +145,7 @@ export default {
           tax_amount: item_tax,
           discount_amount: item_discount_amount,
           discount_type: item_discount_type,
+          amount_after_discount: amount_after_discount,
           total: item_total,
           profit: item_profit,
           profit_percentage: item_profit_percentage,
@@ -156,8 +174,9 @@ export default {
       });
 
       // Create UPI link using settings
-      const upiLink = `upi://pay?pa=${settings?.merchant_upi_id || ""}&pn=${settings?.merchant_name || ""
-        }&am=${total}&cu=INR`;
+      const upiLink = `upi://pay?pa=${settings?.merchant_upi_id || ""}&pn=${
+        settings?.merchant_name || ""
+      }&am=${total}&cu=INR`;
 
       // Create invoice
       const salesInvoice = await SalesInvoice.create({
@@ -172,7 +191,7 @@ export default {
         currency,
         subtotal,
         tax: total_tax,
-        discount: total_discount,
+        discount,
         amount: total,
         total,
         cost_of_goods: total_cost_of_goods,
