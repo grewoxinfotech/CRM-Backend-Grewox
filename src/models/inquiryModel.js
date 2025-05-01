@@ -18,6 +18,11 @@ const Inquiry = sequelize.define('inquiry', {
         type: DataTypes.STRING,
         allowNull: false,
     },
+    phonecode: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: null
+    },
     phone: {
         type: DataTypes.STRING,
         allowNull: false,

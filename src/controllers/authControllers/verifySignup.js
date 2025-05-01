@@ -44,6 +44,7 @@ export default {
             // Create verified user
             const newUser = role.role_name === 'employee' ? await User.create({
                 username: user.username,
+                employeeId: user.employeeId,
                 email: user.email,
                 password: user.password,
                 accounttype: user.accounttype,
@@ -52,6 +53,8 @@ export default {
                 firstName: user.firstName,
                 lastName: user.lastName,
                 phone: user.phone,
+                phoneCode: user.phoneCode,
+                currency: user.currency,
                 address: user.address,
                 gender: user.gender,
                 joiningDate: user.joiningDate,

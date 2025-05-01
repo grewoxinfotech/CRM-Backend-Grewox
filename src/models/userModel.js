@@ -50,7 +50,7 @@ const User = sequelize.define('User', {
     },
     phoneCode: {
         type: DataTypes.STRING,
-        allowNull: true,
+        allowNull: true,    
         defaultValue: null
     },
     phone: {
@@ -58,6 +58,11 @@ const User = sequelize.define('User', {
         allowNull: true,
         defaultValue: null,
         unique: true
+    },
+    currency: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: null
     },
     address: {
         type: DataTypes.TEXT,

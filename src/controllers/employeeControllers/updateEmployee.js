@@ -14,9 +14,12 @@ export default {
             firstName: Joi.string().allow('', null),
             lastName: Joi.string().allow('', null),
             address: Joi.string().allow('', null),
+            phoneCode: Joi.string().optional().allow("", null),
+            phone: Joi.string().allow('', null),
             gender: Joi.string().allow('', null),
             joiningDate: Joi.date().allow('', null),
             leaveDate: Joi.date().allow(null),
+            currency: Joi.string().optional().allow("", null),
             branch: Joi.string().allow('', null),
             department: Joi.string().allow('', null),
             designation: Joi.string().allow('', null),
@@ -36,7 +39,7 @@ export default {
             const cv = req.files?.cv?.[0];
 
             const { id } = req.params;
-            const { firstName, lastName, address, gender, joiningDate, leaveDate, branch, department, designation, salary, accountholder, accountnumber, bankname, ifsc, banklocation, documents, links } = req.body;
+                const { firstName, lastName, address, phoneCode, phone, currency,   gender, joiningDate, leaveDate, branch, department, designation, salary, accountholder, accountnumber, bankname, ifsc, banklocation, documents, links } = req.body;
 
             const employee = await User.findByPk(id);
             if (!employee) {
@@ -95,6 +98,8 @@ export default {
                 department,
                 designation,
                 salary,
+                phoneCode,
+                phone,
                 accountholder,
                 accountnumber,
                 bankname,
@@ -102,6 +107,7 @@ export default {
                 banklocation,
                 documents,
                 links,
+                currency,
                 profilePic: profilePicUrl,
                 // e_signature: e_signatureUrl,
                 cv_path: cvUrl,
