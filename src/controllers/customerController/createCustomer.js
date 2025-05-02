@@ -13,8 +13,8 @@ export default {
       email: Joi.string().email().allow("", null).optional(),
       tax_number: Joi.string().optional().allow("", null),
       alternate_number: Joi.string().allow("", null),
-      billing_address: Joi.object().allow(null),
-      shipping_address: Joi.object().allow(null),
+      billing_address: Joi.any().optional().allow(null),
+      shipping_address: Joi.any().optional().allow(null),
     }),
   }),
   handler: async (req, res) => {
