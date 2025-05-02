@@ -19,7 +19,7 @@ export default {
       startDate: Joi.date().optional(),
       dueDate: Joi.date().optional(),
       assignTo: Joi.object().optional(),
-      description: Joi.string().optional(),
+      description: Joi.string().optional().allow("", null),
       priority: Joi.string().optional(),
       status: Joi.string().optional(),
       reminder_date: Joi.date().allow("", null),
