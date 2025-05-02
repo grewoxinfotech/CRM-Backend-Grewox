@@ -42,34 +42,30 @@ const SalesInvoice = sequelize.define("sales_Invoice", {
   items: {
     type: DataTypes.JSON,
     allowNull: false,
-    defaultValue: [],
-    // get() {
-    //   const rawValue = this.getDataValue("items");
-    //   return rawValue ? JSON.parse(rawValue) : [];
-    // },
-    // set(value) {
-    //   this.setDataValue("items", JSON.stringify(value));
-    // },
   },
   discount: {
-    type: DataTypes.FLOAT,
+    type: DataTypes.INTEGER,
     allowNull: true,
     defaultValue: null,
   },
   tax: {
-    type: DataTypes.FLOAT,
+    type: DataTypes.INTEGER,
     allowNull: true,
     defaultValue: null,
   },
   subtotal: {
-    type: DataTypes.FLOAT,
+    type: DataTypes.INTEGER,
     allowNull: true,
     defaultValue: null,
   },
   total: {
-    type: DataTypes.FLOAT,
+    type: DataTypes.INTEGER,
     allowNull: true,
     defaultValue: null,
+  },
+  amount: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
   },
   payment_status: {
     type: DataTypes.ENUM("paid", "unpaid", "partially_paid"),
@@ -80,60 +76,19 @@ const SalesInvoice = sequelize.define("sales_Invoice", {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  subtotal: {
-    type: DataTypes.FLOAT,
-    allowNull: false,
-    defaultValue: 0,
-    validate: {
-      min: 0,
-    },
-  },
-  tax: {
-    type: DataTypes.FLOAT,
-    allowNull: false,
-    defaultValue: 0,
-    validate: {
-      min: 0,
-    },
-  },
-  discount: {
-    type: DataTypes.FLOAT,
-    allowNull: false,
-    defaultValue: 0,
-    validate: {
-      min: 0,
-    },
-  },
-  total: {
-    type: DataTypes.FLOAT,
-    allowNull: false,
-    validate: {
-      min: 0,
-    },
-  },
-  amount: {
-    type: DataTypes.FLOAT,
-    allowNull: false,
-    defaultValue: 0,
-    validate: {
-      min: 0,
-    },
-  },
+
   cost_of_goods: {
-    type: DataTypes.FLOAT,
+    type: DataTypes.INTEGER,
     allowNull: false,
     defaultValue: 0,
-    validate: {
-      min: 0,
-    },
   },
   profit: {
-    type: DataTypes.FLOAT,
+    type: DataTypes.INTEGER,
     allowNull: false,
     defaultValue: 0,
   },
   profit_percentage: {
-    type: DataTypes.FLOAT,
+    type: DataTypes.INTEGER,
     allowNull: false,
     defaultValue: 0,
   },

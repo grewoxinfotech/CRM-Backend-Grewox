@@ -41,9 +41,7 @@ export default {
       discount: Joi.number().optional().allow("", null),
       subtotal: Joi.number().optional().allow("", null),
       total: Joi.number().optional().allow("", null),
-      payment_status: Joi.string()
-        .valid("paid", "unpaid", "partially_paid")
-        .default("unpaid"),
+      payment_status: Joi.string().valid("paid", "unpaid").default("unpaid"),
       currency: Joi.string().required(),
       additional_notes: Joi.string().optional().allow("", null),
     }),
@@ -243,6 +241,7 @@ Please ensure timely payment to avoid any late fees.`,
             ...item,
             revenue: item.total,
           })),
+          salesInvoiceNumber: salesInvoice.id,
           client_id: req.des?.client_id,
           created_by: req.user?.username,
         });

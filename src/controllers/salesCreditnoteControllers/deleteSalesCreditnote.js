@@ -61,7 +61,7 @@ export default {
       // Find existing revenue entry for this invoice
       const existingRevenue = await SalesRevenue.findOne({
         where: {
-          description: { [Op.like]: `%Invoice #${invoice.id}%` },
+          salesInvoiceNumber: invoice.id,
         },
       });
 

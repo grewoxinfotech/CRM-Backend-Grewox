@@ -49,7 +49,10 @@ export default {
       }
 
       // Parse invoice items
-      const invoiceItems = JSON.parse(salesInvoice.items);
+      const invoiceItems =
+        typeof salesInvoice.items === "string"
+          ? JSON.parse(salesInvoice.items)
+          : salesInvoice.items || [];
 
       // Check product stock availability before proceeding
       if (newTotalCredited >= salesInvoice.total) {
@@ -111,7 +114,7 @@ export default {
         currency: currency || salesInvoice.currency,
         amount,
         description,
-        items: creditNoteItems,
+        items: JSON.stringify(creditNoteItems),
         attachment: attachmentUrl,
         client_id: req.des?.client_id,
         created_by: req.user?.username,
@@ -185,6 +188,7 @@ export default {
             ...item,
             revenue: item.total,
           })),
+          salesInvoiceNumber: invoice,
           client_id: req.des?.client_id,
           created_by: req.user?.username,
         });

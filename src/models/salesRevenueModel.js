@@ -35,26 +35,26 @@ const SalesRevenue = sequelize.define("sales_Revenue", {
     type: DataTypes.VIRTUAL,
     get() {
       return this.amount - this.cost_of_goods;
-    }
+    },
   },
   profit_margin_percentage: {
     type: DataTypes.VIRTUAL,
     get() {
       if (this.cost_of_goods === 0) return 0;
       return ((this.amount - this.cost_of_goods) / this.cost_of_goods) * 100;
-    }
+    },
   },
   products: {
     type: DataTypes.JSON,
     allowNull: true,
     defaultValue: [],
     get() {
-      const rawValue = this.getDataValue('products');
+      const rawValue = this.getDataValue("products");
       return rawValue ? JSON.parse(rawValue) : [];
     },
     set(value) {
-      this.setDataValue('products', JSON.stringify(value));
-    }
+      this.setDataValue("products", JSON.stringify(value));
+    },
   },
   account: {
     type: DataTypes.STRING,
@@ -68,6 +68,12 @@ const SalesRevenue = sequelize.define("sales_Revenue", {
     type: DataTypes.STRING,
     allowNull: true,
     defaultValue: null,
+  },
+  salesInvoiceNumber: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    defaultValue: null,
+    unique: true,
   },
   category: {
     type: DataTypes.STRING,

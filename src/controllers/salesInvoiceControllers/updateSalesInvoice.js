@@ -23,7 +23,7 @@ export default {
       category: Joi.string().optional().allow("", null),
       items: Joi.array().required(),
       payment_status: Joi.string()
-        .valid("paid", "unpaid", "partially_paid")
+        .valid("paid", "unpaid", " ")
         .default("unpaid"),
       currency: Joi.string().optional(),
       additional_notes: Joi.string().optional().allow("", null),
@@ -62,7 +62,8 @@ export default {
       const isBecomingPaid =
         payment_status === "paid" && salesInvoice.payment_status !== "paid";
       const isBecomingUnpaid =
-        payment_status !== "paid" && salesInvoice.payment_status === "paid";
+        payment_status === "unpaid" && salesInvoice.payment_status === "paid";
+
       const isOnlyStatusChange =
         customer === salesInvoice.customer &&
         issueDate === salesInvoice.issueDate &&
@@ -72,29 +73,89 @@ export default {
         JSON.stringify(items) ===
           JSON.stringify(JSON.parse(salesInvoice.items));
 
+      // Handle revenue and stock updates for status changes
+      if (isBecomingUnpaid) {
+        // console.log("Debug - Attempting to delete revenue for invoice:", id);
+
+        // Find existing revenue entry for this invoice
+        const existingRevenue = await SalesRevenue.findOne({
+          where: {
+            salesInvoiceNumber: id,
+          },
+        });
+
+        // console.log("Debug - Found Revenue:", existingRevenue?.id);
+
+        if (existingRevenue) {
+          // Delete the existing revenue entry
+          await SalesRevenue.destroy({
+            where: {
+              id: existingRevenue.id,
+            },
+            force: true,
+          });
+          //  console.log("Debug - Revenue deleted successfully");
+
+          // Log revenue deletion activity
+          await Activity.create({
+            related_id: req.user.id,
+            activity_from: "sales_revenue",
+            activity_id: existingRevenue.id,
+            action: "deleted",
+            performed_by: req.user?.username,
+            client_id: req.des?.client_id,
+            activity_message: `Revenue entry deleted for invoice ${salesInvoice.salesInvoiceNumber}. Amount: ${salesInvoice.total} ${salesInvoice.currency}`,
+          });
+        }
+
+        // Update product stock - add quantities back
+        const items = JSON.parse(salesInvoice.items);
+        for (const item of items) {
+          const product = await Product.findByPk(item.product_id);
+          if (product) {
+            await product.update({
+              stock_quantity: product.stock_quantity + item.quantity,
+              updated_by: req.user?.username,
+            });
+            // console.log(
+            //   `Debug - Added ${item.quantity} back to stock for product ${item.product_id}`
+            // );
+          }
+        }
+      }
+
+      // If becoming paid, update product stock - reduce quantities
+      if (isBecomingPaid) {
+        const items = JSON.parse(salesInvoice.items);
+        for (const item of items) {
+          const product = await Product.findByPk(item.product_id);
+          if (product) {
+            // Check if enough stock is available
+            if (product.stock_quantity < item.quantity) {
+              return responseHandler.error(
+                res,
+                `Insufficient stock for product ${product.name}`
+              );
+            }
+            await product.update({
+              stock_quantity: product.stock_quantity - item.quantity,
+              updated_by: req.user?.username,
+            });
+            // console.log(
+            //   `Debug - Reduced ${item.quantity} from stock for product ${item.product_id}`
+            // );
+          }
+        }
+      }
+
       // If only status is changing, preserve original calculations
       if (isOnlyStatusChange) {
         const existingItems = JSON.parse(salesInvoice.items);
 
-        // Handle stock updates if needed
-        if (isBecomingPaid || isBecomingUnpaid) {
-          for (const item of existingItems) {
-            const product = await Product.findByPk(item.product_id);
-            if (product) {
-              const quantityChange = isBecomingPaid
-                ? -item.quantity
-                : item.quantity;
-              await product.update({
-                stock_quantity: product.stock_quantity + quantityChange,
-                updated_by: req.user?.username,
-              });
-            }
-          }
-        }
-
         // Update only payment status
         await salesInvoice.update({
           payment_status,
+          amount: payment_status === "paid" ? 0 : salesInvoice.total,
           updated_by: req.user?.username,
         });
 
@@ -114,6 +175,7 @@ export default {
               ...item,
               revenue: item.total,
             })),
+            salesInvoiceNumber: salesInvoice.id,
             client_id: req.des?.client_id,
             created_by: req.user?.username,
           });
@@ -336,7 +398,7 @@ export default {
         settings?.merchant_name || ""
       }&am=${total}&cu=INR`;
 
-      // Update invoice
+      // Update invoice with full changes
       await salesInvoice.update({
         customer,
         issueDate,
@@ -349,7 +411,7 @@ export default {
         tax: total_tax,
         discount: total_discount,
         total,
-        amount: total,
+        amount: payment_status === "paid" ? 0 : total,
         cost_of_goods: total_cost_of_goods,
         profit: total_profit,
         profit_percentage: profit_percentage.toFixed(2),
@@ -374,6 +436,7 @@ export default {
             ...item,
             revenue: item.total,
           })),
+          salesInvoiceNumber: salesInvoice.id,
           client_id: req.des?.client_id,
           created_by: req.user?.username,
         });
