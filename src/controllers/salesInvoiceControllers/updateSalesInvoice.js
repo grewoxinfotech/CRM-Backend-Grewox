@@ -22,11 +22,16 @@ export default {
       dueDate: Joi.date().optional(),
       category: Joi.string().optional().allow("", null),
       items: Joi.array().required(),
+
       payment_status: Joi.string()
         .valid("paid", "unpaid", " ")
         .default("unpaid"),
       currency: Joi.string().optional(),
       additional_notes: Joi.string().optional().allow("", null),
+      tax: Joi.number().optional().allow("", null),
+      discount: Joi.number().optional().allow("", null),
+      subtotal: Joi.number().optional().allow("", null),
+      total: Joi.number().optional().allow("", null),
     }),
   }),
   handler: async (req, res) => {
@@ -42,6 +47,11 @@ export default {
         currency,
         additional_notes,
         section,
+        // salesInvoiceNumber,
+        tax,
+        discount,
+        // subtotal,
+        // total,
       } = req.body;
 
       // Find the invoice

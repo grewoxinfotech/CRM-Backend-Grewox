@@ -23,18 +23,6 @@ export default {
       issueDate: Joi.date().required(),
       dueDate: Joi.date().required(),
       category: Joi.string().optional().allow("", null),
-      //   items: Joi.array()
-      //     .items(
-      //       Joi.object({
-      //         // product_id: Joi.string().required(),
-      //         // quantity: Joi.number().integer().min(1).required(),
-      //         // unit_price: Joi.number().min(0).required(),
-      //         // tax_rate: Joi.number().min(0).optional(),
-      //         // discount: Joi.number().min(0).optional()
-      //       })
-      //     )
-      //     .required()
-      //     .min(1),
 
       items: Joi.array().required(),
       tax: Joi.number().optional().allow("", null),
