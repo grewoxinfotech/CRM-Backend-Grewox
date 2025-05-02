@@ -35,13 +35,10 @@ export default {
     }),
     handler: async (req, res) => {
         try {
-            const profilePic = req.files?.profilePic?.[0];
+            const profilePic = req.files?.profilePic?.[0] || null;
 
-            if (!profilePic) {
-                return responseHandler.error(res, "profilePic is required");
-            }
 
-            const e_signatures = req.files?.e_signatures?.[0];
+
             const { id } = req.params;
             const { firstName, lastName, phoneCode,
                 phone, bankname, ifsc, banklocation, website, accountholder, accountnumber, gstIn,
@@ -94,7 +91,7 @@ export default {
             // }
 
             await client.update({
-                firstName, lastName, phoneCode, phone, bankname, website, profilePic: profilePicUrl, ifsc, banklocation, accountholder, accountnumber, gstIn,
+                firstName, lastName, phoneCode, phone, bankname, website, profilePic: profilePicUrl || null, ifsc, banklocation, accountholder, accountnumber, gstIn,
                 city, state, country, zipcode, address, accounttype, storage_limit, storage_used, updated_by: req.user?.username
             });
             return responseHandler.success(res, "Client updated successfully", client);

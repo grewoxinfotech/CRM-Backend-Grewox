@@ -69,12 +69,6 @@ ${description}`,
         created_by: req.user?.username,
       });
 
-      console.log("Custom Form Notification Created:", {
-        eventName: event_name,
-        date: formattedStartDate,
-        time: notificationTime,
-      });
-
       return responseHandler.success(
         res,
         "Custom form created successfully",
