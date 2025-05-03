@@ -95,7 +95,7 @@ export default {
           const reminderTime = "10:00:00"; // Set reminder for 10 AM
           const dueDateDiff = Math.ceil(
             (new Date(dueDate) - new Date(reminder_date)) /
-              (1000 * 60 * 60 * 24)
+            (1000 * 60 * 60 * 24)
           );
 
           await Notification.create({
@@ -119,13 +119,6 @@ export default {
 • Status: ${status || "Not started"}
 ${description ? `\nDescription: ${description}` : ""}`,
             created_by: req.user?.username,
-          });
-
-          console.log("Task Reminder Created:", {
-            taskName,
-            reminderDate: reminderDate.format("YYYY-MM-DD"),
-            reminderTime,
-            daysUntilDue: dueDateDiff,
           });
         }
       }
