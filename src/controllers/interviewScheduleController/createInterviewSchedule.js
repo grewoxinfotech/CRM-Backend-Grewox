@@ -21,16 +21,16 @@ export default {
     }),
     handler: async (req, res) => {
         try {
-            const { 
-                job, 
-                candidate, 
-                interviewer, 
-                round, 
-                interviewType, 
-                startOn, 
-                startTime, 
-                commentForInterviewer, 
-                commentForCandidate 
+            const {
+                job,
+                candidate,
+                interviewer,
+                round,
+                interviewType,
+                startOn,
+                startTime,
+                commentForInterviewer,
+                commentForCandidate
             } = req.body;
 
             console.log('Creating Interview Schedule:', {
@@ -45,34 +45,34 @@ export default {
             // Convert round array to string for comparison
             const roundString = JSON.stringify(round);
 
-            const existingInterviewSchedule = await InterviewSchedule.findOne({ 
-                where: { 
-                    job, 
-                    candidate, 
-                    interviewer, 
-                    interviewType, 
-                    startOn, 
+            const existingInterviewSchedule = await InterviewSchedule.findOne({
+                where: {
+                    job,
+                    candidate,
+                    interviewer,
+                    interviewType,
+                    startOn,
                     startTime,
                     round: roundString
-                } 
+                }
             });
 
             if (existingInterviewSchedule) {
                 return responseHandler.error(res, "Interview schedule already exists");
             }
 
-            const interviewSchedule = await InterviewSchedule.create({ 
-                job, 
-                candidate, 
-                interviewer, 
-                round: roundString, 
-                interviewType, 
-                startOn, 
-                startTime, 
-                commentForInterviewer, 
+            const interviewSchedule = await InterviewSchedule.create({
+                job,
+                candidate,
+                interviewer,
+                round: roundString,
+                interviewType,
+                startOn,
+                startTime,
+                commentForInterviewer,
                 commentForCandidate,
                 client_id: req.des?.client_id,
-                created_by: req.user?.username 
+                created_by: req.user?.username
             });
 
             // Calculate reminder time (2 minutes before)
@@ -84,7 +84,7 @@ export default {
             if (reminderMinutes < 0) {
                 reminderHours = hours - 1;
                 reminderMinutes = 58; // 60 - 2
-                
+
                 // Handle hour rollover
                 if (reminderHours < 0) {
                     reminderHours = 23;
@@ -93,11 +93,6 @@ export default {
 
             // Format reminder time with padding
             const reminderTime = `${String(reminderHours).padStart(2, '0')}:${String(reminderMinutes).padStart(2, '0')}:00`;
-
-            console.log('Time Calculations:', {
-                originalTime: startTime,
-                reminderTime: reminderTime
-            });
 
             // 1. Create interview schedule notification for both interviewer and candidate
             await Notification.create({
@@ -156,14 +151,6 @@ ${interviewType === 'online' ? `\nPlease join the interview link on time.` : `\n
 • Round: ${round.join(', ')}
 ${interviewType === 'online' ? `\nPlease prepare to join the interview link.` : `\nPlease ensure you're at the venue.`}`,
                 created_by: req.user?.username
-            });
-
-            console.log('Interview Notifications Created:', {
-                job,
-                date: dayjs(startOn).format('YYYY-MM-DD'),
-                startTime,
-                reminderTime,
-                notificationCount: 3
             });
 
             return responseHandler.success(res, "Interview schedule created successfully", interviewSchedule);

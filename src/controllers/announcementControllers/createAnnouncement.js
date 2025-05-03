@@ -61,11 +61,6 @@ export default {
         reminderMinutes
       ).padStart(2, "0")}:00`;
 
-      console.log("Time Calculations:", {
-        originalTime: time,
-        reminderTime: reminderTime,
-      });
-
       // Get users array from branch
       const users = branch?.branch || [];
 
