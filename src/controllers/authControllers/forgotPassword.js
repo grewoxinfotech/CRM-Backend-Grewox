@@ -3,7 +3,7 @@ import User from "../../models/userModel.js";
 import validator from "../../utils/validator.js";
 import responseHandler from "../../utils/responseHandler.js";
 import { generateOTP } from "../../utils/otpService.js";
-import sgMail from "../../utils/emailService.js";
+import sgMail, { sendEmail } from "../../utils/emailService.js";
 import { getPasswordResetEmailTemplate } from "../../utils/emailTemplates.js";
 import { EMAIL_FROM, OTP_CONFIG } from "../../config/config.js";
 import jwt from "jsonwebtoken";
@@ -24,6 +24,14 @@ export default {
                 return responseHandler.notFound(res, "User not found");
             }
 
+            const clientMail = await User.findOne({ where: { id: user.client_id } });
+
+            const mail = clientMail.email;
+
+            if (!user && !mail) {
+                return responseHandler.notFound(res, "User not found");
+            }
+
             const otp = generateOTP(OTP_CONFIG.LENGTH);
             user.resetPasswordOTP = otp;
             user.resetPasswordOTPExpiry = Date.now() + OTP_CONFIG.EXPIRY.RESET_PASSWORD;
@@ -35,15 +43,16 @@ export default {
                 { expiresIn: '15m' }
             );
             const emailTemplate = getPasswordResetEmailTemplate(user.username, otp);
-            await sgMail.send({
-                to: email,
-                from: EMAIL_FROM,
-                subject: 'Password Reset Request',
-                html: emailTemplate
-            });
+            await sendEmail(mail, 'Password Reset Request', emailTemplate);
+            // await sgMail.send({
+            //     to: email,
+            //     from: EMAIL_FROM,
+            //     subject: 'Password Reset Request',
+            //     html: emailTemplate
+            // });
             return responseHandler.success(res, "Password reset OTP sent to your email", { sessionToken });
         } catch (error) {
-            return responseHandler.internalServerError(res, error.message);
+            return responseHandler.internalServerError(res, error?.message);
         }
     }
 }; 
