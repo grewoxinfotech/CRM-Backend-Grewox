@@ -24,7 +24,7 @@ const CompanyAccount = sequelize.define("company_accounts", {
     },
     email: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
     },
     company_number: {
         type: DataTypes.STRING,
@@ -35,10 +35,6 @@ const CompanyAccount = sequelize.define("company_accounts", {
         allowNull: true,
     },
     company_category: {
-        type: DataTypes.STRING,
-        allowNull: true,
-    },
-    company_industry: {
         type: DataTypes.STRING,
         allowNull: true,
     },

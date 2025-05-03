@@ -9,12 +9,11 @@ export default {
         body: Joi.object({
             account_owner: Joi.string().required(),
             company_name: Joi.string().required(),
-            email: Joi.string().required(),
+            email: Joi.string().optional().allow('', null),
             company_source: Joi.string().optional().allow('', null),
             company_number: Joi.string().optional().allow('', null),
             company_type: Joi.string().optional().allow('', null),
             company_category: Joi.string().optional().allow('', null),
-            company_industry: Joi.string().optional().allow('', null),
             company_revenue: Joi.string().optional().allow('', null),
             phone_code: Joi.string().optional().allow('', null),
             phone_number: Joi.string().optional().allow('', null),
@@ -42,7 +41,6 @@ export default {
                 company_source,
                 company_type,
                 company_category,
-                company_industry,
                 email,
                 company_revenue,
                 phone_code,
@@ -82,7 +80,6 @@ export default {
                 company_source,
                 company_type,
                 company_category,
-                company_industry,
                 company_revenue,
                 phone_code,
                 phone_number,
@@ -110,7 +107,7 @@ export default {
                 from: req.user?.id,
                 client_id: req.des?.client_id,
                 message: `A new company account "${company_name}" has been added`,
-                description: `Company Account Details:\n• Type: ${company_type}\n• Industry: ${company_industry}\n• Category: ${company_category}`,
+                description: `Company Account Details:\n• Type: ${company_type}\n• \n• Category: ${company_category}`,
                 created_by: req.user?.username,
             });
 
