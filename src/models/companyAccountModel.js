@@ -18,9 +18,13 @@ const CompanyAccount = sequelize.define("company_accounts", {
         type: DataTypes.STRING,
         allowNull: false,
     },
-    company_site: {
+    company_source: {
         type: DataTypes.STRING,
         allowNull: true,
+    },
+    email: {
+        type: DataTypes.STRING,
+        allowNull: false,
     },
     company_number: {
         type: DataTypes.STRING,
@@ -52,18 +56,6 @@ const CompanyAccount = sequelize.define("company_accounts", {
     },
     website: {
         type: DataTypes.STRING,
-        allowNull: true,
-    },
-    fax: {
-        type: DataTypes.STRING,
-        allowNull: true,
-    },
-    ownership: {
-        type: DataTypes.STRING,
-        allowNull: true,
-    },
-    number_of_employees: {
-        type: DataTypes.INTEGER,
         allowNull: true,
     },
     billing_address: {
