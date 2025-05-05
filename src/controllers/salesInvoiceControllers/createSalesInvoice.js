@@ -9,6 +9,7 @@ import Activity from "../../models/activityModel.js";
 import Notification from "../../models/notificationModel.js";
 import dayjs from "dayjs";
 import Setting from "../../models/settingModel.js";
+import Deal from "../../models/dealModel.js";
 
 export default {
   validator: validator({
@@ -29,7 +30,9 @@ export default {
       discount: Joi.number().optional().allow("", null),
       subtotal: Joi.number().optional().allow("", null),
       total: Joi.number().optional().allow("", null),
-      payment_status: Joi.string().valid("paid", "unpaid").default("unpaid"),
+      payment_status: Joi.string()
+        .valid("paid", "unpaid", "partially_paid")
+        .default("unpaid"),
       currency: Joi.string().required(),
       additional_notes: Joi.string().optional().allow("", null),
     }),
@@ -48,7 +51,7 @@ export default {
         additional_notes,
         section,
         tax,
-        discount,
+        discount
       } = req.body;
 
       const { id } = req.params;
@@ -160,9 +163,8 @@ export default {
       });
 
       // Create UPI link using settings
-      const upiLink = `upi://pay?pa=${settings?.merchant_upi_id || ""}&pn=${
-        settings?.merchant_name || ""
-      }&am=${total}&cu=INR`;
+      const upiLink = `upi://pay?pa=${settings?.merchant_upi_id || ""}&pn=${settings?.merchant_name || ""
+        }&am=${total}&cu=INR`;
 
       // Create invoice
       const salesInvoice = await SalesInvoice.create({
@@ -233,6 +235,21 @@ Please ensure timely payment to avoid any late fees.`,
           client_id: req.des?.client_id,
           created_by: req.user?.username,
         });
+
+        // If invoice is created as paid, update the deal value
+        const deal = await Deal.findOne({
+          where: { id: id }
+        });
+
+        if (deal) {
+          const currentValue = deal.value || 0;
+          const newValue = currentValue + total;
+
+          await deal.update({
+            value: newValue,
+            updated_by: req.user?.username
+          });
+        }
       }
 
       // Log activity

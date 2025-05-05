@@ -9,6 +9,7 @@ import Notification from "../../models/notificationModel.js";
 import Setting from "../../models/settingModel.js";
 import dayjs from "dayjs";
 import Tax from "../../models/taxModel.js";
+import Deal from "../../models/dealModel.js";
 
 export default {
   validator: validator({
@@ -24,14 +25,15 @@ export default {
       items: Joi.array().required(),
 
       payment_status: Joi.string()
-        .valid("paid", "unpaid", " ")
-        .default("unpaid"),
+        .valid("paid", "unpaid", "partially_paid")
+        .optional(),
       currency: Joi.string().optional(),
       additional_notes: Joi.string().optional().allow("", null),
       tax: Joi.number().optional().allow("", null),
       discount: Joi.number().optional().allow("", null),
       subtotal: Joi.number().optional().allow("", null),
       total: Joi.number().optional().allow("", null),
+      amount: Joi.number().optional(),
     }),
   }),
   handler: async (req, res) => {
@@ -47,11 +49,9 @@ export default {
         currency,
         additional_notes,
         section,
-        // salesInvoiceNumber,
         tax,
         discount,
-        // subtotal,
-        // total,
+        amount,
       } = req.body;
 
       // Find the invoice
@@ -59,6 +59,9 @@ export default {
       if (!salesInvoice) {
         return responseHandler.error(res, "SalesInvoice not found");
       }
+
+      // Store original payment status
+      const originalPaymentStatus = salesInvoice.payment_status;
 
       // Delete existing notifications for this invoice
       await Notification.destroy({
@@ -81,20 +84,16 @@ export default {
         category === salesInvoice.category &&
         currency === salesInvoice.currency &&
         JSON.stringify(items) ===
-          JSON.stringify(JSON.parse(salesInvoice.items));
+        JSON.stringify(JSON.parse(salesInvoice.items));
 
       // Handle revenue and stock updates for status changes
       if (isBecomingUnpaid) {
-        // console.log("Debug - Attempting to delete revenue for invoice:", id);
-
         // Find existing revenue entry for this invoice
         const existingRevenue = await SalesRevenue.findOne({
           where: {
             salesInvoiceNumber: id,
           },
         });
-
-        // console.log("Debug - Found Revenue:", existingRevenue?.id);
 
         if (existingRevenue) {
           // Delete the existing revenue entry
@@ -104,7 +103,6 @@ export default {
             },
             force: true,
           });
-          //  console.log("Debug - Revenue deleted successfully");
 
           // Log revenue deletion activity
           await Activity.create({
@@ -127,9 +125,6 @@ export default {
               stock_quantity: product.stock_quantity + item.quantity,
               updated_by: req.user?.username,
             });
-            // console.log(
-            //   `Debug - Added ${item.quantity} back to stock for product ${item.product_id}`
-            // );
           }
         }
       }
@@ -151,9 +146,6 @@ export default {
               stock_quantity: product.stock_quantity - item.quantity,
               updated_by: req.user?.username,
             });
-            // console.log(
-            //   `Debug - Reduced ${item.quantity} from stock for product ${item.product_id}`
-            // );
           }
         }
       }
@@ -250,6 +242,62 @@ export default {
 • Status: ${payment_status}`,
             created_by: req.user?.username,
           });
+        }
+
+        // Log update activity
+        await Activity.create({
+          related_id: req.user.id,
+          activity_from: "sales_invoice",
+          activity_id: salesInvoice.id,
+          action: "updated",
+          performed_by: req.user?.username,
+          client_id: req.des?.client_id,
+          activity_message: `Sales invoice ${salesInvoice.salesInvoiceNumber} updated for ${salesInvoice.total} ${currency} with profit of ${salesInvoice.profit.toFixed(2)} (${salesInvoice.profit_percentage.toFixed(2)}%). Status: ${payment_status}`,
+        });
+
+        // Just before the payment status check
+        console.log("Checking payment status condition:", {
+          newStatus: payment_status,
+          currentStatus: salesInvoice.payment_status,
+          willUpdateDeal: payment_status === 'paid' && salesInvoice.payment_status !== 'paid'
+        });
+
+        if (payment_status === 'paid' && salesInvoice.payment_status !== 'paid') {
+          console.log("Inside payment status block - will update deal");
+
+          // Get the related deal
+          const deal = await Deal.findOne({
+            where: { id: salesInvoice.related_id }
+          });
+
+          console.log("Deal search result:", {
+            searchId: salesInvoice.related_id,
+            dealFound: !!deal,
+            dealDetails: deal ? {
+              id: deal.id,
+              value: deal.value
+            } : null
+          });
+
+          if (deal) {
+            const currentValue = deal.value || 0;
+            const newValue = currentValue + salesInvoice.total;
+
+            console.log("Updating deal value:", {
+              dealId: deal.id,
+              currentValue,
+              invoiceAmount: salesInvoice.total,
+              newValue
+            });
+
+            // Update the deal
+            await deal.update({
+              value: newValue,
+              updated_by: req.user?.username
+            });
+
+            console.log("Deal update completed");
+          }
         }
 
         return responseHandler.success(
@@ -404,9 +452,8 @@ export default {
       });
 
       // Create UPI link using settings
-      const upiLink = `upi://pay?pa=${settings?.merchant_upi_id || ""}&pn=${
-        settings?.merchant_name || ""
-      }&am=${total}&cu=INR`;
+      const upiLink = `upi://pay?pa=${settings?.merchant_upi_id || ""}&pn=${settings?.merchant_name || ""
+        }&am=${total}&cu=INR`;
 
       // Update invoice with full changes
       await salesInvoice.update({
@@ -521,15 +568,42 @@ export default {
         action: "updated",
         performed_by: req.user?.username,
         client_id: req.des?.client_id,
-        activity_message: `Sales invoice ${
-          salesInvoice.salesInvoiceNumber
-        } updated for ${total} ${currency} with profit of ${total_profit.toFixed(
-          2
-        )} (${profit_percentage.toFixed(2)}%). Status: ${payment_status}`,
+        activity_message: `Sales invoice ${salesInvoice.salesInvoiceNumber} updated for ${total} ${currency} with profit of ${total_profit.toFixed(2)} (${profit_percentage.toFixed(2)}%). Status: ${payment_status}`,
       });
 
+      // After all invoice updates are done, check if we need to update the deal
+      const updatedInvoice = await SalesInvoice.findByPk(id);
+      const updatedInvoiceData = updatedInvoice.dataValues;
+
+      // Get the deal if it exists
+      const deal = await Deal.findOne({
+        where: { id: updatedInvoiceData.related_id }
+      });
+
+      if (deal) {
+        const currentValue = deal.value || 0;
+        let newValue = currentValue;
+
+        // If changing to paid, add the invoice total
+        if (updatedInvoiceData.payment_status === 'paid' && originalPaymentStatus !== 'paid') {
+          newValue = currentValue + updatedInvoiceData.total;
+        }
+        // If changing from paid to unpaid, subtract the invoice total
+        else if (updatedInvoiceData.payment_status !== 'paid' && originalPaymentStatus === 'paid') {
+          newValue = currentValue - updatedInvoiceData.total;
+        }
+
+        // Only update if the value has changed
+        if (newValue !== currentValue) {
+          await deal.update({
+            value: newValue,
+            updated_by: req.user?.username
+          });
+        }
+      }
+
       return responseHandler.success(res, "SalesInvoice updated successfully", {
-        ...salesInvoice.toJSON(),
+        ...updatedInvoice.toJSON(),
         metrics: {
           subtotal,
           tax: total_tax,
@@ -541,6 +615,7 @@ export default {
         },
       });
     } catch (error) {
+      console.error("Error in updateSalesInvoice:", error);
       return responseHandler.error(res, error?.message);
     }
   },
