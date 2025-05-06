@@ -11,6 +11,7 @@ export default {
             first_name: Joi.string().required(),
             last_name: Joi.string().optional().allow('', null),
             company_name: Joi.string().optional().allow('', null),
+            website: Joi.string().optional().allow('', null),
             email: Joi.string().optional().allow('', null),
             phone_code: Joi.string().optional().allow('', null),
             phone: Joi.string().optional().allow('', null),
@@ -28,7 +29,7 @@ export default {
         try {
             const {
                 contact_owner, first_name, last_name, company_name,
-                email, phone_code, phone, contact_source, description,
+                website, email, phone_code, phone, contact_source, description,
                 address, city, state, country, related_id
             } = req.body;
 
@@ -50,6 +51,7 @@ export default {
                 first_name,
                 last_name,
                 company_name,
+                website,
                 email,
                 phone_code,
                 phone,

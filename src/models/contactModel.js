@@ -27,6 +27,11 @@ const Contact = sequelize.define("contacts", {
         allowNull: true,
         defaultValue: null
     },
+    website: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: null
+    },
     email: {
         type: DataTypes.STRING,
         allowNull: true,

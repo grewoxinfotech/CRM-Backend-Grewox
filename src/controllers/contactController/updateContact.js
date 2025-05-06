@@ -16,7 +16,8 @@ export default {
             first_name: Joi.string().required(),
             last_name: Joi.string().allow('', null),
             company_name: Joi.string().allow('', null),
-            email: Joi.string().email().required(),
+            website: Joi.string().allow('', null),
+            email: Joi.string().email().allow('', null),
             phone: Joi.string().allow('', null),
             contact_source: Joi.string().allow('', null),
             description: Joi.string().allow('', null),
@@ -30,7 +31,7 @@ export default {
     handler: async (req, res) => {
         try {
             const { id } = req.params;
-            const { contact_owner, first_name, last_name, company_name, email, phone, contact_source, description, address, city, state, country, phone_code } = req.body;
+            const { contact_owner, first_name, last_name, company_name, website, email, phone, contact_source, description, address, city, state, country, phone_code } = req.body;
             const contact = await Contact.findByPk(id);
             if (!contact) {
                 return responseHandler.error(res, "Contact not found");
@@ -50,6 +51,7 @@ export default {
                 first_name,
                 last_name,
                 company_name,
+                website,
                 email,
                 phone,
                 contact_source,
