@@ -7,6 +7,7 @@ import sequelize from "./config/db.js";
 import fileUpload from "express-fileupload";
 import initializeSocket from "./socket/index.js";
 import responseHandler from "./utils/responseHandler.js";
+import initializeEmailCronJob from "./utils/sendemailcronjob.js";
 
 const app = express();
 
@@ -39,6 +40,8 @@ app.get("*", (req, res) => {
   return responseHandler.error(res, "Route not found");
 });
 
+app.use(initializeEmailCronJob);
+
 const startServer = async () => {
   try {
     await sequelize.sync({ force: false });
@@ -49,9 +52,12 @@ const startServer = async () => {
     global.io = io;
     console.log("✅ Socket.IO initialized");
 
-    server.listen(PORT, () => {
+    // Initialize email cron job
+    // const emailCronJob = initializeEmailCronJob();
+    // console.log("✅ Email scheduler cron job initialized");
+
+    server.listen(PORT, "0.0.0.0", () => {
       console.log(`✅ Server and Socket.IO running on port ${PORT}`);
-      // Start notification crons
     });
 
     app.set("io", io);
