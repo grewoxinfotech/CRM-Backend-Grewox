@@ -22,6 +22,7 @@ export default {
       const { employeeId, startDate, endDate, leaveType, reason, isHalfDay } =
         req.body;
 
+
       if (isHalfDay) {
         if (startDate.getTime() !== endDate.getTime()) {
           throw new Error(

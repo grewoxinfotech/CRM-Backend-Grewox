@@ -23,13 +23,6 @@ export default {
     try {
       const { title, description, branch, time, date } = req.body;
 
-      console.log("Creating Announcement:", {
-        title,
-        date,
-        time,
-        branch,
-      });
-
       const announcement = await Announcement.create({
         title,
         description,
