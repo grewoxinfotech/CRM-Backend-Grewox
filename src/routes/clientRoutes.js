@@ -8,6 +8,12 @@ const router = express.Router();
 
 router.use(authenticateUser, checkRole);
 
+// Get all clients (with search)
+router.get('/all', getAllClients.validator, getAllClients.handler);
+
+// Get paginated clients
+router.get('/', getAllClients.validator, getAllClients.handler);
+
 router.get('/storage', getClientStorageController.handler);
 
 router.put('/:id',
@@ -21,13 +27,8 @@ router.put('/:id',
 
 router.put('/email/:id', updatemail.validator, updatemail.handler);
 
-router.get('/', getAllClients.validator, getAllClients.handler);
-
-router.use(authenticateUser, checkUserRole(['super-admin']));
-
 router.post('/', createClient.validator, createClient.handler);
 
 router.delete('/:id', cascadeDelete, deleteClient.validator, deleteClient.handler);
-
 
 export default router;
