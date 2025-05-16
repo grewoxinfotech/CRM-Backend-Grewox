@@ -2,31 +2,29 @@ import Joi from "joi";
 import Document from "../../models/documentModel.js";
 import responseHandler from "../../utils/responseHandler.js";
 import validator from "../../utils/validator.js";
-import User from "../../models/userModel.js";
-import { Op } from "sequelize";
 
 export default {
     validator: validator({
         query: Joi.object({
-            page: Joi.number().optional(),
-            limit: Joi.number().optional()
+            page: Joi.number().default(1),
+            pageSize: Joi.number().default(10),
+            search: Joi.string().allow('').optional()
         })
     }),
     handler: async (req, res) => {
         try {
-            const user = await User.findOne({
-                where: { id: req.user.id }
-            });
-
-            const document = await Document.findAll({
-                where: {
-                    [Op.or]: [{ client_id: user.client_id }, { client_id: user.id }]
+            const { rows: data, count } = await Document.findAndCountAll(req.queryOptions);
+            return responseHandler.success(res, {
+                data: data.map(d => ({ ...d.toJSON(), key: d.id })),
+                pagination: {
+                    total: count,
+                    ...req.pagination,
+                    totalPages: Math.ceil(count / req.pagination.pageSize)
                 }
             });
-
-            return responseHandler.success(res, "Document fetched successfully", document);
         } catch (error) {
+            console.error('Error in getDocuments:', error);
             return responseHandler.error(res, error?.message);
         }
     }
-}
+};

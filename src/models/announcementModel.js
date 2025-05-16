@@ -17,7 +17,7 @@ const Announcement = sequelize.define('Announcement', {
         type: DataTypes.STRING,
         allowNull: false
     },
-    branch:{
+    branch: {
         type: DataTypes.JSON,
         allowNull: true,
         defaultValue: null
