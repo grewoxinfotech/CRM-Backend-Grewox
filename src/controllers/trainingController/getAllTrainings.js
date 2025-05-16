@@ -7,43 +7,27 @@ import User from "../../models/userModel.js";
 import { Op } from "sequelize";
 
 export default {
-    validator: validator({
-        query: Joi.object({
-            page: Joi.number().optional(),
-            limit: Joi.number().optional(),
-        })
+  validator: validator({
+    query: Joi.object({
+      page: Joi.number().optional(),
+      limit: Joi.number().optional(),
     }),
-    handler: async (req, res) => {
-        try {
-            const userRole = req.user.role;
-            let training;
+  }),
+  handler: async (req, res) => {
+    try {
+      const user = await User.findOne({
+        where: { id: req.user.id },
+      });
 
-            // Find role in role model
-            const role = await Role.findOne({
-                where: { id: userRole }
-            });
+      const training = await Training.findAll({
+        where: {
+          [Op.or]: [{ client_id: user.client_id }, { client_id: user.id }],
+        },
+      });
 
-            if (!role) {
-                return responseHandler.error(res, "Role not found");
-            }
-
-            const user = await User.findOne({
-                where: { id: req.user.id }
-            });
-
-            training = await Training.findAll({
-                where: {
-                    [Op.or]: [
-                        { client_id: user.client_id },
-                        { client_id: user.id }
-                    ]
-                }
-            });
-
-            return responseHandler.success(res, "Training fetched successfully", training);
-
-        } catch (error) {
-            return responseHandler.error(res, error?.message);
-        }
+      return responseHandler.success(res, "Training fetched successfully", training);
+    } catch (error) {
+      return responseHandler.error(res, error?.message);
     }
-}
+  },
+};
