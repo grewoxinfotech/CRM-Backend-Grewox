@@ -2,7 +2,6 @@ import Joi from "joi";
 import Training from "../../models/trainingModel.js";
 import validator from "../../utils/validator.js";
 import responseHandler from "../../utils/responseHandler.js";
-import Role from "../../models/roleModel.js";
 import User from "../../models/userModel.js";
 import { Op } from "sequelize";
 

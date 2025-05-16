@@ -44,51 +44,18 @@ export default {
     }),
     handler: async (req, res) => {
         try {
-            const userRole = req.user.role;
-            let roles;
-
-            // Find role in role model
-            const role = await Role.findOne({
-                where: { id: userRole }
+            const user = await User.findOne({
+                where: { id: req.user.id }
             });
 
-            if (!role) {
-                return responseHandler.error(res, "Role not found");
-            }
-
-            if (role.role_name === 'super-admin') {
-                // If user is super-admin, get all roles
-                roles = await Role.findAll();
-            } else if (role.role_name === 'client') {
-                // If user is client, find projects matching their client_id
-                roles = await Role.findAll(
-                    {
-                        where: {
-                            
-                            client_id: req.user.id
-                        }
-                    }
-                );
-            } else {
-                // For other roles, get client_id from user model
-                const user = await User.findOne({
-                    where: { id: req.user.id }
-                });
-
-                if (!user) {
-                    return responseHandler.error(res, "User not found");
+            const roles = await Role.findAll({
+                where: {
+                    [Op.or]: [{ client_id: user.client_id }, { client_id: user.id }]
                 }
-
-                roles = await Role.findAll({
-                    where: {
-                        client_id: user.client_id
-                    }
-                });
-            }
+            });
 
             return responseHandler.success(res, "Roles fetched successfully", roles);
-        }
-        catch (error) {
+        } catch (error) {
             return responseHandler.error(res, error?.message);
         }
     }
