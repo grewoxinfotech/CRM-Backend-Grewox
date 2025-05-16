@@ -16,7 +16,7 @@ export default {
             const followupTasks = await FollowupTask.findAll({
                 where: {
                     related_id: id,
-                    client_id: req.des?.client_id
+                    // client_id: req.des?.client_id
                 }
             });
 

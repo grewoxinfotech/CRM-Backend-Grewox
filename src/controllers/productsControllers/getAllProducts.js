@@ -1,10 +1,10 @@
 import Product from "../../models/productModel.js";
-import Role from "../../models/roleModel.js";
 import User from "../../models/userModel.js";
 import Notification from "../../models/notificationModel.js";
 import responseHandler from "../../utils/responseHandler.js";
 import validator from "../../utils/validator.js";
 import Joi from "joi";
+import { Op } from "sequelize";
 
 const createStockNotification = async (product, userId, clientId, username) => {
   // Check for out of stock
@@ -17,17 +17,15 @@ const createStockNotification = async (product, userId, clientId, username) => {
       from: userId,
       client_id: clientId,
       section: "products",
-      //   parent_id: req.user?.id,
       message: `Product ${product.name} is out of stock!`,
       description: `❌ Stock Alert:
 • Current Stock: ${product.stock_quantity}
 • Minimum Stock Level: ${product.min_stock_level}
 • Status: Out of Stock
-${
-  product.reorder_quantity
-    ? `• Recommended Reorder: ${product.reorder_quantity} units`
-    : ""
-}`,
+${product.reorder_quantity
+          ? `• Recommended Reorder: ${product.reorder_quantity} units`
+          : ""
+        }`,
       created_by: username,
     });
   }
@@ -41,17 +39,15 @@ ${
       from: userId,
       client_id: clientId,
       section: "products",
-      //   parent_id: req.user?.id,
       message: `Product ${product.name} is running low on stock!`,
       description: `⚠️ Stock Alert:
 • Current Stock: ${product.stock_quantity}
 • Minimum Stock Level: ${product.min_stock_level}
 • Status: Low Stock Warning
-${
-  product.reorder_quantity
-    ? `• Recommended Reorder: ${product.reorder_quantity} units`
-    : ""
-}`,
+${product.reorder_quantity
+          ? `• Recommended Reorder: ${product.reorder_quantity} units`
+          : ""
+        }`,
       created_by: username,
     });
   }
@@ -69,7 +65,6 @@ ${
       from: userId,
       client_id: clientId,
       section: "products",
-      //   parent_id: req.user?.id,
       message: `Time to reorder ${product.name}`,
       description: `🔄 Reorder Details:
 • Current Stock: ${product.stock_quantity}
@@ -90,60 +85,24 @@ export default {
   }),
   handler: async (req, res) => {
     try {
-      const userRole = req.user.role;
-      let products;
-
-      // Find role in role model
-      const role = await Role.findOne({
-        where: { id: userRole },
+      const user = await User.findOne({
+        where: { id: req.user.id },
       });
 
-      if (!role) {
-        return responseHandler.error(res, "Role not found");
-      }
+      const products = await Product.findAll({
+        where: {
+          [Op.or]: [{ client_id: user.client_id }, { client_id: user.id }]
+        },
+      });
 
-      if (role.role_name === "client") {
-        // If user is client, find projects matching their client_id
-        products = await Product.findAll({
-          where: {
-            client_id: req.user.id,
-          },
-        });
-
-        // Create notifications for each product
-        for (const product of products) {
-          await createStockNotification(
-            product,
-            req.user.id,
-            req.user.id,
-            req.user.username
-          );
-        }
-      } else {
-        // For other roles, get client_id from user model
-        const user = await User.findOne({
-          where: { id: req.user.id },
-        });
-
-        if (!user) {
-          return responseHandler.error(res, "User not found");
-        }
-
-        products = await Product.findAll({
-          where: {
-            client_id: user.client_id,
-          },
-        });
-
-        // Create notifications for each product
-        for (const product of products) {
-          await createStockNotification(
-            product,
-            req.user.id,
-            user.client_id,
-            req.user.username
-          );
-        }
+      // Create notifications for each product
+      for (const product of products) {
+        await createStockNotification(
+          product,
+          req.user.id,
+          user.client_id || user.id,
+          req.user.username
+        );
       }
 
       return responseHandler.success(
