@@ -42,7 +42,7 @@ const Meeting = sequelize.define('Meeting', {
         type: DataTypes.STRING,
         allowNull: true
     },
-    client:{
+    client: {
         type: DataTypes.STRING,
         allowNull: true,
         defaultValue: null
