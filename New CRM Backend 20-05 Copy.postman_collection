@@ -8026,6 +8026,93 @@
 							]
 						}
 					]
+				},
+				{
+					"name": "Notes setup",
+					"item": [
+						{
+							"name": "Get notes",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InIyIiwiZW1haWwiOiJyb2NreTJAeW9wbWFpbC5jb20iLCJwaG9uZSI6bnVsbCwiaWQiOiJobVZ4WDBJMGV4ZzJnT1RkamtER3hVcyIsInJvbGUiOiJ2STV1a1AzbXlNS2hqWFhlSHNtcTFSaiIsInJvbGVOYW1lIjoiY2xpZW50IiwiY3JlYXRlZF9ieSI6InN1cGVyYWRtaW4iLCJpYXQiOjE3NDczOTIyODIsImV4cCI6MTc0OTk4NDI4Mn0.LVsW9Ed0rh4rAS68nXEaIMH5aZAb-xenzpI6LANOYI8"
+									}
+								},
+								"method": "GET",
+								"header": [],
+								"url": "{{base}}/notes/iagWp5oBrdb6eD2EAevBHcU"
+							},
+							"response": []
+						},
+						{
+							"name": "create note",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InIyIiwiZW1haWwiOiJyb2NreTJAeW9wbWFpbC5jb20iLCJwaG9uZSI6bnVsbCwiaWQiOiJobVZ4WDBJMGV4ZzJnT1RkamtER3hVcyIsInJvbGUiOiJ2STV1a1AzbXlNS2hqWFhlSHNtcTFSaiIsInJvbGVOYW1lIjoiY2xpZW50IiwiY3JlYXRlZF9ieSI6InN1cGVyYWRtaW4iLCJpYXQiOjE3NDczOTIyODIsImV4cCI6MTc0OTk4NDI4Mn0.LVsW9Ed0rh4rAS68nXEaIMH5aZAb-xenzpI6LANOYI8"
+									}
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"note_title\": \"sdfsdfsdfsdfsdf\",\r\n    \"notetype\": \"important\",\r\n    \"description\": \"sdsdf\",\r\n    \"employees\": null\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{base}}/notes/iagWp5oBrdb6eD2EAevBHcU"
+							},
+							"response": []
+						},
+						{
+							"name": "update note",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InIyIiwiZW1haWwiOiJyb2NreTJAeW9wbWFpbC5jb20iLCJwaG9uZSI6bnVsbCwiaWQiOiJobVZ4WDBJMGV4ZzJnT1RkamtER3hVcyIsInJvbGUiOiJ2STV1a1AzbXlNS2hqWFhlSHNtcTFSaiIsInJvbGVOYW1lIjoiY2xpZW50IiwiY3JlYXRlZF9ieSI6InN1cGVyYWRtaW4iLCJpYXQiOjE3NDczOTIyODIsImV4cCI6MTc0OTk4NDI4Mn0.LVsW9Ed0rh4rAS68nXEaIMH5aZAb-xenzpI6LANOYI8"
+									}
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"note_title\": \"sdfsdfdfgsdsdfsdfdfg\",\r\n    \"notetype\": \"important\",\r\n    \"description\": \"sdsdf\",\r\n    \"employees\": null\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{base}}/notes/HK6l6ie8RzP0nvwR9TvNoNf"
+							},
+							"response": []
+						},
+						{
+							"name": "delete note",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InIyIiwiZW1haWwiOiJyb2NreTJAeW9wbWFpbC5jb20iLCJwaG9uZSI6bnVsbCwiaWQiOiJobVZ4WDBJMGV4ZzJnT1RkamtER3hVcyIsInJvbGUiOiJ2STV1a1AzbXlNS2hqWFhlSHNtcTFSaiIsInJvbGVOYW1lIjoiY2xpZW50IiwiY3JlYXRlZF9ieSI6InN1cGVyYWRtaW4iLCJpYXQiOjE3NDczOTIyODIsImV4cCI6MTc0OTk4NDI4Mn0.LVsW9Ed0rh4rAS68nXEaIMH5aZAb-xenzpI6LANOYI8"
+									}
+								},
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": "{{base}}/notes/HK6l6ie8RzP0nvwR9TvNoNf"
+							},
+							"response": []
+						}
+					]
 				}
 			]
 		},
