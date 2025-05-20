@@ -26,8 +26,8 @@ export default {
       overallDiscountType: Joi.string().optional(),
       overallDiscount: Joi.number().optional(),
       overallDiscountAmount: Joi.number().optional(),
-      overallTax: Joi.string().optional(),
-      overallTaxAmount: Joi.number().optional(),
+      overallTax: Joi.string().optional().allow("", null),
+      overallTaxAmount: Joi.number().optional().allow("", null),
     }),
   }),
   handler: async (req, res) => {
@@ -125,13 +125,10 @@ export default {
                   action: "stock_updated",
                   performed_by: req.user?.username,
                   client_id: req.des?.client_id,
-                  activity_message: `Stock quantity for product ${
-                    newItem.itemName
-                  } ${
-                    quantityDifference > 0 ? "increased" : "decreased"
-                  } by ${Math.abs(quantityDifference)} units from bill ${
-                    existingBill.billNumber
-                  }. New stock quantity: ${newStockQuantity}`,
+                  activity_message: `Stock quantity for product ${newItem.itemName
+                    } ${quantityDifference > 0 ? "increased" : "decreased"
+                    } by ${Math.abs(quantityDifference)} units from bill ${existingBill.billNumber
+                    }. New stock quantity: ${newStockQuantity}`,
                 });
               }
             }
@@ -145,9 +142,8 @@ export default {
       });
 
       // Create UPI link using settings
-      const upiLink = `upi://pay?pa=${settings?.merchant_upi_id || ""}&pn=${
-        settings?.merchant_name || ""
-      }&am=${total || existingBill.total}&cu=INR`;
+      const upiLink = `upi://pay?pa=${settings?.merchant_upi_id || ""}&pn=${settings?.merchant_name || ""
+        }&am=${total || existingBill.total}&cu=INR`;
 
       // Update bill with new fields
       await existingBill.update({
