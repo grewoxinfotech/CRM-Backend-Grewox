@@ -15,7 +15,7 @@ export default {
             source: Joi.string().required(),
             interest_level: Joi.string().required().valid('high', 'medium', 'low'),
             category: Joi.string().allow('', null),
-            status: Joi.string().allow('', null),
+            status: Joi.string().optional().allow('', null),
             inquiry_id: Joi.string().allow(null),
             company_id: Joi.string().allow(null),
             contact_id: Joi.string().allow(null),

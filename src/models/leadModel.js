@@ -66,7 +66,8 @@ const Lead = sequelize.define('Lead', {
     },
     status: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
+        defaultValue: null
     },
     interest_level: {
         type: DataTypes.ENUM('high', 'medium', 'low'),

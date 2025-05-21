@@ -13,6 +13,7 @@ export default {
       taskDate: Joi.date().required(),
       taskTime: Joi.string().required(),
       taskDescription: Joi.string().required(),
+      taskType: Joi.string().required(),
     }),
     params: Joi.object({
       id: Joi.string().required(),
@@ -21,7 +22,7 @@ export default {
   handler: async (req, res) => {
     try {
       const { id } = req.params;
-      const { taskName, taskDate, taskTime, taskDescription } = req.body;
+      const { taskName, taskDate, taskTime, taskDescription, taskType } = req.body;
       const task = await TaskCalendar.findByPk(id);
       if (!task) {
         return responseHandler.error(res, "Task not found");
@@ -32,6 +33,7 @@ export default {
           taskDate,
           taskTime,
           taskDescription,
+          taskType,
           id: { [Op.not]: id },
         },
       });
@@ -43,6 +45,7 @@ export default {
         taskDate,
         taskTime,
         taskDescription,
+        taskType,
         updated_by: req.user?.username,
       });
 
