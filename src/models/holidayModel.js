@@ -25,7 +25,7 @@ const Holiday = sequelize.define('holiday', {
     end_date: {
         type: DataTypes.DATE,
         allowNull: false,
-    },                      
+    },
     client_id: {
         type: DataTypes.STRING,
         allowNull: false

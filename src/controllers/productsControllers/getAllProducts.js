@@ -79,9 +79,11 @@ ${product.reorder_quantity
 
 export default {
   validator: validator({
-    params: Joi.object({
-      id: Joi.string().required(),
-    }),
+    query: Joi.object({
+      page: Joi.number().default(1),
+      pageSize: Joi.number().default(10),
+      search: Joi.string().allow('').optional()
+    })
   }),
   handler: async (req, res) => {
     try {
@@ -89,10 +91,11 @@ export default {
         where: { id: req.user.id },
       });
 
-      const products = await Product.findAll({
+      const { rows: products, count } = await Product.findAndCountAll({
+        ...req.queryOptions,
         where: {
           [Op.or]: [{ client_id: user.client_id }, { client_id: user.id }]
-        },
+        }
       });
 
       // Create notifications for each product
@@ -105,12 +108,16 @@ export default {
         );
       }
 
-      return responseHandler.success(
-        res,
-        "Products fetched successfully",
-        products
-      );
+      return responseHandler.success(res, {
+        data: products.map(d => ({ ...d.toJSON(), key: d.id })),
+        pagination: {
+          total: count,
+          ...req.pagination,
+          totalPages: Math.ceil(count / req.pagination.pageSize)
+        }
+      });
     } catch (error) {
+      console.error('Error in getAllProducts:', error);
       return responseHandler.error(res, error?.message);
     }
   },

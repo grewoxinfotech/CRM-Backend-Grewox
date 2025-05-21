@@ -3,17 +3,20 @@ import { createTask, deleteTask, updateTask, getAllTask } from "../controllers/t
 import { authenticateUser, checkRole, checkStorageLimit } from "../middlewares/index.js";
 import upload from "../middlewares/upload.js";
 import passCompanyDetails from '../middlewares/passCompanyDetail.js';
+import queryMiddleware from "../middleware/queryMiddleware.js";
+
 const router = Router();
+const searchFields = ['id', 'related_id', 'taskName', 'startDate', 'dueDate', 'status', 'priority', 'client_id', 'task_reporter', 'created_by'];
 
 router.use(authenticateUser, checkRole, passCompanyDetails);
 
-router.post('/:id',
+router.post('/',
     // checkStorageLimit,
     upload.single('file'),
     createTask.validator,
     createTask.handler
 );
-router.get('/:id', getAllTask.validator, getAllTask.handler);
+router.get('/:id', queryMiddleware(searchFields), getAllTask.validator, getAllTask.handler);
 router.put('/:id',
     // checkStorageLimit,
     upload.single('file'),

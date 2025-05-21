@@ -8,12 +8,16 @@ const queryMiddleware = searchFields => async (req, res, next) => {
         if (!user) return responseHandler.error(res, "User not found");
 
         const page = Math.max(1, +req.query.page || 1);
-        const limit = Math.max(1, Math.min(100, +req.query.pageSize || 10));
+        // If pageSize is -1 or Infinity, don't apply a limit
+        const requestedPageSize = +req.query.pageSize || 10;
+        const limit = requestedPageSize === -1 || requestedPageSize === Infinity
+            ? null
+            : Math.max(1, requestedPageSize);
         const search = req.query.search?.trim();
 
         req.queryOptions = {
-            limit,
-            offset: (page - 1) * limit,
+            ...(limit && { limit }),
+            ...(limit && { offset: (page - 1) * limit }),
             order: [['createdAt', 'DESC']],
             where: { [Op.or]: [{ client_id: user.client_id }, { client_id: user.id }] }
         };
@@ -24,7 +28,10 @@ const queryMiddleware = searchFields => async (req, res, next) => {
             }];
         }
 
-        req.pagination = { current: page, pageSize: limit };
+        req.pagination = {
+            current: page,
+            pageSize: limit || 'all'
+        };
         next();
     } catch (e) {
         return responseHandler.error(res, e?.message || "Query failed");

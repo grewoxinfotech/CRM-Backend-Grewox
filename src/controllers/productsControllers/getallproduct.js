@@ -7,10 +7,10 @@ import Joi from "joi";
 
 export default {
     validator: validator({
-       params: Joi.object({
-        page: Joi.number().optional(),
-        limit: Joi.number().optional(),
-       }),
+        params: Joi.object({
+            page: Joi.number().optional(),
+            limit: Joi.number().optional(),
+        }),
     }),
     handler: async (req, res) => {
         try {

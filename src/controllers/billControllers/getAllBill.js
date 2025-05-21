@@ -1,32 +1,30 @@
 import Joi from "joi";
 import Bill from "../../models/billModel.js";
-import responseHandler from "../../utils/responseHandler.js";
 import validator from "../../utils/validator.js";
-import User from "../../models/userModel.js";
-import { Op } from "sequelize";
+import responseHandler from "../../utils/responseHandler.js";
 
 export default {
   validator: validator({
     query: Joi.object({
-      page: Joi.number().optional(),
-      limit: Joi.number().optional(),
-    }),
+      page: Joi.number().default(1),
+      pageSize: Joi.number().default(10),
+      search: Joi.string().allow('').optional()
+    })
   }),
   handler: async (req, res) => {
     try {
-      const user = await User.findOne({
-        where: { id: req.user.id },
+      const { rows: data, count } = await Bill.findAndCountAll(req.queryOptions);
+      return responseHandler.success(res, {
+        data: data.map(d => ({ ...d.toJSON(), key: d.id })),
+        pagination: {
+          total: count,
+          ...req.pagination,
+          totalPages: Math.ceil(count / req.pagination.pageSize)
+        }
       });
-
-      const bills = await Bill.findAll({
-        where: {
-          [Op.or]: [{ client_id: user.client_id }, { client_id: user.id }]
-        },
-      });
-
-      return responseHandler.success(res, "Bills fetched successfully", bills);
     } catch (error) {
+      console.error('Error in getAllBill:', error);
       return responseHandler.error(res, error?.message);
     }
-  },
+  }
 };

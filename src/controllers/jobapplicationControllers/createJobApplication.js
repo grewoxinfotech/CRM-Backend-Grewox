@@ -13,7 +13,7 @@ export default {
             phoneCode: Joi.string().allow('', null),
             phone: Joi.string().allow('', null),
             location: Joi.string().allow('', null),
-            total_experience: Joi.number().allow('', null),
+            total_experience: Joi.string().allow('', null),
             current_location: Joi.string().allow('', null),
             notice_period: Joi.number().allow('', null),
             status: Joi.string().allow('', null),
