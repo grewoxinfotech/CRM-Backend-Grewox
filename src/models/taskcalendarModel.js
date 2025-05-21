@@ -24,6 +24,10 @@ const TaskCalendar = sequelize.define('taskcalendar', {
         type: DataTypes.STRING,
         allowNull: false
     },
+    taskType: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
     taskDescription: {
         type: DataTypes.STRING,
         allowNull: false

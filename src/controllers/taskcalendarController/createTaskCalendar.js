@@ -10,6 +10,7 @@ export default {
     body: Joi.object({
       taskName: Joi.string().required(),
       section: Joi.string().required(),
+      taskType: Joi.string().required(),
       taskDate: Joi.date().required(),
       taskTime: Joi.string().required(),
       taskDescription: Joi.string().required(),
@@ -17,7 +18,7 @@ export default {
   }),
   handler: async (req, res) => {
     try {
-      const { taskName, taskDate, taskTime, section, taskDescription } =
+      const { taskName, taskDate, taskTime, section, taskDescription, taskType } =
         req.body;
 
       const existingTask = await TaskCalendar.findOne({
@@ -33,6 +34,7 @@ export default {
         taskDate,
         taskTime,
         taskDescription,
+        taskType,
         client_id: req.des?.client_id,
         created_by: req.user?.username,
       });
