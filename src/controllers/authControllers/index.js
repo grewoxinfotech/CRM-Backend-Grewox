@@ -10,10 +10,11 @@ import getUserById from "./getUserById.js";
 import updateUser from "./updateUser.js";
 import deleteUser from "./deleteUser.js";
 import verify from "./verify.js";
-
+import register from "./register.js";
 export {
     signup,
     login,
+    register,
     verifySignup,
     resendSignupOtp,
     forgotPassword,

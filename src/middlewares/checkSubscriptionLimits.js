@@ -94,21 +94,12 @@ export const checkSubscriptionDates = async (req, res, next) => {
         }
 
         let subscription;
-        if (role.role_name === 'client') {
-            subscription = await ClientSubscription.findOne({
-                where: {
-                    client_id: user.id,
-                    status: ['active', 'trial']
-                }
-            });
-        } else {
-            subscription = await ClientSubscription.findOne({
-                where: {
-                    client_id: user.client_id,
-                    status: ['active', 'trial']
-                }
-            });
-        }
+        subscription = await ClientSubscription.findOne({
+            where: {
+                client_id: role.role_name === 'client' ? user.id : user.client_id,
+                status: ['active', 'trial']
+            }
+        });
 
         if (!subscription) {
             return responseHandler.error(res, 'No active subscription found');

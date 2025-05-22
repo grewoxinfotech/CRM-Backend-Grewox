@@ -1,5 +1,5 @@
 import express from "express";
-import { signup, login, getAllUsers, getUserById, updateUser, deleteUser, verifySignup, resendSignupOtp, forgotPassword, verifyOtp, resetPassword, verify } from "../controllers/authControllers/index.js";
+import { signup, login, register, getAllUsers, getUserById, updateUser, deleteUser, verifySignup, resendSignupOtp, forgotPassword, verifyOtp, resetPassword, verify } from "../controllers/authControllers/index.js";
 import { authenticateUser, checkRole } from "../middlewares/index.js";
 import { checkSubscriptionLimits, getActiveSubscription, checkSubscriptionDates } from "../middlewares/checkSubscriptionLimits.js";
 import passCompanyDetail from "../middlewares/passCompanyDetail.js";
@@ -8,6 +8,7 @@ const router = express.Router();
 
 router.post('/signup', authenticateUser, checkRole, getActiveSubscription, passCompanyDetail, signup.validator, signup.handler);
 router.post('/login', checkSubscriptionDates, login.validator, login.handler);
+router.post('/register', register.validator, register.handler);
 router.post('/admin-login', login.adminValidator, login.adminHandler);
 router.post("/verify-signup", authenticateUser, checkSubscriptionLimits, verifySignup.validator, verifySignup.handler);
 router.post("/resend-signup-otp", authenticateUser, resendSignupOtp.handler);

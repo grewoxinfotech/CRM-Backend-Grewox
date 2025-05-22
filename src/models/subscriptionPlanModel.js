@@ -47,6 +47,11 @@ const SubscriptionPlan = sequelize.define('SubscriptionPlan', {
         type: DataTypes.STRING,
         allowNull: false
     },
+    is_default: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false
+    },
     storage_limit: {
         type: DataTypes.STRING,
         allowNull: false

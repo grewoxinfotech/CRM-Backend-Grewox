@@ -24,12 +24,15 @@ export default {
                 return responseHandler.notFound(res, "User not found");
             }
 
-            const clientMail = await User.findOne({ where: { id: user.client_id } });
+            // Get the email to send OTP to
+            let mailToSend = email;
 
-            const mail = clientMail.email;
-
-            if (!user && !mail) {
-                return responseHandler.notFound(res, "User not found");
+            // If user has a client_id, try to get client's email
+            if (user.client_id) {
+                const clientMail = await User.findOne({ where: { id: user.client_id } });
+                if (clientMail && clientMail.email) {
+                    mailToSend = clientMail.email;
+                }
             }
 
             const otp = generateOTP(OTP_CONFIG.LENGTH);
@@ -42,17 +45,14 @@ export default {
                 JWT_SECRET,
                 { expiresIn: '15m' }
             );
+
             const emailTemplate = getPasswordResetEmailTemplate(user.username, otp);
-            await sendEmail(mail, 'Password Reset Request', emailTemplate);
-            // await sgMail.send({
-            //     to: email,
-            //     from: EMAIL_FROM,
-            //     subject: 'Password Reset Request',
-            //     html: emailTemplate
-            // });
+            await sendEmail(mailToSend, 'Password Reset Request', emailTemplate);
+
             return responseHandler.success(res, "Password reset OTP sent to your email", { sessionToken });
         } catch (error) {
-            return responseHandler.internalServerError(res, error?.message);
+            console.error("Forgot password error:", error);
+            return responseHandler.internalServerError(res, error?.message || "An error occurred while processing your request");
         }
     }
 }; 

@@ -11,6 +11,7 @@ import ClientSubscription from "../../models/clientSubscriptionModel.js";
 import { seedDefaultLabels } from "../labelControllers/createLabel.js";
 import { seedDefaultPipelines } from "../pipelineControllers/createPipeline.js";
 import { seedDefaultStages } from "../stageControllers/createStage.js";
+import SubscriptionPlan from "../../models/subscriptionPlanModel.js";
 
 export default {
     validator: validator({
@@ -26,7 +27,7 @@ export default {
 
             const { subscription } = req;
 
-            if (user.type !== 'signup_verification') {
+            if (user.type !== 'signup_verification' && user.type !== 'register_verification') {
                 return responseHandler.unauthorized(res, "Invalid verification token");
             }
 
@@ -86,6 +87,47 @@ export default {
                 isEmailVerified: true,
                 created_by: user.created_by
             });
+
+            // If type is register_verification, create subscription with new user's ID
+            if (user.type === 'register_verification') {
+                const plan = await SubscriptionPlan.findByPk(user.client_plan_id);
+                if (!plan) {
+                    throw new Error("Subscription plan not found");
+                }
+
+                const startDateTime = new Date();
+                const endDateTime = new Date(startDateTime);
+                endDateTime.setDate(endDateTime.getDate() + parseInt(plan.duration));
+                endDateTime.setHours(23, 59, 59, 999);
+
+                const newSubscription = await ClientSubscription.create({
+                    client_id: newUser.id,  // Using new user's ID here
+                    plan_id: user.client_plan_id,
+                    start_time: startDateTime,
+                    end_time: endDateTime,
+                    start_date: startDateTime,
+                    end_date: endDateTime,
+                    status: 'active',
+                    current_users_count: 0,
+                    current_clients_count: 0,
+                    current_storage_used: 0,
+                    payment_status: 'unpaid',
+                    created_by: newUser.username
+                });
+
+                // Update user with new subscription ID
+                await User.update(
+                    { client_plan_id: newSubscription.id },
+                    { where: { id: newUser.id } }
+                );
+
+                // Return early for register_verification
+                return responseHandler.success(res, "Registration completed successfully", {
+                    success: true,
+                    user: newUser,
+                    // subscription: newSubscription    
+                });
+            }
 
             // If this is a client, seed their data
             if (role.role_name === 'client') {
@@ -175,5 +217,3 @@ export default {
         }
     }
 };
-
-

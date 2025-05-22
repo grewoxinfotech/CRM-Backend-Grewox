@@ -10,7 +10,7 @@ export default {
         try {
             const { user } = req;
 
-            if (user.type !== 'signup_verification') {
+            if (user.type !== 'signup_verification' && user.type !== 'register_verification') {
                 return responseHandler.unauthorized(res, "Invalid verification token");
             }
 
@@ -23,7 +23,7 @@ export default {
             const newSessionToken = jwt.sign(
                 {
                     ...user,
-                    type: 'signup_verification'
+                    type: user.type
                 },
                 JWT_SECRET
             );

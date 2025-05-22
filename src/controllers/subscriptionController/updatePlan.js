@@ -18,6 +18,9 @@ export default {
             status: Joi.string().valid('active', 'inactive').optional(),
             max_users: Joi.string().optional(),
             max_clients: Joi.string().optional(),
+            max_customers: Joi.string().optional(),
+            max_vendors: Joi.string().optional(),
+            is_default: Joi.boolean().optional(),
             storage_limit: Joi.string().optional(),
             features: Joi.object().optional().allow(null),
         })
@@ -25,7 +28,7 @@ export default {
     handler: async (req, res) => {
         try {
             const { id } = req.params;
-            const { name, currency, price, duration, trial_period, max_users, max_clients, storage_limit, features, status } = req.body;
+            const { name, currency, price, duration, trial_period, max_users, max_clients, max_customers, max_vendors, storage_limit, features, status, is_default } = req.body;
 
             const plan = await SubscriptionPlan.findByPk(id);
             if (!plan) {
@@ -37,7 +40,49 @@ export default {
                 return responseHandler.error(res, "Plan already exists");
             }
 
-            await plan.update({ name, currency, price, duration, trial_period, max_users, max_clients, storage_limit, features, status, updated_by: req.user?.username });
+            // If this plan is being set as default, remove default status from all other plans
+            if (is_default) {
+                await SubscriptionPlan.update(
+                    { is_default: false },
+                    {
+                        where: {
+                            id: { [Op.not]: id },
+                            is_default: true
+                        }
+                    }
+                );
+            }
+
+            // If this plan's default status is being removed, ensure there's at least one default plan
+            if (plan.is_default && !is_default) {
+                const defaultPlansCount = await SubscriptionPlan.count({
+                    where: {
+                        is_default: true,
+                        id: { [Op.not]: id }
+                    }
+                });
+
+                if (defaultPlansCount === 0) {
+                    return responseHandler.error(res, "Cannot remove default status: At least one plan must be set as default");
+                }
+            }
+
+            await plan.update({
+                name,
+                currency,
+                price,
+                duration,
+                trial_period,
+                max_users,
+                max_clients,
+                max_customers,
+                max_vendors,
+                storage_limit,
+                features,
+                status,
+                is_default,
+                updated_by: req.user?.username
+            });
 
             return responseHandler.success(res, "Plan updated successfully", plan);
         } catch (error) {
