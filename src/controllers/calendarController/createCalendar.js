@@ -9,6 +9,7 @@ export default {
     validator: validator({
         body: Joi.object({
             name: Joi.string().required(),
+            label: Joi.string().required(),
             startDate: Joi.date().required(),
             endDate: Joi.date().required(),
             color: Joi.string().required(),
@@ -16,7 +17,7 @@ export default {
     }),
     handler: async (req, res) => {
         try {
-            const { name, startDate, endDate, color } = req.body;
+            const { name, label, startDate, endDate, color } = req.body;
 
            
 
@@ -28,6 +29,7 @@ export default {
 
             const calendar = await Calendar.create({
                 name,
+                label,
                 startDate,
                 endDate,
                 color,

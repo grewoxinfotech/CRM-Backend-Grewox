@@ -22,6 +22,10 @@ const Calendar = sequelize.define('calendar', {
         type: DataTypes.DATE,
         allowNull: false
     },
+    label: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
     color: {
         type: DataTypes.STRING,
         allowNull: false
