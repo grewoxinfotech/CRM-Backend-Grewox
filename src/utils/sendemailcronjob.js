@@ -14,7 +14,6 @@ const initializeEmailCronJob = () => {
       console.error("Error in scheduled email check:", error);
     }
   });
-
   return cronJob;
 };
 

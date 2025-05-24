@@ -13,6 +13,10 @@ import { seedDefaultPipelines } from "../pipelineControllers/createPipeline.js";
 import { seedDefaultStages } from "../stageControllers/createStage.js";
 import SubscriptionPlan from "../../models/subscriptionPlanModel.js";
 
+const DEFAULT_LABEL_TYPES = [
+    'source', 'status', 'tag', 'contract_type', 'category', 'followup', 'label'
+];
+
 export default {
     validator: validator({
         body: Joi.object({
@@ -101,18 +105,18 @@ export default {
                 endDateTime.setHours(23, 59, 59, 999);
 
                 const newSubscription = await ClientSubscription.create({
-                    client_id: newUser.id,  // Using new user's ID here
+                    client_id: newUser.id,
                     plan_id: user.client_plan_id,
                     start_time: startDateTime,
                     end_time: endDateTime,
                     start_date: startDateTime,
                     end_date: endDateTime,
-                    status: 'active',
+                    status: 'trial',
                     current_users_count: 0,
                     current_clients_count: 0,
                     current_storage_used: 0,
                     payment_status: 'unpaid',
-                    created_by: newUser.username
+                    created_by: 'self-register'
                 });
 
                 // Update user with new subscription ID
@@ -121,19 +125,10 @@ export default {
                     { where: { id: newUser.id } }
                 );
 
-                // Return early for register_verification
-                return responseHandler.success(res, "Registration completed successfully", {
-                    success: true,
-                    user: newUser,
-                    // subscription: newSubscription    
-                });
-            }
-
-            // If this is a client, seed their data
-            if (role.role_name === 'client') {
+                // Create default data for the new client
                 try {
-                    const labelTypes = ['source', 'status', 'tag', 'contract_type', 'category', 'followup', 'label'];
-                    const labelResults = await Promise.all(labelTypes.map(async type => {
+                    // Create default labels
+                    const labelResults = await Promise.all(DEFAULT_LABEL_TYPES.map(async type => {
                         try {
                             const labels = await seedDefaultLabels(
                                 newUser.id,    // related_id
@@ -141,32 +136,37 @@ export default {
                                 'system',      // created_by
                                 type          // label type
                             );
+                            console.log(`Created ${labels.length} labels for type ${type}`);
                             return { type, count: labels.length, success: true };
                         } catch (error) {
-                            console.error(`Error seeding ${type} labels:`, error.message);
+                            console.error(`Error seeding ${type} labels:`, error);
                             return { type, count: 0, success: false, error: error.message };
                         }
                     }));
 
+                    // Create default pipelines
                     const pipelines = await seedDefaultPipelines(
-                        newUser.id,       // client_id
-                        newUser.username  // created_by
+                        newUser.id,    // client_id
+                        'system'       // created_by
                     );
+                    console.log(`Created ${pipelines.length} default pipelines`);
 
+                    // Create default stages for each pipeline
                     const stageResults = await Promise.all(pipelines.map(async pipeline => {
                         try {
                             const stages = await seedDefaultStages(
                                 pipeline.id,    // pipeline_id
                                 newUser.id,     // client_id
-                                newUser.username // created_by
+                                'system'        // created_by
                             );
+                            console.log(`Created ${stages.length} stages for pipeline ${pipeline.pipeline_name}`);
                             return {
                                 pipeline_name: pipeline.pipeline_name,
                                 stages_count: stages.length,
                                 success: true
                             };
                         } catch (error) {
-                            console.error(`Error seeding stages for pipeline ${pipeline.pipeline_name}:`, error.message);
+                            console.error(`Error seeding stages for pipeline ${pipeline.pipeline_name}:`, error);
                             return {
                                 pipeline_name: pipeline.pipeline_name,
                                 stages_count: 0,
@@ -177,18 +177,28 @@ export default {
                     }));
 
                 } catch (error) {
-                    console.error('Error in client data seeding:', error.message);
+                    console.error('Error in client data seeding:', error);
+                    // Continue with user creation even if seeding fails
                 }
+
+                // Return early for register_verification
+                return responseHandler.success(res, "Registration completed successfully", {
+                    success: true,
+                    user: newUser
+                });
             }
 
-            //increment user/client count if subscription exists
-            if (subscription) {
-                const clientSubscription = await ClientSubscription.findByPk(subscription.id);
-                if (clientSubscription) {
-                    if (role.role_name === 'sub-client') {
-                        await clientSubscription.increment('current_clients_count');
-                    } else if (!['super-admin', 'client'].includes(role.role_name)) {
-                        await clientSubscription.increment('current_users_count');
+            // If this is a client, seed their data
+            if (role.role_name === 'client') {
+                // Keep only the subscription increment logic here
+                if (subscription) {
+                    const clientSubscription = await ClientSubscription.findByPk(subscription.id);
+                    if (clientSubscription) {
+                        if (role.role_name === 'sub-client') {
+                            await clientSubscription.increment('current_clients_count');
+                        } else if (!['super-admin', 'client'].includes(role.role_name)) {
+                            await clientSubscription.increment('current_users_count');
+                        }
                     }
                 }
             }
@@ -213,6 +223,7 @@ export default {
                 user: newUser
             });
         } catch (error) {
+            console.error('Verification error:', error);
             return responseHandler.internalServerError(res, error);
         }
     }

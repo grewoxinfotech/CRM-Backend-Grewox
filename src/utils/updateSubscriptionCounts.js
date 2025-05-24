@@ -4,6 +4,7 @@ import { calculateClientStorage } from './calculateStorage.js';
 import { Op } from 'sequelize';
 
 export const updateSubscriptionCounts = async (clientId) => {
+    console.log("clientId", clientId)
     try {
         // Find the client's subscription
         const client = await User.findByPk(clientId);

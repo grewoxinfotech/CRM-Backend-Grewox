@@ -10,7 +10,7 @@ const searchFields = ['id', 'salesInvoiceNumber', 'related_id', 'customer', 'iss
 
 router.use(authenticateUser, checkRole, passCompanyDetails);
 
-router.post("/", upload.single("attachment"), createSalesInvoice.validator, createSalesInvoice.handler);
+router.post("/:id", upload.single("attachment"), createSalesInvoice.validator, createSalesInvoice.handler);
 router.get("/", queryMiddleware(searchFields), getAllSalesInvoice.validator, getAllSalesInvoice.handler);
 router.get("/:id", getSalesInvoiceById.validator, getSalesInvoiceById.handler);
 router.put("/:id", updateSalesInvoice.validator, updateSalesInvoice.handler);

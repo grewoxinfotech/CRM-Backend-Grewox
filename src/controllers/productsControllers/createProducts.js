@@ -47,6 +47,7 @@ export default {
         currency,
       } = req.body;
 
+
       const image = req.file;
       const imageUrl = await uploadToS3(
         image,
@@ -74,8 +75,8 @@ export default {
           ? ((selling_price - buying_price) / buying_price) * 100
           : 0;
       const total_investment = buying_price * stock_quantity;
-      const potential_revenue = selling_price * stock_quantity;
-      const potential_profit = profit_margin * stock_quantity;
+      // const potential_revenue = selling_price * stock_quantity;
+      // const potential_profit = profit_margin * stock_quantity;
 
       const product = await Product.create({
         related_id: req.params.id,
@@ -108,11 +109,10 @@ export default {
         action: "created",
         performed_by: req.user?.username,
         client_id: req.des?.client_id,
-        activity_message: `Product ${
-          product.name
-        } created successfully with initial stock quantity of ${stock_quantity}. Buying price: ${buying_price}, Selling price: ${selling_price}, Profit margin: ${profit_margin} (${profit_percentage.toFixed(
-          2
-        )}%)`,
+        activity_message: `Product ${product.name
+          } created successfully with initial stock quantity of ${stock_quantity}. Buying price: ${buying_price}, Selling price: ${selling_price}, Profit margin: ${profit_margin} (${profit_percentage.toFixed(
+            2
+          )}%)`,
       });
 
       return responseHandler.success(res, "Product created successfully", {

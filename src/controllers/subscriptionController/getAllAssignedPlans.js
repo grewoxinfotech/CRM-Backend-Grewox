@@ -56,6 +56,7 @@ export default {
                         { where: { id: plan.id } }
                     );
                     await updateSubscriptionCounts(plan.client_id);
+                    // console.log("updated successfully", plan.client_id)
                 } catch (error) {
                     console.error(`Error updating counts for client ${username}:`, error);
                 }

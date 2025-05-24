@@ -10,7 +10,7 @@ const searchFields = ['id', 'related_id', 'name', 'currency', 'buying_price', 's
 
 router.use(authenticateUser, checkRole, passCompanyDetails);
 
-router.post("/", upload.single('image'), createProducts.validator, createProducts.handler);
+router.post("/:id", upload.single('image'), createProducts.validator, createProducts.handler);
 router.get("/", queryMiddleware(searchFields), getAllProducts.validator, getAllProducts.handler);
 router.get("/:id", getallproduct.validator, getallproduct.handler);
 router.put("/:id", upload.single('image'), updateProducts.validator, updateProducts.handler);

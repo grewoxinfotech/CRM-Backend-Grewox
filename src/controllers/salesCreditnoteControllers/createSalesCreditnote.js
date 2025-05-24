@@ -144,9 +144,8 @@ export default {
       // Update invoice amount
       await salesInvoice.update({
         amount: newAmount,
-        upiLink: `upi://pay?pa=${settings?.merchant_upi_id || ""}&pn=${
-          settings?.merchant_name || ""
-        }&am=${newAmount}&cu=INR`,
+        upiLink: `upi://pay?pa=${settings?.merchant_upi_id || ""}&pn=${settings?.merchant_name || ""
+          }&am=${newAmount}&cu=INR`,
         payment_status: newPaymentStatus,
       });
 
@@ -170,7 +169,7 @@ export default {
         const totalCost = salesInvoice.cost_of_goods;
         const totalProfit = salesInvoice.profit;
         const profitPercentage = salesInvoice.profit_percentage;
-
+        const invoiceNumber = salesInvoice.salesInvoiceNumber;
         // Create revenue entry with total profit from invoice
         await SalesRevenue.create({
           related_id: id,
@@ -180,7 +179,7 @@ export default {
           cost_of_goods: totalCost,
           account: "sales_credit",
           customer: salesInvoice.customer,
-          description: `Credit Note for Invoice #${invoice}`,
+          description: `Credit Note for Invoice #${invoiceNumber}`,
           category: salesInvoice.category || "Sales Credit",
           profit: totalProfit,
           profit_margin_percentage: profitPercentage,
@@ -202,11 +201,9 @@ export default {
         action: "created",
         performed_by: req.user?.username,
         client_id: req.des?.client_id,
-        activity_message: `Credit note of ${amount} ${
-          currency || salesInvoice.currency
-        } created for invoice #${invoice}. New invoice balance: ${newAmount}. Status changed to: ${newPaymentStatus}${
-          shouldUpdateStock ? ". Stock updated for products." : ""
-        }`,
+        activity_message: `Credit note of ${amount} ${currency || salesInvoice.currency
+          } created for invoice #${invoice}. New invoice balance: ${newAmount}. Status changed to: ${newPaymentStatus}${shouldUpdateStock ? ". Stock updated for products." : ""
+          }`,
       });
 
       return responseHandler.success(
