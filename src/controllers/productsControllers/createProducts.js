@@ -19,6 +19,8 @@ export default {
       currency: Joi.string().optional().allow("", null),
       hsn_sac: Joi.string().optional().allow("", null),
       description: Joi.string().optional().allow("", null),
+      tax_name: Joi.string().optional().allow("", null),
+      tax_percentage: Joi.number().min(0).optional().default(0),
       // Stock Management Fields
       stock_quantity: Joi.number().integer().min(0).default(0),
       min_stock_level: Joi.number().integer().min(0).default(0),
@@ -45,6 +47,8 @@ export default {
         reorder_quantity,
         stock_status,
         currency,
+        tax_name,
+        tax_percentage,
       } = req.body;
 
 
@@ -89,6 +93,8 @@ export default {
         description,
         image: imageUrl,
         currency,
+        tax_name,
+        tax_percentage,
         profit_margin,
         profit_percentage,
         // Stock Management Fields

@@ -60,9 +60,8 @@ export default {
       });
 
       // Create UPI link using settings
-      const upiLink = `upi://pay?pa=${settings?.merchant_upi_id || ""}&pn=${
-        settings?.merchant_name || ""
-      }&am=${total}&cu=INR`;
+      const upiLink = `upi://pay?pa=${settings?.merchant_upi_id || ""}&pn=${settings?.merchant_name || ""
+        }&am=${total}&cu=INR`;
 
       // Create new bill
       const newBill = await Bill.create({

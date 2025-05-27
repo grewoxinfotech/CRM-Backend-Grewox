@@ -1,7 +1,6 @@
 import Joi from "joi";
 import SalesInvoice from "../../models/salesInvoiceModel.js";
 import Product from "../../models/productModel.js";
-import Tax from "../../models/taxModel.js";
 import SalesRevenue from "../../models/salesRevenueModel.js";
 import validator from "../../utils/validator.js";
 import responseHandler from "../../utils/responseHandler.js";
@@ -24,7 +23,6 @@ export default {
       issueDate: Joi.date().required(),
       dueDate: Joi.date().required(),
       category: Joi.string().optional().allow("", null),
-
       items: Joi.array().required(),
       tax: Joi.number().optional().allow("", null),
       discount: Joi.number().optional().allow("", null),
@@ -108,11 +106,9 @@ export default {
         // Get tax percentage and calculate tax on discounted amount
         let item_tax = 0;
         if (item.tax) {
-          const taxData = await Tax.findByPk(item.tax);
-          if (taxData) {
-            const taxPercentage = parseFloat(taxData.gstPercentage);
-            item_tax = (amount_after_discount * taxPercentage) / 100;
-          }
+          // Use product's tax_percentage directly from the request
+          const taxPercentage = parseFloat(item.tax);
+          item_tax = (amount_after_discount * taxPercentage) / 100;
         }
 
         const item_total = amount_after_discount + item_tax;
@@ -132,6 +128,8 @@ export default {
           buying_price: product.buying_price,
           subtotal: item_subtotal,
           tax_amount: item_tax,
+          tax_name: item.tax_name || product.tax_name,
+          tax_percentage: item.tax || product.tax_percentage,
           discount_amount: item_discount_amount,
           discount_type: item_discount_type,
           amount_after_discount: amount_after_discount,

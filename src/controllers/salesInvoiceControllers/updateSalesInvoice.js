@@ -23,7 +23,6 @@ export default {
       dueDate: Joi.date().optional(),
       category: Joi.string().optional().allow("", null),
       items: Joi.array().required(),
-
       payment_status: Joi.string()
         .valid("paid", "unpaid", "partially_paid")
         .optional(),
@@ -401,10 +400,19 @@ export default {
           if (taxData) {
             const taxPercentage = parseFloat(taxData.gstPercentage);
             item_tax = (amount_after_discount * taxPercentage) / 100;
+            console.log(`Tax calculated from tax ID: ${item_tax} (${taxPercentage}% of ${amount_after_discount})`);
           }
+        }
+        // Use tax_percentage directly if provided
+        else if (item.tax_percentage && item.tax_percentage > 0) {
+          const taxPercentage = parseFloat(item.tax_percentage);
+          item_tax = (amount_after_discount * taxPercentage) / 100;
+          console.log(`Tax calculated from tax_percentage: ${item_tax} (${taxPercentage}% of ${amount_after_discount})`);
         }
 
         const item_total = amount_after_discount + item_tax;
+        console.log(`Item summary - ${product.name}: Subtotal: ${item_subtotal}, Discount: ${item_discount_amount}, Tax: ${item_tax}, Total: ${item_total}`);
+
         const item_profit = item_total - item_cost;
         const item_profit_percentage =
           item_cost > 0 ? (item_profit / item_cost) * 100 : 0;
@@ -440,6 +448,8 @@ export default {
 
       // Calculate final totals
       const total = subtotal + total_tax - total_discount;
+      console.log(`Final totals - Subtotal: ${subtotal}, Tax: ${total_tax}, Discount: ${total_discount}, Total: ${total}`);
+
       const total_profit = total - total_cost_of_goods;
       const profit_percentage =
         total_cost_of_goods > 0

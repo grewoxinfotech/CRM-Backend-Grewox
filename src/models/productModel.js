@@ -66,6 +66,19 @@ const Product = sequelize.define("Product", {
     allowNull: true,
     defaultValue: null,
   },
+  tax_name: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    defaultValue: null,
+  },
+  tax_percentage: {
+    type: DataTypes.FLOAT,
+    allowNull: true,
+    defaultValue: 0,
+    validate: {
+      min: 0,
+    },
+  },
   image: {
     type: DataTypes.STRING,
     allowNull: true,
