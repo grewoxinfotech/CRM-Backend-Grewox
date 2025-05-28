@@ -57,20 +57,7 @@ export default {
             }
 
             // Parse invoice items for revenue calculation
-            let invoiceItems;
-            try {
-                // Check if items is already an object or a JSON string
-                if (typeof salesInvoice.items === 'string') {
-                    invoiceItems = JSON.parse(salesInvoice.items);
-                } else if (typeof salesInvoice.items === 'object') {
-                    invoiceItems = salesInvoice.items;
-                } else {
-                    return responseHandler.error(res, "Invalid invoice items format");
-                }
-            } catch (error) {
-                console.error('Error parsing invoice items:', error);
-                return responseHandler.error(res, "Failed to parse invoice items");
-            }
+            const invoiceItems = JSON.parse(salesInvoice.items);
 
             // Check product stock availability before proceeding
             const newTotalPaid = totalPaidAmount + Number(amount);
@@ -178,13 +165,13 @@ export default {
                     customer: salesInvoice.customer,
                     description: `Payment received for Invoice #${invoice}`,
                     category: salesInvoice.category || 'Sales Payment',
-                    products: JSON.stringify(paymentItems.map(item => ({
+                    products: paymentItems.map(item => ({
                         ...item,
                         revenue: item.payment_amount,
                         cost: item.payment_cost,
                         profit: item.payment_profit,
                         profit_percentage: item.payment_profit_percentage
-                    }))),
+                    })),
                     client_id: req.des?.client_id,
                     created_by: req.user?.username
                 });
