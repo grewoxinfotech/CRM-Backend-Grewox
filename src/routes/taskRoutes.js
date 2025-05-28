@@ -10,7 +10,7 @@ const searchFields = ['id', 'related_id', 'taskName', 'startDate', 'dueDate', 's
 
 router.use(authenticateUser, checkRole, passCompanyDetails);
 
-router.post('/',
+router.post('/:id',
     // checkStorageLimit,
     upload.single('file'),
     createTask.validator,
