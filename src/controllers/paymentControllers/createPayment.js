@@ -106,7 +106,7 @@ export default {
                 paymentMethod,
                 status,
                 remark,
-                items: paymentItems,
+                items: JSON.stringify(paymentItems),
                 client_id: req.des?.client_id,
                 created_by: req.user?.username,
                 updated_by: req.user?.username
