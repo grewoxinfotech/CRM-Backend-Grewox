@@ -36,7 +36,7 @@ const Notification = sequelize.define("Notification", {
     allowNull: false,
   },
   description: {
-    type: DataTypes.STRING,
+    type: DataTypes.TEXT,
     allowNull: true,
   },
   priority: {
