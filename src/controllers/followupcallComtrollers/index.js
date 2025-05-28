@@ -1,4 +1,4 @@
-import createFollowupCall from "./createFollowupCall.js";
+import createFollowupCall from "./createFollowupcall.js";
 import getAllfollowupcalls from "./getallfollowupcalls.js";
 import getfollowupcalls from "./getfollowupcalls.js";
 import updateFollowupcall from "./updateFollowupcall.js";
