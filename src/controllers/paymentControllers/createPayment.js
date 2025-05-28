@@ -178,13 +178,13 @@ export default {
                     customer: salesInvoice.customer,
                     description: `Payment received for Invoice #${invoice}`,
                     category: salesInvoice.category || 'Sales Payment',
-                    products: paymentItems.map(item => ({
+                    products: JSON.stringify(paymentItems.map(item => ({
                         ...item,
                         revenue: item.payment_amount,
                         cost: item.payment_cost,
                         profit: item.payment_profit,
                         profit_percentage: item.payment_profit_percentage
-                    })),
+                    }))),
                     client_id: req.des?.client_id,
                     created_by: req.user?.username
                 });
