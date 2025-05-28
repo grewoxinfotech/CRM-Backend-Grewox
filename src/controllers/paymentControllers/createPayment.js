@@ -57,7 +57,22 @@ export default {
             }
 
             // Parse invoice items for revenue calculation
-            const invoiceItems = JSON.parse(salesInvoice.items);
+            let invoiceItems;
+            try {
+                // Check if items is already an object or a JSON string
+                if (typeof salesInvoice.items === 'string') {
+                    invoiceItems = JSON.parse(salesInvoice.items);
+                } else {
+                    invoiceItems = salesInvoice.items;
+                }
+                
+                if (!Array.isArray(invoiceItems)) {
+                    throw new Error("Invoice items is not an array");
+                }
+            } catch (error) {
+                console.error('Error parsing invoice items:', error);
+                return responseHandler.error(res, "Failed to parse invoice items: " + error.message);
+            }
 
             // Check product stock availability before proceeding
             const newTotalPaid = totalPaidAmount + Number(amount);
@@ -94,7 +109,7 @@ export default {
                 };
             });
 
-            // Create payment record
+            // Create payment recordwork
             const payment = await Payment.create({
                 related_id: id,
                 project_name,   
@@ -106,7 +121,6 @@ export default {
                 paymentMethod,
                 status,
                 remark,
-                items: JSON.stringify(paymentItems),
                 client_id: req.des?.client_id,
                 created_by: req.user?.username,
                 updated_by: req.user?.username
