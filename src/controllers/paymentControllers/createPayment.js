@@ -57,7 +57,20 @@ export default {
             }
 
             // Parse invoice items for revenue calculation
-            const invoiceItems = JSON.parse(salesInvoice.items);
+            let invoiceItems;
+            try {
+                // Check if items is already an object or a JSON string
+                if (typeof salesInvoice.items === 'string') {
+                    invoiceItems = JSON.parse(salesInvoice.items);
+                } else if (typeof salesInvoice.items === 'object') {
+                    invoiceItems = salesInvoice.items;
+                } else {
+                    return responseHandler.error(res, "Invalid invoice items format");
+                }
+            } catch (error) {
+                console.error('Error parsing invoice items:', error);
+                return responseHandler.error(res, "Failed to parse invoice items");
+            }
 
             // Check product stock availability before proceeding
             const newTotalPaid = totalPaidAmount + Number(amount);
