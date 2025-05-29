@@ -101,7 +101,18 @@ export default {
 
                 const startDateTime = new Date();
                 const endDateTime = new Date(startDateTime);
-                endDateTime.setDate(endDateTime.getDate() + parseInt(plan.duration));
+                
+                // Extract the duration value and unit
+                const durationValue = parseInt(plan.duration);
+                const durationUnit = plan.duration.includes('Month') || plan.duration.includes('month') ? 'months' : 'days';
+                
+                // Add the appropriate duration
+                if (durationUnit === 'months') {
+                    endDateTime.setMonth(endDateTime.getMonth() + durationValue);
+                } else {
+                    endDateTime.setDate(endDateTime.getDate() + durationValue);
+                }
+                
                 endDateTime.setHours(23, 59, 59, 999);
 
                 const newSubscription = await ClientSubscription.create({
