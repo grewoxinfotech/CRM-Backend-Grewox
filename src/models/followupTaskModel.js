@@ -21,8 +21,8 @@ const FollowupTask = sequelize.define('followup_task', {
     },
     priority: {
         type: DataTypes.ENUM('highest', 'high', 'medium', 'low'),
-        allowNull: false,
-        defaultValue: 'medium',
+        allowNull: true,
+        defaultValue: null,
     },
     task_reporter: {
         type: DataTypes.STRING,

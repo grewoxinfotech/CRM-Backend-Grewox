@@ -13,6 +13,7 @@ export default {
             firstName: Joi.string().allow('', null),
             lastName: Joi.string().allow('', null),
             username: Joi.string().allow('', null),
+            email: Joi.string().allow('', null),
             phone: Joi.string().allow('', null),
             address: Joi.string().allow('', null),
             joiningDate: Joi.date().allow('', null),
@@ -32,7 +33,7 @@ export default {
     handler: async (req, res) => {
         try {
             const { id } = req.params;
-            const { firstName, lastName, username, phone, address, joiningDate, leaveDate, department, designation, salary, accountholder, accountnumber, bankname, ifsc, banklocation, e_signatures, links } = req.body;
+            const { firstName, lastName, username, email, phone, address, joiningDate, leaveDate, department, designation, salary, accountholder, accountnumber, bankname, ifsc, banklocation, e_signatures, links } = req.body;
 
             const user = await User.findByPk(id);
 
@@ -40,12 +41,15 @@ export default {
                 return responseHandler.notFound(res, "User not found");
             }
 
-            const existingUser = await User.findOne({ where: { username, id: { [Op.not]: id } } });
-            if (existingUser) {
-                return responseHandler.error(res, "User already exists");
+            if (username) {
+                const existingUser = await User.findOne({ where: { username, id: { [Op.not]: id } } });
+                if (existingUser) {
+                    return responseHandler.error(res, "User already exists");
+                }
             }
 
-            await user.update({ firstName, lastName, username, phone, address, joiningDate, leaveDate, department, designation, salary, accountholder, accountnumber, bankname, ifsc, banklocation, e_signatures, links, updated_by: req.user?.username });
+            await user.update({ firstName, lastName, username,
+                 email, phone, address, joiningDate, leaveDate, department, designation, salary, accountholder, accountnumber, bankname, ifsc, banklocation, e_signatures, links, updated_by: req.user?.username });
 
             return responseHandler.success(res, "User updated successfully", user);
         } catch (error) {

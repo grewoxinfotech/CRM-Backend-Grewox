@@ -69,7 +69,7 @@ export default {
       due_date: Joi.string().required(),
       priority: Joi.string()
         .valid("highest", "high", "medium", "low")
-        .required(),
+        .optional(),
       task_reporter: Joi.string().optional().allow("", null),
       assigned_to: Joi.object({
         assigned_to: Joi.array().items(Joi.string()).required(),

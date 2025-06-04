@@ -16,6 +16,9 @@ export default {
             closedDate: Joi.date().required(),
             company_id: Joi.string().allow('', null),
             contact_id: Joi.string().allow('', null),
+            deal_members: Joi.object({
+                deal_members: Joi.array().items(Joi.string())
+            }).optional()
         })
     }),
     handler: async (req, res) => {
@@ -31,6 +34,7 @@ export default {
                 closedDate,
                 company_id,
                 contact_id,
+                deal_members
             } = req.body;
 
             const existingDeal = await Deal.findOne({
@@ -42,6 +46,16 @@ export default {
 
             if (existingDeal) {
                 return responseHandler.error(res, "Deal already exists");
+            }
+
+            // Initialize deal_members with the logged-in user if not provided
+            const initialDealMembers = {
+                deal_members: deal_members?.deal_members || []
+            };
+
+            // Add logged-in user to deal_members if not already included
+            if (!initialDealMembers.deal_members.includes(req.user?.id)) {
+                initialDealMembers.deal_members.push(req.user?.id);
             }
 
             const deal = await Deal.create({
@@ -57,7 +71,7 @@ export default {
                 contact_id,
                 client_id: req.des?.client_id,
                 created_by: req.user?.username,
-                deal_members: { deal_members: [] }
+                deal_members: initialDealMembers
             });
 
             return responseHandler.success(res, "Deal created successfully", deal);

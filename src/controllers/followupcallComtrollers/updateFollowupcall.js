@@ -57,8 +57,7 @@ export default {
       call_status: Joi.string().optional().allow(null),
       priority: Joi.string()
         .valid("highest", "high", "medium", "low")
-        .optional()
-        .allow(null),
+        .optional(),
     }),
   }),
 
