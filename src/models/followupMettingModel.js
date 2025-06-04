@@ -79,7 +79,7 @@ const FollowupMetting = sequelize.define("followup_metting", {
   },
   priority: {
     type: DataTypes.STRING,
-    allowNull: true,
+    allowNull: true,  
     defaultValue: null,
   },
   related_id: {

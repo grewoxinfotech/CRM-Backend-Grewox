@@ -32,7 +32,8 @@ const Lead = sequelize.define('Lead', {
     },
     leadValue: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
+        defaultValue: null
     },
     company_id: {
         type: DataTypes.STRING,

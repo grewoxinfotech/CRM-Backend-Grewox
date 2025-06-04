@@ -11,7 +11,7 @@ export default {
             leadStage: Joi.string().required(),
             pipeline: Joi.string().required(),
             currency: Joi.string().required(),
-            leadValue: Joi.number().required(),
+            leadValue: Joi.number().optional().allow('', null),
             source: Joi.string().required(),
             interest_level: Joi.string().required().valid('high', 'medium', 'low'),
             category: Joi.string().allow('', null),
@@ -39,6 +39,7 @@ export default {
                 inquiry_id
             } = req.body;
 
+            // Create lead with logged-in user as a lead member
             const lead = await Lead.create({
                 leadStage,
                 leadTitle,
@@ -53,7 +54,10 @@ export default {
                 status,
                 inquiry_id: inquiry_id || null,
                 client_id: req.des?.client_id,
-                created_by: req.user?.username
+                created_by: req.user?.username,
+                lead_members: {
+                    lead_members: [req.user?.id] // Add logged-in user as lead member
+                }
             });
 
             // Create notification for team
